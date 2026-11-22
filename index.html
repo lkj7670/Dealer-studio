@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f5c">
+<meta name="description" content="딜러리세상 작업실 — 지금 돌아가는 축과 자동 루틴, 모션 효과 사전, 공모전·체험단 판, 지난 작업 보관실을 한 화면에서.">
+<meta property="og:title" content="딜러리세상 작업실">
+<meta property="og:description" content="AI 사무실 현황 · 모션 사전 · 공모전 판 · 작업 보관실">
+<meta property="og:image" content="og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<title>딜러리세상 작업실</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <div class="appbar">
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">딜</span>
+      <div class="brand-txt">
+        <h1>딜러리세상 작업실</h1>
+        <p id="todayLine">오늘</p>
+      </div>
+    </div>
+    <button id="manualBtn" class="btn ghost small" type="button">
+      <span aria-hidden="true">📘</span> 업무 매뉴얼
+    </button>
+  </header>
+
+  <div class="syncbar">
+    <span class="live-dot" aria-hidden="true"></span>
+    <span class="sync-label">마지막 동기화</span>
+    <b id="syncTime">—</b>
+    <span class="sync-meta" id="syncMeta"></span>
+  </div>
+
+  <nav class="tabbar" aria-label="화면 전환">
+    <button class="tab is-active" type="button" data-view="office" aria-current="page">
+      <span class="tab-ico" aria-hidden="true">🏢</span><span class="tab-label">사무실</span>
+    </button>
+    <button class="tab" type="button" data-view="motion">
+      <span class="tab-ico" aria-hidden="true">✨</span><span class="tab-label">모션</span>
+    </button>
+    <button class="tab" type="button" data-view="contest">
+      <span class="tab-ico" aria-hidden="true">🏆</span><span class="tab-label">공모전</span>
+    </button>
+    <button class="tab" type="button" data-view="archive">
+      <span class="tab-ico" aria-hidden="true">📦</span><span class="tab-label">보관실</span>
+    </button>
+  </nav>
+  </div>
+
+  <main class="main">
+    <!-- ================= 1. AI 사무실 ================= -->
+    <section id="view-office" class="view" aria-label="AI 사무실">
+      <div class="panel quickbar-panel">
+        <div class="panel-head">
+          <h2>🔗 내 채널·앱 바로가기</h2>
+          <span class="chip soft">8개</span>
+        </div>
+        <nav class="quickbar" aria-label="내 채널과 앱 바로가기">
+          <a class="q" href="https://lkj7670.github.io/Dealer-card/" target="_blank" rel="noopener"><span aria-hidden="true">🪪</span>전자명함</a>
+          <a class="q" href="https://cshop.naver.com/dealerisesang" target="_blank" rel="noopener"><span aria-hidden="true">🛒</span>내 마켓</a>
+          <a class="q" href="https://blog.naver.com/lkj7670" target="_blank" rel="noopener"><span aria-hidden="true">📝</span>네이버 블로그</a>
+          <a class="q" href="https://lkj7670.tistory.com" target="_blank" rel="noopener"><span aria-hidden="true">✍️</span>티스토리</a>
+          <a class="q" href="https://www.youtube.com/channel/UC_I4_myPuOysdBNDmAgwPFg" target="_blank" rel="noopener"><span aria-hidden="true">▶️</span>딜러리세상</a>
+          <a class="q" href="https://www.youtube.com/channel/UCXdmTvRav7u54Ot9aKLC1MQ" target="_blank" rel="noopener"><span aria-hidden="true">🌏</span>Dealer’s World</a>
+          <a class="q" href="https://www.youtube.com/@dealerisesangpi" target="_blank" rel="noopener"><span aria-hidden="true">🟣</span>딜러리세상 파이</a>
+          <a class="q" href="https://eomma-nag.netlify.app" target="_blank" rel="noopener"><span aria-hidden="true">🗣️</span>엄마의 잔소리</a>
+        </nav>
+        <p class="quick-hint">버튼을 누르면 새 창에서 바로 열립니다.</p>
+      </div>
+
+      <div class="stats" id="officeStats"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>🧭 지금 돌아가는 축</h2>
+          <span class="chip soft" id="axisCount">0개</span>
+        </div>
+        <p class="lead">유튜브 3채널부터 마켓·앱 3종·공모전까지, 지금 손에 잡고 있는 일 전부입니다. 「열기」는 실제 라이브 주소, 「경로 복사」는 내 작업 파일 경로입니다.</p>
+        <div class="axes" id="axes"></div>
+      </div>
+
+      <div class="office-wrap">
+        <div class="office" id="office">
+          <div class="office-sky" aria-hidden="true">
+            <span class="sun"></span><span class="cloud c1"></span><span class="cloud c2"></span>
+            <span class="plant">🪴</span><span class="clock">🕘</span>
+          </div>
+          <div class="office-floor" aria-hidden="true"></div>
+          <div class="leader" id="leaderDesk"></div>
+          <div class="staff-grid" id="staffGrid"></div>
+        </div>
+        <p class="office-hint">직원을 누르면 지금 맡은 일과 말풍선을 볼 수 있어요.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>⏱️ 자동 실행 루틴</h2>
+          <span class="chip soft" id="routineCount">0개</span>
+        </div>
+        <p class="lead">정해진 시각에 알아서 돌아가는 루틴입니다. 준비·조사·보고까지 하고, 올리기·결제·전화는 확인을 받고 합니다.</p>
+        <div class="routines" id="routines"></div>
+      </div>
+
+      <div class="panel" id="weeklyPanel">
+        <div class="panel-head">
+          <h2>📅 주간 일정표</h2>
+          <span class="chip soft" id="weeklyCount">0개</span>
+        </div>
+        <p class="lead">위 루틴을 <b>매일 공통</b>과 <b>월~일</b>로 다시 묶었습니다. 오늘 요일은 색으로 표시되고, 날짜가 정해진 확인은 D-day로 셉니다.</p>
+
+        <div class="wk-head">
+          <h3>① 매일 공통</h3>
+          <span class="chip soft" id="weeklyDailyCount">0개</span>
+        </div>
+        <div class="wdailies" id="weeklyDaily"></div>
+
+        <div class="wk-head">
+          <h3>② 월~일 요일별</h3>
+          <span class="chip soft" id="weeklyDayCount">7일</span>
+        </div>
+        <div class="chip-row" id="weeklyChips" role="group" aria-label="요일 선택"></div>
+        <div class="wdays" id="weeklyDays"></div>
+
+        <div class="wk-head">
+          <h3>③ 날짜가 정해진 확인</h3>
+          <span class="chip soft" id="weeklyDateCount">0건</span>
+        </div>
+        <div class="wdates" id="weeklyDates"></div>
+        <p class="arch-hint">📌 발표·검진처럼 날짜가 박힌 알림은 <code>scheduled-actions/</code> 등록분입니다. 지난 날짜는 흐리게 남기고, 새 날짜는 작업실 동기화(08:35 · 20:30) 때 채웁니다.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>작업 보드</h2>
+          <span class="chip soft" id="boardCount">0개</span>
+        </div>
+        <form class="add-row" id="taskForm" autocomplete="off">
+          <input id="taskTitle" type="text" placeholder="할 일을 적어 주세요 (예: 메리 셀레스트 쇼츠 대본 검토)" maxlength="80" required>
+          <select id="taskOwner" aria-label="담당 직원"></select>
+          <select id="taskStage" aria-label="시작 단계">
+            <option value="doing">진행 중</option>
+            <option value="review">검토 대기</option>
+            <option value="done">완료</option>
+          </select>
+          <button class="btn primary" type="submit">추가</button>
+        </form>
+        <div class="board" id="board"></div>
+        <p class="board-help">카드의 <b>◀</b> <b>▶</b> 로 단계를 옮기고, <b>📦</b> 는 보관실로 보내고, <b>✕</b> 는 지웁니다. 보낸 카드는 보관실에서 되돌릴 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- ================= 2. 모션 효과 사전 ================= -->
+    <section id="view-motion" class="view" hidden aria-label="모션 효과 사전">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>✨ 모션 효과 사전</h2>
+          <span class="chip soft" id="motionCount">0종</span>
+        </div>
+        <p class="lead">카드마다 실제로 움직입니다. 마음에 드는 효과는 <b>프롬프트 복사</b> 한 번으로 가져가세요.</p>
+        <div class="chip-row" id="motionFilters" role="group" aria-label="효과 분류"></div>
+      </div>
+
+      <div class="motion-grid" id="motionGrid"></div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>🎬 조합 예시 2가지</h2></div>
+        <p class="lead">효과 두세 개를 시간표로 묶으면 그대로 쇼츠 오프닝이 됩니다. <b>재생</b>을 눌러 순서대로 확인해 보세요.</p>
+        <div id="comboList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>🎨 ESF 3D 모션 23종</h2>
+          <span class="chip soft">폴더 연계</span>
+        </div>
+        <p class="lead">이 사전의 효과를 아래 스타일 프롬프트에 얹어 쓰면 됩니다. 원본은 <code>work/imported-skills/esf-3d-motion/styles/</code> 에 23개 파일로 있습니다.</p>
+        <div class="esf-list" id="esfList"></div>
+      </div>
+    </section>
+
+    <!-- ================= 3. 공모전·체험단 판 ================= -->
+    <section id="view-contest" class="view" hidden aria-label="공모전 체험단 판">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>🏆 공모전·체험단 판</h2>
+          <span class="chip soft" id="contestCount">0건</span>
+        </div>
+        <div class="stats" id="contestStats"></div>
+        <div class="chip-row" id="contestFilters" role="group" aria-label="구분 필터"></div>
+      </div>
+
+      <div class="contest-list" id="contestList"></div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>➕ 새 항목 추가</h2></div>
+        <form class="add-grid" id="contestForm" autocomplete="off">
+          <label>이름<input id="cTitle" type="text" maxlength="70" required placeholder="예: ○○ 공모전"></label>
+          <label>구분
+            <select id="cKind">
+              <option value="공모전">공모전</option>
+              <option value="체험단">체험단</option>
+            </select>
+          </label>
+          <label>마감·발표일<input id="cDue" type="date"></label>
+          <label>혜택<input id="cReward" type="text" maxlength="60" placeholder="예: 대상 200만 원"></label>
+          <label>주최·플랫폼<input id="cOrg" type="text" maxlength="40" placeholder="예: 사랑의열매"></label>
+          <label>링크<input id="cUrl" type="url" placeholder="https://"></label>
+          <label class="wide">전략 메모<textarea id="cMemo" rows="2" maxlength="300" placeholder="어떻게 준비할지, 남은 일이 무엇인지"></textarea></label>
+          <div class="wide"><button class="btn primary" type="submit">판에 올리기</button></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= 4. 보관실 ================= -->
+    <section id="view-archive" class="view" hidden aria-label="보관실">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>📦 보관실</h2>
+          <span class="chip soft" id="archCount">0건</span>
+        </div>
+        <p class="lead">끝난 작업을 <b>날짜별 · 분야별</b>로 모아 둡니다. 라이브 주소는 <b>바로 열기</b>, 내 작업 파일은 <b>경로 복사</b>로 가져다 쓰세요.</p>
+        <div class="search-row">
+          <input id="archSearch" type="search" placeholder="검색 — 제목·날짜·경로" aria-label="보관실 검색">
+          <button class="btn ghost small" type="button" id="archClear">초기화</button>
+        </div>
+        <div class="chip-row" id="archCats" role="group" aria-label="분야 필터"></div>
+        <p class="arch-hint">🔬 <b>논문·성분</b> 보관함은 매일 10:00 루틴이 출처를 확인한 자료만 날짜·출처와 함께 쌓을 예정입니다(첫 실행 전).</p>
+      </div>
+
+      <div class="arch-list" id="archList"></div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>➕ 보관 항목 직접 추가</h2></div>
+        <p class="lead">작업 보드 카드의 <b>📦</b> 버튼으로도 바로 보관실로 보낼 수 있습니다.</p>
+        <form class="add-grid" id="archForm" autocomplete="off">
+          <label>날짜<input id="aDate" type="date"></label>
+          <label>분야
+            <select id="aCat">
+              <option value="웹앱">웹앱</option>
+              <option value="유튜브">유튜브</option>
+              <option value="블로그·티스토리">블로그·티스토리</option>
+              <option value="마켓">마켓</option>
+              <option value="공모전·문서">공모전·문서</option>
+              <option value="논문·성분">논문·성분</option>
+            </select>
+          </label>
+          <label>제목<input id="aTitle" type="text" maxlength="80" required placeholder="예: 공모전 제안서 최종본"></label>
+          <label>라이브 주소<input id="aUrl" type="url" placeholder="https://"></label>
+          <label class="wide">파일 경로<input id="aPath" type="text" maxlength="140" placeholder="work/…"></label>
+          <label class="wide">메모<textarea id="aNote" rows="2" maxlength="200" placeholder="무엇이 끝났는지 한 줄로"></textarea></label>
+          <div class="wide"><button class="btn primary" type="submit">보관실에 넣기</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- 매뉴얼 서랍 -->
+<div class="sheet" id="manualSheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+    <div class="sheet-head">
+      <h2 id="manualTitle">📘 공통 업무 매뉴얼</h2>
+      <button class="btn icon" type="button" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="sheet-body" id="manualBody"></div>
+    <form class="manual-add" id="manualForm" autocomplete="off">
+      <input id="manualTitleInput" type="text" maxlength="40" placeholder="매뉴얼 제목" required>
+      <textarea id="manualTextInput" rows="2" maxlength="400" placeholder="지킬 내용을 적어 주세요" required></textarea>
+      <div class="manual-add-row">
+        <button class="btn primary" type="submit">매뉴얼 추가</button>
+        <button class="btn ghost small" type="button" id="manualReset">기본값으로 되돌리기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 직원 상세 -->
+<div class="sheet" id="staffSheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="staffTitle">
+    <div class="sheet-head">
+      <h2 id="staffTitle">직원</h2>
+      <button class="btn icon" type="button" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="sheet-body" id="staffBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
