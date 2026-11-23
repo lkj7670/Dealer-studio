@@ -1,11 +1,13 @@
-/* 딜러리세상 작업실 — 오프라인 캐시 (v2 화면부터 v12) */
-var CACHE = 'dealer-studio-v12';
+/* 딜러리세상 작업실 — 오프라인 캐시 (v2 화면부터 v13) */
+var CACHE = 'dealer-studio-v13';
 var FILES = [
   './',
   'index.html',
   'styles.css',
   'app.js',
   'manifest.json',
+  'logistics.html',
+  'progress.html',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
