@@ -570,12 +570,20 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 .q span{font-size:17px;line-height:1}
 .q:hover{background:#fdfbf7;border-color:#d9d0bf}
 .q:active{transform:scale(.97)}
+/* 🤖 노션 AI 사단 본부 — 바로가기 맨 위 한 줄 전체를 쓰는 강조 버튼 */
+.q.feature{
+  grid-column:1 / -1;flex-direction:row;justify-content:center;gap:8px;min-height:54px;
+  font-size:14px;background:linear-gradient(150deg,#1f6f5c,#154a3e);color:#fff;
+  border-color:#154a3e;box-shadow:0 6px 16px rgba(21,74,62,.22)}
+.q.feature span{font-size:20px}
+.q.feature:hover{background:linear-gradient(150deg,#23816b,#17594a);border-color:#17594a}
 .quick-hint{font-size:11px;color:var(--muted);margin-top:7px}
 @media (max-width:360px){ .q{font-size:10.5px;min-height:58px} .q span{font-size:16px} }
 @media (min-width:760px){
   .quickbar{display:flex;flex-wrap:wrap}
   .q{flex:0 0 auto;flex-direction:row;gap:6px;min-height:44px;padding:9px 13px;font-size:12.5px;white-space:nowrap;text-align:left}
   .q span{font-size:15px}
+  .q.feature{flex:1 1 100%;justify-content:flex-start;padding-left:16px;font-size:14px}
 }
 
 /* ---------- 동기화 배지 ---------- */
