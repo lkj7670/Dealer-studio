@@ -925,7 +925,7 @@
           </div>
         </div>
         <label class="field" style="margin-top:10px"><span class="flabel">메모 (선택)</span>
-          <input id="fMemo" type="text" maxlength="40" autocomplete="off" placeholder="예: 진천 냉동, 코스트코 출고">
+          <input id="fMemo" type="text" maxlength="40" autocomplete="off" placeholder="예: A현장, 오후 정리">
         </label>
 
         <div class="field" style="margin-top:10px">
@@ -1068,7 +1068,7 @@
           <input id="pasteDate" type="date">
         </label>
         <textarea id="pasteText" class="paste-box" spellcheck="false" placeholder="예)
-이광준
+홍길동
 08시30분 출근
 19시30분 퇴근
 10시간00분 근무
@@ -1206,7 +1206,7 @@
         <div class="setblock">
           <div class="bt">내 정보</div>
           <label class="field"><span class="flabel">이름 (문구 복사·카톡 자동 인식에 사용)</span>
-            <input id="sName" type="text" maxlength="20" autocomplete="off">
+            <input id="sName" type="text" maxlength="20" autocomplete="off" placeholder="예: 홍길동">
           </label>
         </div>
 
@@ -1309,7 +1309,7 @@
           <rect x="176" y="16" width="130" height="20" rx="12" fill="#0f766e"/>
           <text x="241" y="30" font-size="9" fill="#fff" text-anchor="middle">딜러리의 일급계산기</text>
           <rect x="188" y="46" width="106" height="30" rx="8" fill="#f1f5f9" stroke="#dbe4ee"/>
-          <text x="194" y="58" font-size="8" fill="#64748b">이광준 08시30분 출근…</text>
+          <text x="194" y="58" font-size="8" fill="#64748b">홍길동 08시30분 출근…</text>
           <rect x="188" y="84" width="106" height="20" rx="7" fill="#0f766e"/>
           <text x="241" y="98" font-size="9" fill="#fff" text-anchor="middle">분석해서 넣기</text>
         </svg>
@@ -1338,9 +1338,9 @@
           <rect x="200" y="16" width="106" height="98" rx="12" fill="#fff" stroke="#dbe4ee"/>
           <text x="210" y="34" font-size="9" font-weight="700" fill="#334155">내 이름을 고르세요</text>
           <rect x="210" y="42" width="30" height="18" rx="9" fill="#e6f4f1" stroke="#0f766e"/>
-          <text x="225" y="55" font-size="9" fill="#0b5a55" text-anchor="middle">이광준</text>
+          <text x="225" y="55" font-size="9" fill="#0b5a55" text-anchor="middle">홍길동</text>
           <rect x="244" y="42" width="30" height="18" rx="9" fill="#fff" stroke="#dbe4ee"/>
-          <text x="259" y="55" font-size="9" fill="#64748b" text-anchor="middle">최광수</text>
+          <text x="259" y="55" font-size="9" fill="#64748b" text-anchor="middle">김철수</text>
           <rect x="210" y="70" width="84" height="6" rx="3" fill="#e8eef5"/>
           <rect x="210" y="82" width="66" height="6" rx="3" fill="#e8eef5"/>
           <rect x="210" y="94" width="76" height="6" rx="3" fill="#e8eef5"/>
@@ -1510,7 +1510,7 @@
         <label class="btn ghost" for="stmtFile" style="display:flex; align-items:center; justify-content:center; margin-top:10px; min-height:48px">📎 명세 파일 고르기 (.txt / .csv)</label>
         <input type="file" id="stmtFile" accept=".txt,.csv,text/plain,text/csv" hidden>
         <label class="field" style="margin-top:10px"><span class="flabel">또는 받은 글을 그대로 붙여넣기</span>
-          <textarea id="stmtText" style="min-height:120px" placeholder="예)&#10;딜러리의 입금대장 · 급여 명세서&#10;회사: 진천냉동&#10;직원: 홍길동&#10;기간: 2026-11 (2026년 11월)&#10;&#10;[근무]&#10;2026-11-24|08:30|19:30|60|169938|5608|169938|지급완료"></textarea>
+          <textarea id="stmtText" style="min-height:120px" placeholder="예)&#10;딜러리의 입금대장 · 급여 명세서&#10;회사: OO상사&#10;직원: 홍길동&#10;기간: 2026-11 (2026년 11월)&#10;&#10;[근무]&#10;2026-11-24|08:30|19:30|60|169938|5608|169938|지급완료"></textarea>
         </label>
         <button class="btn" id="btnStmtRead" type="button" style="width:100%; margin-top:10px; min-height:52px">명세 읽기</button>
         <p class="hint" id="stmtInfo" style="margin-top:8px">사장님이 [카톡용 글로 복사]로 보내 준 글을 붙여넣거나, 명세 파일을 고르세요.</p>
@@ -1939,7 +1939,7 @@ var L = (function(){
     B: { label:'세전 145,000원 + 3.3%', ico:'🧾', baseMode:'gross', dailyPay:145000, baseHours:8, hourly:15480, multiplier:1, breakMin:60, taxRate:3.3, fullPayShort:false }
   };
   var DEFAULTS = {
-    name:'이광준', preset:'A', baseMode:'net', dailyPay:140000, baseHours:8, hourly:15480,
+    name:'', preset:'A', baseMode:'net', dailyPay:140000, baseHours:8, hourly:15480,
     multiplier:1, breakMin:60, taxRate:3.3, fullPayShort:false, dawnFix:true, dupMode:'keep',
     dedMode:'tax33', nightOn:true, nightMode:'mult', nightMult:0.5, nightAmount:0,
     workMode:'daily', hourlyPay:10320, weeklyHoliday:true, fivePlus:true, lockOn:false,
@@ -2419,12 +2419,13 @@ var L = (function(){
   function buildCopyText(name, start, end, workedMin){
     var sh = start ? start.split(':') : ['00','00'];
     var eh = end ? end.split(':') : ['00','00'];
-    return [
-      name,
+    var lines = name ? [name] : [];
+    lines.push(
       sh[0] + '시' + sh[1] + '분 출근',
       eh[0] + '시' + eh[1] + '분 퇴근',
       Math.floor(workedMin/60) + '시간' + pad(workedMin%60) + '분 근무'
-    ].join('\n');
+    );
+    return lines.join('\n');
   }
   function legacyCopy(text){
     try{
@@ -4087,14 +4088,14 @@ var L = (function(){
       var recs = monthRecords();
       if(!recs.length){ toast('이 달에는 내보낼 기록이 없어요.'); return; }
       var name = '일급계산기_' + viewMonth.replace('-','') + '.csv';
-      if(download(name, buildCsv(recs, monthLabel(viewMonth) + ' 일급 시트 (' + data.settings.name + ')'), 'text/csv;charset=utf-8')) toast('CSV 파일을 저장했어요 · ' + name);
+      if(download(name, buildCsv(recs, monthLabel(viewMonth) + ' 일급 시트' + (data.settings.name ? ' (' + data.settings.name + ')' : '')), 'text/csv;charset=utf-8')) toast('CSV 파일을 저장했어요 · ' + name);
       else toast('CSV 저장이 막혔어요. 브라우저 설정을 확인해 주세요.');
     });
     $('#btnCsvAll').addEventListener('click', function(){
       if(!data.records.length){ toast('내보낼 기록이 없어요.'); return; }
       var recs = data.records.slice().sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
       var name = '일급계산기_전체_' + todayISO().replace(/-/g,'') + '.csv';
-      if(download(name, buildCsv(recs, '일급 시트 전체 (' + data.settings.name + ')'), 'text/csv;charset=utf-8')) toast('CSV 파일을 저장했어요 · ' + name);
+      if(download(name, buildCsv(recs, '일급 시트 전체' + (data.settings.name ? ' (' + data.settings.name + ')' : '')), 'text/csv;charset=utf-8')) toast('CSV 파일을 저장했어요 · ' + name);
       else toast('CSV 저장이 막혔어요. 브라우저 설정을 확인해 주세요.');
     });
     $('#btnBackup').addEventListener('click', function(){
