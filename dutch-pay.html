@@ -1,0 +1,1547 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🧮 딜러리의 자동 더치페이</title>
+<meta name="description" content="영수증·메뉴판·해외여행 3가지 모드로 1원 오차 없이 나누는 자동 더치페이 계산기">
+<meta name="theme-color" content="#111827">
+<style>
+:root{
+  --bg:#f3f5f9; --card:#fff; --line:#e4e8ef; --ink:#111827; --sub:#6b7280; --tiny:#8b93a1;
+  --brand:#2563eb; --brand-d:#1d4ed8; --ok:#059669; --warn:#b45309; --danger:#dc2626;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink); font-size:16px; line-height:1.45;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%; overflow-x:hidden;
+}
+h1,h2,h3,p{margin:0}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+header{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,#111827,#1e293b);color:#fff;box-shadow:0 2px 10px rgba(15,23,42,.18)}
+.hd{max-width:460px;margin:0 auto;padding:11px 14px 10px;display:flex;align-items:center;gap:10px}
+.hd h1{font-size:15px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.hd .sub{display:block;font-size:11px;font-weight:600;color:#9fb0c9;letter-spacing:0}
+.gear{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:18px;display:grid;place-items:center}
+.app{max-width:460px;margin:0 auto;padding:0 12px 110px}
+.tabs{position:sticky;top:60px;z-index:25;display:flex;gap:4px;background:var(--bg);padding:9px 0 8px;margin:0 auto}
+.tab{flex:1 1 0;min-width:0;min-height:46px;border:1px solid var(--line);background:#fff;border-radius:13px;font-size:12.5px;font-weight:800;color:#4b5563;padding:6px 2px;line-height:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab .em{font-size:15px}
+.tab.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.28)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px;margin:0 0 11px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.card>h2{font-size:14.5px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.num{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:7px;background:#e8efff;color:var(--brand-d);font-size:11.5px;font-weight:900;flex:0 0 auto}
+.tiny{font-size:12px;color:var(--tiny);line-height:1.5}
+.hint{font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #dbe3ee;border-radius:10px;padding:8px 9px;margin-top:8px;line-height:1.55}
+.hint b{color:#334155}
+.btnrow{display:flex;gap:7px;flex-wrap:wrap}
+.btn{min-height:44px;border:1px solid var(--line);background:#fff;border-radius:12px;font-size:14px;font-weight:800;color:#1f2937;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-d));border-color:var(--brand-d);color:#fff;box-shadow:0 5px 14px rgba(37,99,235,.25)}
+.btn.ghost{background:#f8fafc;color:#475569}
+.btn.wide{width:100%;flex:1 1 100%;min-height:50px;font-size:15.5px}
+.btn.sm{min-height:38px;font-size:12.5px;padding:0 10px;border-radius:10px}
+input,textarea,select{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:16px;color:var(--ink);background:#fff;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#93b4fb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+textarea{resize:vertical;line-height:1.5;font-size:14px}
+.empty{font-size:12.5px;color:var(--tiny);background:#f8fafc;border:1px dashed #e2e8f0;border-radius:11px;padding:12px 10px;text-align:center;line-height:1.6}
+.empty b{color:#475569}
+.tiny+.tiny{margin-top:3px}
+/* 사람 */
+.plist{display:flex;flex-direction:column;gap:7px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.prow.no-drink{grid-template-columns:minmax(0,1fr) auto}
+.sw{min-height:38px;border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:0 9px;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:#94a3b8;white-space:nowrap}
+.sw .dot{width:9px;height:9px;border-radius:50%;background:#cbd5e1;flex:0 0 auto}
+.sw.on{background:#fff3e6;border-color:#f8c98a;color:#9a3412}
+.sw.on .dot{background:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.18)}
+.icon-btn{width:38px;height:38px;min-width:38px;border:1px solid var(--line);background:#fff;border-radius:10px;color:#94a3b8;font-size:14px;display:grid;place-items:center;padding:0}
+.icon-btn:active{background:#fef2f2;color:var(--danger)}
+/* 메뉴 카드 */
+.items{display:flex;flex-direction:column;gap:8px}
+.item{border:1px solid #eef1f6;background:#fcfdff;border-radius:13px;padding:9px}
+.irow{display:grid;grid-template-columns:minmax(0,1fr) 96px 38px;gap:6px;align-items:center}
+.iwrap{position:relative;display:flex;align-items:center}
+.iwrap .cur{position:absolute;right:8px;font-size:11px;font-weight:800;color:#94a3b8;pointer-events:none}
+.iwrap input{padding-right:24px;text-align:right;font-weight:700;font-size:15px}
+.alloc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:7px}
+.alloc button{min-height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:11.5px;font-weight:800;color:#64748b;padding:2px;line-height:1.2}
+.alloc button.on{background:#e8efff;border-color:#93b4fb;color:var(--brand-d);box-shadow:inset 0 0 0 1px #bfd4fd}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{min-height:30px;border:1px solid var(--line);background:#fff;border-radius:20px;font-size:11.5px;font-weight:700;color:#94a3b8;padding:0 10px}
+.chip.on{background:#e7f7f0;border-color:#7dd3ae;color:#047857}
+.share-note{margin-top:6px;font-size:11.5px;color:#64748b;line-height:1.45}
+.share-note .warn{color:var(--warn);font-weight:700}
+/* 결과 */
+.totalbar{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;background:linear-gradient(135deg,#eef4ff,#e6f0ff);border:1px solid #d8e5ff;border-radius:12px;padding:10px 12px;margin-bottom:9px}
+.totalbar span{font-size:12px;font-weight:800;color:#3b5b96}
+.totalbar b{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--brand-d)}
+.totalbar .sub{font-size:11px;color:#7c8fae;margin-left:auto}
+.pres{border:1px solid #eef1f6;border-radius:11px;padding:8px 10px;margin-bottom:6px;background:#fff}
+.pres-h{display:flex;align-items:center;gap:8px}
+.pres-h .nm{font-size:13.5px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pres-h .drink{font-style:normal;font-size:11px}
+.pres-h .amt{margin-left:auto;font-size:15px;font-weight:900;color:#0f172a;white-space:nowrap}
+.pres .det{font-size:11.5px;color:#8b93a1;margin-top:2px;line-height:1.45;word-break:break-all}
+.amt-zero{color:#b6bec9!important}
+.acctwrap{margin-top:10px}
+.acctwrap label{display:block;margin-bottom:4px}
+.copyrow{display:flex;gap:7px;margin-top:9px}
+.pv{margin-top:9px;border:1px solid var(--line);border-radius:11px;background:#f8fafc;overflow:hidden}
+.pv summary{font-size:12.5px;font-weight:800;color:#475569;padding:9px 11px;cursor:pointer;list-style:none}
+.pv summary::-webkit-details-marker{display:none}
+.pv summary::before{content:"▸ ";color:#94a3b8}
+.pv[open] summary::before{content:"▾ "}
+.pv pre{margin:0;padding:0 11px 11px;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-all;color:#334155;font-family:inherit;max-height:300px;overflow:auto}
+/* 메뉴판 취합 */
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 88px 38px;gap:6px;align-items:center;border:1px solid #eef1f6;background:#fcfdff;border-radius:12px;padding:8px}
+.menu-block{border:1px solid #eef1f6;border-radius:13px;padding:9px;margin-bottom:8px;background:#fcfdff}
+.mb-head{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.mb-head .nm{font-size:13.5px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mb-head .q{font-size:11px;font-weight:900;background:#eef4ff;color:var(--brand-d);border-radius:20px;padding:2px 8px;white-space:nowrap}
+.mb-head .price{margin-left:auto;font-size:11.5px;color:#8b93a1;white-space:nowrap}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) 34px 32px 34px;gap:5px;align-items:center;margin-top:4px}
+.qrow .nm{font-size:12.5px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:2px}
+.step{width:34px;height:34px;min-width:34px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:17px;font-weight:800;color:#475569;display:grid;place-items:center;padding:0;line-height:1}
+.step.plus{background:#eef4ff;border-color:#c7d9fb;color:var(--brand-d)}
+.qval{text-align:center;font-size:13.5px;font-weight:900;color:#0f172a}
+.mtot{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 2px;border-bottom:1px dashed #eef1f6}
+.mtot:last-child{border-bottom:0}
+.mtot span{color:#64748b;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtot b{color:#0f172a;white-space:nowrap}
+/* 해외 */
+.cur-row{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+.rate-line{display:flex;align-items:center;gap:6px;margin-top:7px}
+.rate-line .lb{font-size:12px;font-weight:800;color:#475569;white-space:nowrap}
+.rate-line input{text-align:right;font-weight:800}
+.item .r1{display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:6px}
+.item .r2{display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:6px}
+.ko{color:#334155}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;border-radius:20px;padding:3px 9px;background:#eef4ff;color:var(--brand-d)}
+/* 토스트/모달 */
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,26px);opacity:0;pointer-events:none;z-index:80;
+  background:#0f172a;color:#fff;font-size:13.5px;font-weight:800;padding:12px 16px;border-radius:14px;max-width:88vw;text-align:center;
+  box-shadow:0 10px 30px rgba(2,6,23,.35);transition:opacity .18s,transform .18s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.ok{background:#065f46}
+.modal{position:fixed;inset:0;z-index:90;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal[hidden]{display:none}
+.sheet{width:100%;max-width:460px;background:#fff;border-radius:20px 20px 0 0;padding:16px 15px 22px;max-height:88vh;overflow:auto}
+.sheet h2{font-size:16px;font-weight:900;margin-bottom:9px}
+.sheet .sec{font-size:12px;font-weight:900;color:#334155;margin:12px 0 5px}
+.sheet .hint{margin-top:6px}
+footer{max-width:460px;margin:0 auto;padding:4px 14px 26px;font-size:11px;color:#9aa3b2;text-align:center;line-height:1.6}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <h1>🧮 딜러리의 자동 더치페이<span class="sub">영수증 · 메뉴판 · 해외여행 3모드</span></h1>
+    <button class="gear" id="openSettings" aria-label="설정">⚙️</button>
+  </div>
+</header>
+
+<div class="app">
+  <nav class="tabs" role="tablist" aria-label="모드 선택">
+    <button class="tab on" id="tab-m1" data-tab="m1" role="tab" aria-selected="true"><span class="em">🧾</span>영수증 정산</button>
+    <button class="tab" id="tab-m2" data-tab="m2" role="tab" aria-selected="false"><span class="em">📋</span>메뉴판 취합</button>
+    <button class="tab" id="tab-m3" data-tab="m3" role="tab" aria-selected="false"><span class="em">✈️</span>해외여행</button>
+  </nav>
+
+  <!-- ============ 모드 1 ============ -->
+  <section id="m1" class="pane">
+    <div class="card">
+      <h2><span class="num">1</span>영수증 가져오기</h2>
+      <div class="btnrow">
+        <button class="btn" id="m1-photo">📷 사진 찍기·고르기</button>
+        <button class="btn ghost hidden" id="m1-ai">✨ AI 정밀 인식</button>
+      </div>
+      <input type="file" id="m1-file" accept="image/*" capture="environment" class="hidden">
+      <div class="tiny" id="m1-ocr" style="margin-top:7px"></div>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn ghost" id="m1-sample">✨ 샘플 채우기</button>
+        <button class="btn ghost" id="m1-tgl-text">📋 텍스트 붙여넣기</button>
+      </div>
+      <div id="m1-textbox" class="hidden" style="margin-top:9px">
+        <textarea id="m1-text" rows="5" placeholder="영수증 내용을 그대로 붙여넣어 주세요.&#10;예) 김치찌개 9,000&#10;소주 3병 15,000"></textarea>
+        <div class="btnrow" style="margin-top:7px">
+          <button class="btn primary" id="m1-parse">메뉴로 만들기</button>
+        </div>
+      </div>
+      <div class="hint">사진 인식은 <b>무료</b>(기기·브라우저 안에서 글자만 읽음)이고, ⚙️에 <b>Gemini 키</b>를 넣으면 AI가 메뉴·금액을 더 정확히 뽑아 줍니다. 인터넷이 없어도 <b>텍스트 붙여넣기·샘플</b>은 그대로 동작해요.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span>참여자 <span class="tiny" style="font-weight:600">(🍺 술 마신 사람은 켜 두세요)</span></h2>
+      <div class="plist" id="m1-people"></div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn ghost" data-addperson="m1">＋ 사람 추가</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>메뉴와 나누는 방법</h2>
+      <div class="items" id="m1-items"></div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn ghost" data-additem="m1">＋ 메뉴 추가</button>
+      </div>
+      <div class="hint">각 메뉴마다 <b>전원 N빵</b> / <b>🍺 술 마신 사람만</b> / <b>먹은 사람만</b> 중 하나를 고르면, 그 메뉴 금액만 그 사람들끼리 나눕니다.</div>
+    </div>
+
+    <div class="card" id="m1-resultcard">
+      <h2><span class="num">4</span>정산 결과</h2>
+      <div id="m1-result"></div>
+      <div class="acctwrap">
+        <label class="tiny" for="m1-acct">입금받을 계좌 (선택 · 이 폰에만 저장)</label>
+        <input class="acct" id="m1-acct" data-mode="m1" placeholder="예: 카카오뱅크 3333-01-1234567 홍길동" autocomplete="off">
+      </div>
+      <div class="copyrow">
+        <button class="btn primary wide" data-copy="m1">📋 카톡 정산 복사</button>
+      </div>
+      <details class="pv" id="m1-pv"><summary>👀 복사될 내용 미리보기</summary><pre id="m1-pv-text"></pre></details>
+    </div>
+  </section>
+
+  <!-- ============ 모드 2 ============ -->
+  <section id="m2" class="pane hidden">
+    <div class="card">
+      <h2><span class="num">1</span>메뉴판 가져오기</h2>
+      <div class="btnrow">
+        <button class="btn" id="m2-photo">📷 메뉴판 사진</button>
+        <button class="btn ghost" id="m2-sample">✨ 샘플 채우기</button>
+      </div>
+      <input type="file" id="m2-file" accept="image/*" capture="environment" class="hidden">
+      <div class="tiny" id="m2-ocr" style="margin-top:7px"></div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn ghost" id="m2-tgl-text">📋 텍스트 붙여넣기</button>
+      </div>
+      <div id="m2-textbox" class="hidden" style="margin-top:9px">
+        <textarea id="m2-text" rows="5" placeholder="메뉴판 내용을 붙여넣어 주세요.&#10;예) 김치찌개 9,000&#10;삼겹살 12,000"></textarea>
+        <div class="btnrow" style="margin-top:7px"><button class="btn primary" id="m2-parse">메뉴로 만들기</button></div>
+      </div>
+      <div class="hint">메뉴 이름과 가격만 있으면 됩니다. 손님 수만큼 <b>＋ / −</b>로 주문 수량을 세면 식당에 그대로 불러 줄 <b>메뉴별 총 수량</b>과 <b>개인별 금액</b>이 나와요.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span>메뉴 <span class="tiny" style="font-weight:600">(이름·가격 수정 가능)</span></h2>
+      <div class="items" id="m2-menus"></div>
+      <div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-addmenu="m2">＋ 메뉴 추가</button></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>참여자</h2>
+      <div class="plist" id="m2-people"></div>
+      <div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-addperson="m2">＋ 사람 추가</button></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">4</span>주문 수량 <span class="tiny" style="font-weight:600">(＋ / −)</span></h2>
+      <div id="m2-order"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">5</span>합계와 정산</h2>
+      <div id="m2-result"></div>
+      <div class="acctwrap">
+        <label class="tiny" for="m2-acct">입금받을 계좌 (선택 · 이 폰에만 저장)</label>
+        <input class="acct" id="m2-acct" data-mode="m2" placeholder="예: 카카오뱅크 3333-01-1234567 홍길동" autocomplete="off">
+      </div>
+      <div class="copyrow">
+        <button class="btn primary wide" data-copy="m2">📋 카톡 정산 복사</button>
+      </div>
+      <div class="copyrow">
+        <button class="btn" data-copy="m2order">🍽 식당에 부를 주문 내역 복사</button>
+      </div>
+      <details class="pv" id="m2-pv"><summary>👀 정산 문구 미리보기</summary><pre id="m2-pv-text"></pre></details>
+      <details class="pv"><summary>👀 주문 내역 미리보기</summary><pre id="m2-pv-order"></pre></details>
+    </div>
+  </section>
+
+  <!-- ============ 모드 3 ============ -->
+  <section id="m3" class="pane hidden">
+    <div class="card">
+      <h2><span class="num">1</span>통화와 환율</h2>
+      <div class="cur-row">
+        <select id="m3-cur" aria-label="통화 선택">
+          <option value="JPY">🇯🇵 일본 엔 (JPY)</option>
+          <option value="THB">🇹🇭 태국 바트 (THB)</option>
+          <option value="VND">🇻🇳 베트남 동 (VND)</option>
+          <option value="USD">🇺🇸 미국 달러 (USD)</option>
+          <option value="EUR">🇪🇺 유로 (EUR)</option>
+        </select>
+      </div>
+      <div class="rate-line">
+        <span class="lb" id="m3-rate-lb">100 JPY =</span>
+        <input id="m3-rate" inputmode="decimal" aria-label="환율">
+        <span class="lb">원</span>
+      </div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn ghost sm" id="m3-rate-refresh">🔄 오늘 환율 불러오기</button>
+      </div>
+      <div class="tiny" id="m3-rate-note" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span>메뉴판·영수증 사진</h2>
+      <div class="btnrow">
+        <button class="btn" id="m3-photo">📷 사진 읽기</button>
+        <button class="btn ghost hidden" id="m3-ai">✨ AI 번역·금액 추출</button>
+      </div>
+      <input type="file" id="m3-file" accept="image/*" capture="environment" class="hidden">
+      <div class="tiny" id="m3-ocr" style="margin-top:7px"></div>
+      <div class="btnrow" style="margin-top:9px">
+        <button class="btn ghost" id="m3-sample">✨ 샘플 채우기</button>
+        <button class="btn ghost" id="m3-tgl-text">📋 직접 입력</button>
+      </div>
+      <div id="m3-textbox" class="hidden" style="margin-top:9px">
+        <textarea id="m3-text" rows="5" placeholder="예) ラーメン 980&#10;餃子 480&#10;生ビール 550"></textarea>
+        <div class="btnrow" style="margin-top:7px"><button class="btn primary" id="m3-parse">메뉴로 만들기</button></div>
+      </div>
+      <div class="hint">⚙️에 Gemini 키를 넣으면 사진 속 <b>외국어 메뉴를 한국어로 번역</b>하고 금액까지 뽑아 줍니다. 키가 없으면 <b>직접 입력·샘플</b>로 똑같이 계산할 수 있어요.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>메뉴와 금액 <span class="tiny" style="font-weight:600">(현지 통화)</span></h2>
+      <div class="items" id="m3-items"></div>
+      <div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-additem="m3">＋ 메뉴 추가</button></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">4</span>참여자 <span class="tiny" style="font-weight:600">(🍺 술 마신 사람은 켜 두세요)</span></h2>
+      <div class="plist" id="m3-people"></div>
+      <div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-addperson="m3">＋ 사람 추가</button></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">5</span>정산 결과 <span class="tiny" style="font-weight:600">(현지 돈 + 원화)</span></h2>
+      <div id="m3-result"></div>
+      <div class="acctwrap">
+        <label class="tiny" for="m3-acct">입금받을 계좌 (선택 · 이 폰에만 저장)</label>
+        <input class="acct" id="m3-acct" data-mode="m3" placeholder="예: 카카오뱅크 3333-01-1234567 홍길동" autocomplete="off">
+      </div>
+      <div class="copyrow">
+        <button class="btn primary wide" data-copy="m3">📋 카톡 정산 복사</button>
+      </div>
+      <details class="pv" id="m3-pv"><summary>👀 복사될 내용 미리보기</summary><pre id="m3-pv-text"></pre></details>
+    </div>
+  </section>
+</div>
+
+<footer>무료 · 설치 없이 · 1원 오차 없이 나누는 더치페이 계산기<br>계좌·키는 이 브라우저에만 저장됩니다.</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal" id="settings" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="설정">
+    <h2>⚙️ 설정</h2>
+    <div class="sec">사진 글자 인식 (무료 · 기본)</div>
+    <div class="tiny">인터넷이 되면 사진에서 글자를 읽는 무료 인식이 자동으로 켜집니다. 키가 없어도 되고, 사진은 기기 안에서만 처리돼요.</div>
+    <div class="sec">Gemini API 키 (선택 · AI 정밀 인식)</div>
+    <input id="gemKey" type="password" placeholder="AIza… 또는 AQ.…" autocomplete="off" spellcheck="false">
+    <div class="hint">① aistudio.google.com/apikey 접속 → 구글 로그인 → <b>API 키 만들기</b><br>② 나온 키를 위에 붙여넣고 <b>저장</b>. 무료 한도 안에서 씁니다.<br>③ 키가 있을 때만 사진이 구글로 전송됩니다(번역·정밀 추출).</div>
+    <div class="btnrow" style="margin-top:9px">
+      <button class="btn" id="gemSave">저장</button>
+      <button class="btn ghost" id="gemClear">키 삭제</button>
+    </div>
+    <div class="tiny" id="gemMsg" style="margin-top:6px"></div>
+    <div class="btnrow" style="margin-top:14px"><button class="btn primary wide" id="closeSettings">닫기</button></div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   딜러리의 자동 더치페이 — 단일 HTML (외부 라이브러리 없이 기본 동작)
+   ================================================================ */
+(function(){
+'use strict';
+var APP_URL='https://lkj7670.github.io/Dealer-studio/dutch-pay.html';
+var LS_ACCT='dp_account_v1', LS_RATE='dp_rates_v1', LS_GEM='dp_gemini_v1';
+
+function $(s,r){ return (r||document).querySelector(s); }
+function $$(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function won(n){ var v=Math.round(Number(n)||0); return v.toLocaleString('ko-KR'); }
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+var SEQ=1;
+function nid(){ return 'x'+(SEQ++); }
+function numOnly(v){ var s=String(v==null?'':v).replace(/[^0-9]/g,''); return s?parseInt(s,10):0; }
+
+var CUR={
+  JPY:{name:'일본 엔',sym:'¥',unit:100,def:890},
+  THB:{name:'태국 바트',sym:'฿',unit:1,def:39},
+  VND:{name:'베트남 동',sym:'₫',unit:100,def:5.5},
+  USD:{name:'미국 달러',sym:'$',unit:1,def:1380},
+  EUR:{name:'유로',sym:'€',unit:1,def:1490}
+};
+
+/* ---------------- 상태 ---------------- */
+var S={
+  account:'',
+  m1:{items:[],people:[]},
+  m2:{menus:[],people:[],orders:{}},
+  m3:{cur:'JPY',rates:{},items:[],people:[],rateAt:0}
+};
+(function load(){
+  try{ S.account=localStorage.getItem(LS_ACCT)||''; }catch(e){}
+  var o={};
+  try{ o=JSON.parse(localStorage.getItem(LS_RATE)||'{}'); }catch(e){ o={}; }
+  Object.keys(CUR).forEach(function(k){
+    var v=Number(o[k]); S.m3.rates[k]=(v>0?v:CUR[k].def);
+  });
+})();
+
+/* ---------------- 공통 UI ---------------- */
+var toastTimer=null;
+function toast(msg,ok){
+  var t=$('#toast'); if(!t) return;
+  t.textContent=msg;
+  t.className='show'+(ok?' ok':'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ t.className=''; },2200);
+}
+function copyText(text){
+  return new Promise(function(resolve){
+    var done=function(v){ resolve(v); };
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ done(true); },function(){ done(fallback()); });
+        return;
+      }
+    }catch(e){}
+    done(fallback());
+    function fallback(){
+      try{
+        var ta=document.createElement('textarea');
+        ta.value=text; ta.setAttribute('readonly','');
+        ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.left='0'; ta.style.opacity='0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        var ok=document.execCommand('copy');
+        document.body.removeChild(ta);
+        return !!ok;
+      }catch(e){ return false; }
+    }
+  });
+}
+
+/* ---------------- 분배 계산 (1원 오차 없이) ---------------- */
+function computeShare(items, people){
+  var per={}, mat={}, total=0;
+  people.forEach(function(p){ per[p.id]=0; mat[p.id]={}; });
+  items.forEach(function(it,idx){
+    var price=Math.max(0, Math.round(Number(it.price)||0));
+    if(!price) return;
+    total+=price;
+    var pool, fb=false;
+    if(it.alloc==='drink'){
+      pool=people.filter(function(p){ return p.drink; });
+      if(!pool.length){ pool=people.slice(); fb=true; }
+    }else if(it.alloc==='eaters'){
+      pool=people.filter(function(p){ return (it.eaters||[]).indexOf(p.id)>=0; });
+      if(!pool.length){ pool=people.slice(); fb=true; }
+    }else{
+      pool=people.slice();
+    }
+    if(!pool.length) return;
+    var n=pool.length, base=Math.floor(price/n), rem=price-base*n, off=idx%n;
+    pool.forEach(function(p,i){
+      var k=(i-off+n)%n;
+      var amt=base+(k<rem?1:0);
+      per[p.id]+=amt;
+      mat[p.id][it.id]=(mat[p.id][it.id]||0)+amt;
+    });
+  });
+  return {total:total, per:per, mat:mat};
+}
+function itemInfo(it, people){
+  var price=Math.max(0, Math.round(Number(it.price)||0));
+  var pool, fb=false;
+  if(it.alloc==='drink'){
+    pool=people.filter(function(p){ return p.drink; });
+    if(!pool.length){ pool=people.slice(); fb=true; }
+  }else if(it.alloc==='eaters'){
+    pool=people.filter(function(p){ return (it.eaters||[]).indexOf(p.id)>=0; });
+    if(!pool.length){ pool=people.slice(); fb=true; }
+  }else{
+    pool=people.slice();
+  }
+  var n=pool.length;
+  if(!price||!n) return {n:0,base:0,rem:0,fb:fb,price:price};
+  return {n:n, base:Math.floor(price/n), rem:price-Math.floor(price/n)*n, fb:fb, price:price};
+}
+function curSym(mode){ return mode==='m3' ? CUR[S.m3.cur].sym : ''; }
+function fmtLocal(mode,v){ return mode==='m3' ? (CUR[S.m3.cur].sym+won(v)) : (won(v)+'원'); }
+
+/* ---------------- 사람 목록 ---------------- */
+function addPerson(mode,name){
+  var st=S[mode];
+  var p={id:nid(), name:(name||('사람'+(st.people.length+1))), drink:false};
+  st.people.push(p);
+  if(mode==='m2'){ st.menus.forEach(function(m){ (st.orders[m.id]=st.orders[m.id]||{})[p.id]=0; }); }
+  return p;
+}
+function renderPeople(mode){
+  var st=S[mode], host=$('#'+mode+'-people');
+  if(!host) return;
+  var withDrink=(mode!=='m2');
+  if(!st.people.length){
+    host.innerHTML='<div class="empty">아직 참여자가 없어요.<br><b>＋ 사람 추가</b>를 눌러 주세요.</div>';
+    return;
+  }
+  host.innerHTML=st.people.map(function(p){
+    var drinkBtn = withDrink ? ('<button class="sw'+(p.drink?' on':'')+'" data-act="drink" aria-pressed="'+(p.drink?'true':'false')+'" aria-label="'+esc(p.name)+' 술 마심"><span class="dot"></span><span>🍺 술 마심</span></button>') : '';
+    return '<div class="prow'+(withDrink?'':' no-drink')+'" data-id="'+p.id+'">'
+      + '<input class="p-name" value="'+esc(p.name)+'" maxlength="12" aria-label="이름" placeholder="이름">'
+      + drinkBtn
+      + '<button class="icon-btn" data-act="del" aria-label="'+esc(p.name)+' 삭제">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+/* ---------------- 모드1·3 메뉴 목록 ---------------- */
+function renderItems(mode){
+  var st=S[mode], host=$('#'+mode+'-items');
+  if(!host) return;
+  var sym=curSym(mode)||'원';
+  if(!st.items.length){
+    host.innerHTML='<div class="empty">메뉴가 없어요.<br><b>＋ 메뉴 추가</b> 또는 <b>✨ 샘플 채우기</b>를 눌러 주세요.</div>';
+    return;
+  }
+  host.innerHTML=st.items.map(function(it){
+    var chips='';
+    if(it.alloc==='eaters'){
+      chips='<div class="chips">'+(st.people.length? st.people.map(function(p){
+        return '<button class="chip'+((it.eaters||[]).indexOf(p.id)>=0?' on':'')+'" data-eat="'+p.id+'">'+esc(p.name)+'</button>';
+      }).join('') : '<span class="tiny">참여자를 먼저 추가하세요</span>')+'</div>';
+    }
+    var nameRow = mode==='m3'
+      ? '<div class="r1"><input class="i-name" value="'+esc(it.name)+'" maxlength="30" placeholder="원어 메뉴명" aria-label="원어 메뉴명"><button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button></div>'
+        + '<div class="r2"><input class="i-ko ko" value="'+esc(it.ko||'')+'" maxlength="30" placeholder="한국어 이름" aria-label="한국어 이름">'
+        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price||'')+'" placeholder="0" aria-label="현지 금액"><span class="cur">'+sym+'</span></div></div>'
+      : '<div class="irow"><input class="i-name" value="'+esc(it.name)+'" maxlength="30" placeholder="메뉴 이름" aria-label="메뉴 이름">'
+        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price||'')+'" placeholder="0" aria-label="금액"><span class="cur">원</span></div>'
+        + '<button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button></div>';
+    return '<div class="item" data-id="'+it.id+'">'
+      + nameRow
+      + '<div class="alloc">'
+      + '<button data-alloc="all" class="'+(it.alloc==='all'?'on':'')+'" aria-pressed="'+(it.alloc==='all')+'">전원 N빵</button>'
+      + '<button data-alloc="drink" class="'+(it.alloc==='drink'?'on':'')+'" aria-pressed="'+(it.alloc==='drink')+'">🍺 술 마신 사람만</button>'
+      + '<button data-alloc="eaters" class="'+(it.alloc==='eaters'?'on':'')+'" aria-pressed="'+(it.alloc==='eaters')+'">먹은 사람만</button>'
+      + '</div>'
+      + chips
+      + '<div class="share-note"></div>'
+      + '</div>';
+  }).join('');
+  updateItemNotes(mode);
+}
+function updateItemNotes(mode){
+  var st=S[mode];
+  $$('#'+mode+'-items .item').forEach(function(el){
+    var it=st.items.filter(function(x){ return x.id===el.dataset.id; })[0];
+    if(!it) return;
+    var note=el.querySelector('.share-note');
+    if(!note) return;
+    var info=itemInfo(it, st.people);
+    if(!info.n){
+      note.innerHTML='<span class="tiny">금액과 참여자를 넣으면 자동으로 나눠요</span>';
+      return;
+    }
+    var fb = info.fb ? '<span class="warn">⚠️ 대상이 없어 전원 N빵</span> · ' : '';
+    var tail = info.rem ? ('~'+fmtLocal(mode, info.base+1)) : '';
+    note.innerHTML = fb + info.n+'명 · 1인 '+fmtLocal(mode, info.base)+tail;
+  });
+}
+
+/* ---------------- 모드2 메뉴 ---------------- */
+function renderMenus(){
+  var st=S.m2, host=$('#m2-menus');
+  if(!st.menus.length){
+    host.innerHTML='<div class="empty">메뉴가 없어요.<br><b>＋ 메뉴 추가</b> 또는 <b>✨ 샘플 채우기</b>를 눌러 주세요.</div>';
+    return;
+  }
+  host.innerHTML=st.menus.map(function(m){
+    return '<div class="mrow" data-id="'+m.id+'">'
+      + '<input class="m-name" value="'+esc(m.name)+'" maxlength="30" aria-label="메뉴 이름" placeholder="메뉴 이름">'
+      + '<div class="iwrap"><input class="m-price" inputmode="numeric" value="'+(m.price||'')+'" placeholder="0" aria-label="가격"><span class="cur">원</span></div>'
+      + '<button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button>'
+      + '</div>';
+  }).join('');
+}
+function qtyOf(menuId, personId){
+  var o=S.m2.orders[menuId];
+  return o && o[personId] ? o[personId] : 0;
+}
+function menuQty(menuId){
+  var o=S.m2.orders[menuId]||0, sum=0;
+  Object.keys(o).forEach(function(k){ sum+=o[k]; });
+  return sum;
+}
+function renderOrder(){
+  var st=S.m2, host=$('#m2-order');
+  if(!st.menus.length || !st.people.length){
+    host.innerHTML='<div class="empty">메뉴와 참여자를 먼저 넣으면 여기서 수량을 셀 수 있어요.</div>';
+    return;
+  }
+  host.innerHTML=st.menus.map(function(m){
+    var rows=st.people.map(function(p){
+      var q=qtyOf(m.id,p.id);
+      return '<div class="qrow" data-menu="'+m.id+'" data-person="'+p.id+'">'
+        + '<span class="nm">'+esc(p.name)+'</span>'
+        + '<button class="step" data-step="-1" aria-label="'+esc(p.name)+' '+esc(m.name)+' 줄이기">−</button>'
+        + '<span class="qval">'+q+'</span>'
+        + '<button class="step plus" data-step="1" aria-label="'+esc(p.name)+' '+esc(m.name)+' 늘리기">＋</button>'
+        + '</div>';
+    }).join('');
+    return '<div class="menu-block" data-mid="'+m.id+'">'
+      + '<div class="mb-head"><span class="nm">'+esc(m.name||'메뉴')+'</span><span class="q">합계 '+menuQty(m.id)+'</span>'
+      + '<span class="price">'+won(m.price)+'원</span></div>' + rows + '</div>';
+  }).join('');
+}
+
+/* ---------------- 결과 렌더 ---------------- */
+function renderResult(mode){
+  if(mode==='m1') return renderResultM1();
+  if(mode==='m2') return renderResultM2();
+  return renderResultM3();
+}
+function renderResultM1(){
+  var st=S.m1, host=$('#m1-result');
+  var peopleRows='', head='';
+  if(!st.people.length || !st.items.length){
+    host.innerHTML='<div class="empty">참여자와 메뉴를 넣으면 사람별 금액이 나와요.<br><b>✨ 샘플 채우기</b>로 먼저 확인해 보세요.</div>';
+  }else{
+    var r=computeShare(st.items, st.people);
+    peopleRows=st.people.map(function(p){
+      var amt=r.per[p.id]||0;
+      var parts=st.items.filter(function(it){ return (r.mat[p.id][it.id]||0)>0; })
+        .map(function(it){ return esc(it.name||'메뉴')+' '+esc(won(r.mat[p.id][it.id]))+'원'; });
+      return '<div class="pres"><div class="pres-h"><span class="nm">'+esc(p.name)+(p.drink?' <i class="drink">🍺</i>':'')+'</span>'
+        + '<b class="amt'+(amt?'':' amt-zero')+'">'+won(amt)+'원</b></div>'
+        + '<div class="det">'+(parts.length?parts.join(' · '):'낼 금액 없음')+'</div></div>';
+    }).join('');
+    head='<div class="totalbar"><span>총 금액</span><b>'+won(r.total)+'원</b><span class="sub">'+st.people.length+'명 · '+st.items.length+'개</span></div>';
+    host.innerHTML=head+'<div class="plist">'+peopleRows+'</div>';
+  }
+  syncPreviews();
+}
+function renderResultM2(){
+  var st=S.m2, host=$('#m2-result');
+  if(!st.menus.length || !st.people.length){
+    host.innerHTML='<div class="empty">메뉴와 참여자를 넣고 수량을 세면 금액이 나와요.<br><b>✨ 샘플 채우기</b>로 먼저 확인해 보세요.</div>';
+    syncPreviews();
+    return;
+  }
+  var grand=0, mlines=[];
+  st.menus.forEach(function(m){
+    var q=menuQty(m.id), amt=q*(Number(m.price)||0);
+    grand+=amt;
+    if(q) mlines.push('<div class="mtot"><span>'+esc(m.name||'메뉴')+' × '+q+'</span><b>'+won(amt)+'원</b></div>');
+  });
+  var peopleRows=st.people.map(function(p){
+    var amt=0, parts=[];
+    st.menus.forEach(function(m){
+      var q=qtyOf(m.id,p.id); if(!q) return;
+      amt+=q*(Number(m.price)||0);
+      parts.push(esc(m.name||'메뉴')+' '+q+'개');
+    });
+    return '<div class="pres"><div class="pres-h"><span class="nm">'+esc(p.name)+'</span>'
+      + '<b class="amt'+(amt?'':' amt-zero')+'">'+won(amt)+'원</b></div>'
+      + '<div class="det">'+(parts.length?parts.join(' · '):'주문 없음')+'</div></div>';
+  }).join('');
+  host.innerHTML='<div class="totalbar"><span>예상 총액</span><b>'+won(grand)+'원</b><span class="sub">'+st.people.length+'명</span></div>'
+    + (mlines.length?('<div style="margin-bottom:9px">'+mlines.join('')+'</div>'):'')
+    + '<div class="plist">'+peopleRows+'</div>';
+  syncPreviews();
+}
+function krwOf(v){ return v*S.m3.rates[S.m3.cur]/CUR[S.m3.cur].unit; }
+function renderResultM3(){
+  var st=S.m3, host=$('#m3-result');
+  var c=CUR[st.cur];
+  if(!st.people.length || !st.items.length){
+    host.innerHTML='<div class="empty">메뉴와 참여자를 넣으면 현지 돈과 원화로 같이 나눠 드려요.<br><b>✨ 샘플 채우기</b>로 먼저 확인해 보세요.</div>';
+    syncPreviews();
+    return;
+  }
+  var r=computeShare(st.items, st.people);
+  var totalKRW=krwOf(r.total);
+  var rows=st.people.map(function(p){
+    var amt=r.per[p.id]||0;
+    var parts=st.items.filter(function(it){ return (r.mat[p.id][it.id]||0)>0; })
+      .map(function(it){ return esc(it.ko||it.name||'메뉴')+' '+esc(won(r.mat[p.id][it.id])); });
+    return '<div class="pres"><div class="pres-h"><span class="nm">'+esc(p.name)+(p.drink?' <i class="drink">🍺</i>':'')+'</span>'
+      + '<b class="amt'+(amt?'':' amt-zero')+'">'+c.sym+won(amt)+'</b></div>'
+      + '<div class="det">≈ '+won(krwOf(amt))+'원'+(parts.length?' · '+parts.join(' · '):'')+'</div></div>';
+  }).join('');
+  host.innerHTML='<div class="totalbar"><span>총 금액</span><b>'+c.sym+won(r.total)+'</b><span class="sub">≈ '+won(totalKRW)+'원 · '+st.people.length+'명</span></div>'
+    + '<div class="tiny" style="margin:-2px 0 8px">환율 '+c.unit+' '+st.cur+' = ₩'+won(st.rates[st.cur])+' (⚙️ 위 입력칸에서 직접 고칠 수 있어요)</div>'
+    + '<div class="plist">'+rows+'</div>';
+  syncPreviews();
+}
+
+/* ---------------- 복사 문구 ---------------- */
+function footerLines(){
+  var out=[];
+  out.push('');
+  if(S.account && S.account.trim()) out.push('💳 입금 계좌: '+S.account.trim());
+  out.push('👉 자동 더치페이 계산기: '+APP_URL);
+  return out;
+}
+function textM1(){
+  var st=S.m1;
+  if(!st.people.length || !st.items.length) return '아직 정산할 내역이 없어요.\n참여자와 메뉴를 넣어 주세요.\n\n👉 자동 더치페이 계산기: '+APP_URL;
+  var r=computeShare(st.items, st.people);
+  var L=['🧾 영수증 정산 결과','💰 총 '+won(r.total)+'원 · '+st.people.length+'명',''];
+  st.people.forEach(function(p){
+    var amt=r.per[p.id]||0;
+    L.push('👤 '+p.name+' — '+won(amt)+'원'+(p.drink?' 🍺':''));
+    var parts=st.items.filter(function(it){ return (r.mat[p.id][it.id]||0)>0; })
+      .map(function(it){ return (it.name||'메뉴')+' '+won(r.mat[p.id][it.id])+'원'; });
+    L.push(parts.length?('   · '+parts.join(' · ')):'   · 낼 금액 없음');
+  });
+  var drinkItems=st.items.filter(function(it){ return it.alloc==='drink'; });
+  var eatItems=st.items.filter(function(it){ return it.alloc==='eaters'; });
+  if(drinkItems.length||eatItems.length){
+    L.push('');
+    if(drinkItems.length){
+      var dn=st.people.filter(function(p){ return p.drink; }).map(function(p){ return p.name; });
+      L.push('🍺 술값('+drinkItems.map(function(i){return i.name;}).join(', ')+')은 술 마신 '+(dn.length?dn.join('·'):'전원')+'끼리만 나눴어요.');
+      var nn=st.people.filter(function(p){ return !p.drink; }).map(function(p){ return p.name; });
+      if(nn.length) L.push('🚫 술 안 마신 '+nn.join('·')+'에게는 술값이 없어요.');
+    }
+    if(eatItems.length){
+      L.push('🍽 '+eatItems.map(function(i){return i.name;}).join(', ')+'은 먹은 사람끼리만 나눴어요.');
+    }
+  }
+  return L.concat(footerLines()).join('\n');
+}
+function textM2(){
+  var st=S.m2;
+  if(!st.menus.length || !st.people.length) return '아직 정산할 내역이 없어요.\n메뉴와 참여자를 넣어 주세요.\n\n👉 자동 더치페이 계산기: '+APP_URL;
+  var grand=0;
+  var per=st.people.map(function(p){
+    var amt=0, parts=[];
+    st.menus.forEach(function(m){
+      var q=qtyOf(m.id,p.id);
+      if(!q) return;
+      amt+=q*(Number(m.price)||0);
+      parts.push((m.name||'메뉴')+' '+q+'개');
+    });
+    grand+=amt;
+    return {p:p,amt:amt,parts:parts};
+  });
+  var orderList=[];
+  st.menus.forEach(function(m){
+    var q=menuQty(m.id);
+    if(q) orderList.push((m.name||'메뉴')+' '+q);
+  });
+  var L=['📋 메뉴판 취합 정산','💰 총 '+won(grand)+'원 · '+st.people.length+'명',''];
+  per.forEach(function(x){
+    L.push('👤 '+x.p.name+' — '+won(x.amt)+'원');
+    L.push(x.parts.length?('   · '+x.parts.join(' · ')):'   · 주문 없음');
+  });
+  if(orderList.length){
+    L.push('');
+    L.push('🍽 주문: '+orderList.join(' · '));
+  }
+  return L.concat(footerLines()).join('\n');
+}
+function textM2Order(){
+  var st=S.m2;
+  if(!st.menus.length) return '메뉴가 없어요.';
+  var grand=0, lines=[], grandQ=0;
+  st.menus.forEach(function(m){
+    var q=menuQty(m.id);
+    if(!q) return;
+    grandQ+=q; grand+=q*(Number(m.price)||0);
+    lines.push('· '+(m.name||'메뉴')+' '+q);
+  });
+  if(!lines.length) return '아직 주문 수량이 없어요.';
+  var out=['🍽 주문 내역 ('+st.people.length+'명)',''];
+  out=out.concat(lines);
+  out.push('');
+  out.push('총 '+grandQ+'개 · 예상 '+won(grand)+'원');
+  out.push('👉 자동 더치페이 계산기: '+APP_URL);
+  return out.join('\n');
+}
+function textM3(){
+  var st=S.m3, c=CUR[st.cur];
+  if(!st.people.length || !st.items.length) return '아직 정산할 내역이 없어요.\n메뉴와 참여자를 넣어 주세요.\n\n👉 자동 더치페이 계산기: '+APP_URL;
+  var r=computeShare(st.items, st.people);
+  var L=['✈️ 해외여행 더치페이 ('+c.name+')',
+         '💰 총 '+c.sym+won(r.total)+' (≈'+won(krwOf(r.total))+'원) · '+st.people.length+'명',
+         '환율: '+c.unit+' '+st.cur+' = ₩'+won(st.rates[st.cur]), ''];
+  st.people.forEach(function(p){
+    var amt=r.per[p.id]||0;
+    L.push('👤 '+p.name+' — '+c.sym+won(amt)+' (≈'+won(krwOf(amt))+'원)'+(p.drink?' 🍺':''));
+    var parts=st.items.filter(function(it){ return (r.mat[p.id][it.id]||0)>0; })
+      .map(function(it){ return (it.ko||it.name||'메뉴')+' '+c.sym+won(r.mat[p.id][it.id]); });
+    L.push(parts.length?('   · '+parts.join(' · ')):'   · 낼 금액 없음');
+  });
+  var drinkItems=st.items.filter(function(it){ return it.alloc==='drink'; });
+  if(drinkItems.length){
+    L.push('');
+    L.push('🍺 술값('+drinkItems.map(function(i){return i.ko||i.name;}).join(', ')+')은 술 마신 사람끼리만 나눴어요.');
+  }
+  return L.concat(footerLines()).join('\n');
+}
+function copySource(kind){
+  if(kind==='m1') return textM1();
+  if(kind==='m2') return textM2();
+  if(kind==='m2order') return textM2Order();
+  return textM3();
+}
+function syncPreviews(){
+  var map={m1:'#m1-pv-text', m2:'#m2-pv-text', m3:'#m3-pv-text'};
+  Object.keys(map).forEach(function(k){
+    var el=$(map[k]); if(el) el.textContent=copySource(k);
+  });
+  var o=$('#m2-pv-order'); if(o) o.textContent=textM2Order();
+}
+
+/* ---------------- 샘플 ---------------- */
+var SAMPLE1_PEOPLE=['나','지훈','수아','태호'];
+var SAMPLE1_ITEMS=[
+  {name:'김치찌개', price:9000,  alloc:'all'},
+  {name:'제육볶음', price:12000, alloc:'all'},
+  {name:'삼겹살',   price:36000, alloc:'eaters'},
+  {name:'소주 3병', price:15000, alloc:'drink'},
+  {name:'음료',     price:4000,  alloc:'eaters'}
+];
+function fillSample1(){
+  S.m1.people=[];
+  S.m1.items=[];
+  SAMPLE1_PEOPLE.forEach(function(n,i){
+    var p=addPerson('m1',n); p.drink=(i<2);
+  });
+  var ids=S.m1.people.map(function(p){ return p.id; });
+  S.m1.items=SAMPLE1_ITEMS.map(function(it){
+    var eaters=ids.slice();
+    if(it.name==='음료') eaters=[ids[1],ids[3]];
+    return {id:nid(), name:it.name, price:it.price, alloc:it.alloc, eaters:eaters};
+  });
+  renderPeople('m1'); renderItems('m1'); renderResultM1();
+  toast('샘플 영수증을 채웠어요 · 76,000원 4명');
+}
+function fillSample2(){
+  S.m2.menus=[]; S.m2.people=[]; S.m2.orders={};
+  ['나','지훈','수아','태호'].forEach(function(n){ addPerson('m2',n); });
+  [['김치찌개',9000],['제육볶음',12000],['냉면',10000],['삼겹살',12000],['소주',5000],['콜라',2000]].forEach(function(x){
+    var m={id:nid(), name:x[0], price:x[1]};
+    S.m2.menus.push(m);
+    var o={}; S.m2.people.forEach(function(p){ o[p.id]=0; }); S.m2.orders[m.id]=o;
+  });
+  var ps=S.m2.people.map(function(p){ return p.id; });
+  var ms=S.m2.menus;
+  function set(mi,pi,q){ S.m2.orders[ms[mi].id][ps[pi]]=q; }
+  set(0,0,1); set(0,1,1);
+  set(1,2,1); set(1,3,1);
+  set(2,0,1); set(2,2,1);
+  set(3,1,2); set(3,3,2);
+  set(4,0,1); set(4,1,1);
+  set(5,2,1); set(5,3,1);
+  renderMenus(); renderPeople('m2'); renderOrder(); renderResultM2();
+  toast('샘플 메뉴판을 채웠어요');
+}
+function fillSample3(){
+  S.m3.cur='JPY';
+  S.m3.people=[]; S.m3.items=[];
+  ['나','지훈','수아','태호'].forEach(function(n,i){ addPerson('m3',n).drink=(i<2); });
+  var ids=S.m3.people.map(function(p){ return p.id; });
+  S.m3.items=[
+    {id:nid(), name:'ラーメン',   ko:'라멘',   price:980, alloc:'all',    eaters:ids.slice()},
+    {id:nid(), name:'餃子',       ko:'교자',   price:480, alloc:'eaters', eaters:ids.slice()},
+    {id:nid(), name:'生ビール',   ko:'생맥주', price:550, alloc:'drink',  eaters:ids.slice()},
+    {id:nid(), name:'ハイボール', ko:'하이볼', price:480, alloc:'drink',  eaters:ids.slice()}
+  ];
+  syncCurUi(); renderPeople('m3'); renderItems('m3'); renderResultM3();
+  toast('일본 메뉴 샘플을 채웠어요');
+}
+
+/* ---------------- 영수증/메뉴 텍스트 파서 ---------------- */
+var SKIP_RE=/(합계|총액|총\s*금액|소계|부가세|vat|세금|할인|쿠폰|결제|승인|잔액|거스름|받은|카드|현금|포인트|적립|사업자|대표|주소|전화|영수증|일시|번호|매장|배달|포장|주문번호)/i;
+function parseMenuText(text){
+  var out=[];
+  String(text||'').split(/\r?\n/).forEach(function(raw){
+    var line=String(raw).replace(/\t/g,' ').replace(/\s+/g,' ').trim();
+    if(!line) return;
+    if(SKIP_RE.test(line)) return;
+    line=line.replace(/^[·•*\-–—>\s]+/,'').replace(/\s*(원|KRW|₩)\s*$/i,'');
+    var work=line, price=0, priceTok='';
+    /* "3,000 x 2" 처럼 곱셈으로 적힌 줄은 곱해서 총액으로 */
+    var mult=/(\d[\d,]*)\s*[x×*]\s*(\d+)/i.exec(work);
+    if(mult){
+      var ma=parseFloat(mult[1].replace(/,/g,'')), mb=parseFloat(mult[2]);
+      if(isFinite(ma)&&isFinite(mb)&&ma>=100){ price=ma*mb; work=work.replace(mult[0],' '); }
+    }
+    if(!price){
+      var nums=work.match(/\d[\d,]*(?:\.\d+)?/g);
+      if(!nums||!nums.length) return;
+      for(var i=nums.length-1;i>=0;i--){
+        var v=parseFloat(nums[i].replace(/,/g,''));
+        if(isFinite(v) && v>=100){ price=v; priceTok=nums[i]; break; }
+      }
+      if(!price) return;
+      var pos=work.lastIndexOf(priceTok);
+      if(pos>=0){ work=work.slice(0,pos)+' '+work.slice(pos+priceTok.length); }
+    }
+    var name=work.replace(/[\d,]+\s*(?:병|개|인분|잔|그릇|장|봉|팩|캔|컵|명|인|조각|EA|ea)/g,' ')
+             .replace(/[·.\-\s]{2,}/g,' ')
+             .replace(/^[\s:：\-·•]+|[\s:：\-·•]+$/g,'')
+             .replace(/\s+/g,' ').trim();
+    if(!name) name='메뉴';
+    out.push({name:name, price:Math.round(price)});
+  });
+  return out;
+}
+
+/* ---------------- 음성 없는 화면 이벤트 ---------------- */
+/* 탭 */
+$$('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    var id=t.dataset.tab;
+    $$('.tab').forEach(function(x){
+      var on=(x===t);
+      x.classList.toggle('on',on);
+      x.setAttribute('aria-selected', on?'true':'false');
+    });
+    ['m1','m2','m3'].forEach(function(k){ $('#'+k).classList.toggle('hidden', k!==id); });
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* 계좌 입력 (3개 모드 동기화) */
+$$('.acct').forEach(function(inp){
+  inp.addEventListener('input',function(){
+    S.account=inp.value;
+    try{ localStorage.setItem(LS_ACCT,S.account); }catch(e){}
+    $$('.acct').forEach(function(o){ if(o!==inp) o.value=inp.value; });
+    syncPreviews();
+  });
+});
+
+/* 복사 버튼 */
+$$('[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var kind=b.dataset.copy;
+    var txt=copySource(kind);
+    copyText(txt).then(function(ok){
+      if(ok){
+        toast('카톡방에 바로 붙여넣기 하세요!', true);
+        var pv=$('#'+(kind==='m1'?'m1':kind==='m3'?'m3':'m2')+'-pv');
+        if(pv && kind!=='m2order') pv.open=true;
+      }else{
+        toast('복사가 막혔어요 — 미리보기 글을 길게 눌러 복사해 주세요');
+        var box=$('#'+(kind==='m2order'?'m2-pv-order':(kind+'-pv-text')));
+        if(box){
+          var d=box.closest('details'); if(d) d.open=true;
+          try{
+            var rng=document.createRange(); rng.selectNodeContents(box);
+            var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(rng);
+          }catch(e){}
+        }
+      }
+    });
+  });
+});
+
+/* 사람 추가/편집 (3개 모드) */
+['m1','m2','m3'].forEach(function(mode){
+  var host=$('#'+mode+'-people');
+  host.addEventListener('input',function(e){
+    if(!e.target.classList.contains('p-name')) return;
+    var row=e.target.closest('.prow'); if(!row) return;
+    var p=S[mode].people.filter(function(x){ return x.id===row.dataset.id; })[0];
+    if(!p) return;
+    p.name=e.target.value;
+    renderResult(mode);
+    if(mode==='m2'){ renderOrder(); renderMenus(); }
+    if(mode!=='m2') updateItemNotes(mode);
+  });
+  host.addEventListener('click',function(e){
+    var row=e.target.closest('.prow'); if(!row) return;
+    var st=S[mode], idx=-1;
+    st.people.forEach(function(p,i){ if(p.id===row.dataset.id) idx=i; });
+    if(idx<0) return;
+    var act=e.target.closest('[data-act]');
+    if(!act) return;
+    if(act.dataset.act==='del'){
+      var pid=st.people[idx].id;
+      st.people.splice(idx,1);
+      if(mode==='m2'){
+        Object.keys(st.orders).forEach(function(mid){ delete st.orders[mid][pid]; });
+        renderOrder();
+      }else{
+        st.items.forEach(function(it){ it.eaters=(it.eaters||[]).filter(function(x){ return x!==pid; }); });
+        renderItems(mode);
+      }
+      renderPeople(mode); renderResult(mode);
+    }else if(act.dataset.act==='drink'){
+      st.people[idx].drink=!st.people[idx].drink;
+      renderPeople(mode); renderItems(mode); renderResult(mode);
+    }
+  });
+});
+
+/* ＋ 사람 추가 (모든 모드 공통 버튼) */
+$$('[data-addperson]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var mode=b.dataset.addperson;
+    addPerson(mode);
+    renderPeople(mode);
+    if(mode==='m2') renderOrder();
+    else { renderItems(mode); }
+    renderResult(mode);
+  });
+});
+
+/* 모드1·3 메뉴 편집 */
+['m1','m3'].forEach(function(mode){
+  var host=$('#'+mode+'-items');
+  host.addEventListener('input',function(e){
+    var row=e.target.closest('.item'); if(!row) return;
+    var it=S[mode].items.filter(function(x){ return x.id===row.dataset.id; })[0];
+    if(!it) return;
+    if(e.target.classList.contains('i-name')) it.name=e.target.value;
+    else if(e.target.classList.contains('i-ko')) it.ko=e.target.value;
+    else if(e.target.classList.contains('i-price')) it.price=numOnly(e.target.value);
+    updateItemNotes(mode); renderResult(mode);
+  });
+  host.addEventListener('click',function(e){
+    var row=e.target.closest('.item'); if(!row) return;
+    var st=S[mode], it=st.items.filter(function(x){ return x.id===row.dataset.id; })[0];
+    if(!it) return;
+    var ab=e.target.closest('[data-alloc]'), eb=e.target.closest('[data-eat]');
+    if(ab){
+      it.alloc=ab.dataset.alloc;
+      if(it.alloc==='eaters' && !(it.eaters||[]).length) it.eaters=st.people.map(function(p){ return p.id; });
+      renderItems(mode); renderResult(mode);
+      return;
+    }
+    if(eb){
+      it.eaters=it.eaters||[];
+      var id=eb.dataset.eat, i=it.eaters.indexOf(id);
+      if(i>=0) it.eaters.splice(i,1); else it.eaters.push(id);
+      renderItems(mode); renderResult(mode);
+      return;
+    }
+    if(e.target.closest('[data-act="del"]')){
+      st.items.splice(st.items.indexOf(it),1);
+      renderItems(mode); renderResult(mode);
+    }
+  });
+});
+/* 금액 칸은 포커스를 벗어나면 1,000 처럼 보기 좋게 */
+$$('#m1-items, #m3-items, #m2-menus').forEach(function(host){
+  host.addEventListener('focusin',function(e){
+    var el=e.target;
+    if(!el || !(el.classList.contains('i-price')||el.classList.contains('m-price'))) return;
+    el.value = numOnly(el.value) || '';
+  },true);
+  host.addEventListener('focusout',function(e){
+    var el=e.target;
+    if(!el || !(el.classList.contains('i-price')||el.classList.contains('m-price'))) return;
+    var v=numOnly(el.value);
+    el.value = v? won(v) : '';
+  },true);
+});
+$$('[data-additem]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var mode=b.dataset.additem;
+    var it={id:nid(), name:'', ko:'', price:0, alloc:'all', eaters:S[mode].people.map(function(p){ return p.id; })};
+    S[mode].items.push(it);
+    renderItems(mode); renderResult(mode);
+    var el=$('#'+mode+'-items .item:last-child .i-name');
+    if(el){ el.focus(); }
+  });
+});
+
+/* 모드2 메뉴 편집 */
+(function(){
+  var host=$('#m2-menus');
+  host.addEventListener('input',function(e){
+    var row=e.target.closest('.mrow'); if(!row) return;
+    var m=S.m2.menus.filter(function(x){ return x.id===row.dataset.id; })[0];
+    if(!m) return;
+    if(e.target.classList.contains('m-name')) m.name=e.target.value;
+    else if(e.target.classList.contains('m-price')) m.price=numOnly(e.target.value);
+    renderOrder(); renderResultM2();
+  });
+  host.addEventListener('click',function(e){
+    var row=e.target.closest('.mrow'); if(!row) return;
+    if(!e.target.closest('[data-act="del"]')) return;
+    var m=S.m2.menus.filter(function(x){ return x.id===row.dataset.id; })[0];
+    if(!m) return;
+    S.m2.menus.splice(S.m2.menus.indexOf(m),1);
+    delete S.m2.orders[m.id];
+    renderMenus(); renderOrder(); renderResultM2();
+  });
+})();
+$$('[data-addmenu]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var m={id:nid(), name:'', price:0};
+    S.m2.menus.push(m);
+    var o={}; S.m2.people.forEach(function(p){ o[p.id]=0; }); S.m2.orders[m.id]=o;
+    renderMenus(); renderOrder(); renderResultM2();
+    var el=$('#m2-menus .mrow:last-child .m-name');
+    if(el) el.focus();
+  });
+});
+/* 모드2 수량 */
+(function(){
+  var host=$('#m2-order');
+  host.addEventListener('click',function(e){
+    var b=e.target.closest('[data-step]'); if(!b) return;
+    var row=b.closest('.qrow'); if(!row) return;
+    var mid=row.dataset.menu, pid=row.dataset.person;
+    var o=S.m2.orders[mid]||(S.m2.orders[mid]={});
+    var q=(o[pid]||0)+parseInt(b.dataset.step,10);
+    if(q<0) q=0;
+    o[pid]=q;
+    renderOrder(); renderResultM2();
+  });
+})();
+
+/* 샘플 */
+$('#m1-sample').addEventListener('click',fillSample1);
+$('#m2-sample').addEventListener('click',fillSample2);
+$('#m3-sample').addEventListener('click',fillSample3);
+
+/* 텍스트 토글 + 파싱 */
+function bindText(mode, targetFn){
+  $('#'+mode+'-tgl-text').addEventListener('click',function(){
+    $('#'+mode+'-textbox').classList.toggle('hidden');
+  });
+  $('#'+mode+'-parse').addEventListener('click',function(){
+    var txt=$('#'+mode+'-text').value;
+    var items=parseMenuText(txt);
+    if(!items.length){
+      toast('가격을 찾지 못했어요 — 한 줄에 "메뉴 이름 금액"으로 넣어 주세요');
+      return;
+    }
+    targetFn(items);
+  });
+}
+bindText('m1',function(items){
+  S.m1.items=items.map(function(it){ return {id:nid(), name:it.name, price:it.price, alloc:'all', eaters:S.m1.people.map(function(p){return p.id;})}; });
+  renderItems('m1'); renderResultM1();
+  toast(items.length+'개 메뉴를 넣었어요');
+});
+bindText('m2',function(items){
+  S.m2.menus=[]; S.m2.orders={};
+  items.forEach(function(it){
+    var m={id:nid(), name:it.name, price:it.price};
+    S.m2.menus.push(m);
+    var o={}; S.m2.people.forEach(function(p){ o[p.id]=0; }); S.m2.orders[m.id]=o;
+  });
+  renderMenus(); renderOrder(); renderResultM2();
+  toast(items.length+'개 메뉴를 넣었어요');
+});
+bindText('m3',function(items){
+  S.m3.items=items.map(function(it){ return {id:nid(), name:it.name, ko:'', price:it.price, alloc:'all', eaters:S.m3.people.map(function(p){return p.id;})}; });
+  renderItems('m3'); renderResultM3();
+  toast(items.length+'개 메뉴를 넣었어요');
+});
+
+/* ---------------- 환율 UI ---------------- */
+function syncCurUi(){
+  var c=CUR[S.m3.cur];
+  $('#m3-cur').value=S.m3.cur;
+  $('#m3-rate-lb').textContent=c.unit+' '+S.m3.cur+' =';
+  var r=$('#m3-rate');
+  if(document.activeElement!==r) r.value=S.m3.rates[S.m3.cur];
+  var note=$('#m3-rate-note');
+  note.textContent='1 '+S.m3.cur+' = ₩'+(S.m3.rates[S.m3.cur]/c.unit).toFixed(c.unit>1?2:2)+' · 기본값은 예시 환율이니 여행 전에 실제 환율로 고쳐 주세요';
+}
+$('#m3-cur').addEventListener('change',function(){
+  S.m3.cur=this.value;
+  syncCurUi(); renderItems('m3'); renderResultM3();
+});
+$('#m3-rate').addEventListener('input',function(){
+  var v=parseFloat(String(this.value).replace(/[^0-9.]/g,''));
+  if(!isFinite(v)||v<=0) return;
+  S.m3.rates[S.m3.cur]=v;
+  try{ localStorage.setItem(LS_RATE,JSON.stringify(S.m3.rates)); }catch(e){}
+  updateItemNotes('m3'); renderResultM3(); syncCurUi();
+});
+$('#m3-rate-refresh').addEventListener('click',function(){
+  var btn=this; btn.disabled=true; btn.textContent='불러오는 중…';
+  fetch('https://open.er-api.com/v6/latest/KRW',{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+    if(!j||!j.rates) throw new Error('no rates');
+    var map={JPY:'JPY',THB:'THB',VND:'VND',USD:'USD',EUR:'EUR'};
+    var okAny=false;
+    Object.keys(map).forEach(function(k){
+      var perKRW=Number(j.rates[k]);
+      if(perKRW>0){ S.m3.rates[k]=CUR[k].unit/perKRW; okAny=true; }
+    });
+    if(!okAny) throw new Error('empty');
+    try{ localStorage.setItem(LS_RATE,JSON.stringify(S.m3.rates)); }catch(e){}
+    syncCurUi(); updateItemNotes('m3'); renderResultM3();
+    toast('오늘 환율로 바꿨어요', true);
+  }).catch(function(){
+    toast('환율을 못 불러왔어요 — 위 칸에 직접 넣어 주세요');
+  }).then(function(){
+    btn.disabled=false; btn.textContent='🔄 오늘 환율 불러오기';
+  });
+});
+
+/* ---------------- 사진 인식 ---------------- */
+var OCR_LS_TIMEOUT=90000;
+function setOcrMsg(mode,msg,err){
+  var el=$('#'+mode+'-ocr'); if(!el) return;
+  el.innerHTML = msg; if(err) el.style.color='#b45309'; else el.style.color='';
+}
+var tessLoading=null;
+function loadTesseract(){
+  if(window.Tesseract) return Promise.resolve(window.Tesseract);
+  if(tessLoading) return tessLoading;
+  tessLoading=new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    s.async=true;
+    var settled=false;
+    s.onload=function(){ settled=true; window.Tesseract?resolve(window.Tesseract):reject(new Error('로드 실패')); };
+    s.onerror=function(){ settled=true; reject(new Error('인터넷·CDN 연결 실패')); };
+    document.head.appendChild(s);
+    setTimeout(function(){ if(!settled && !window.Tesseract) reject(new Error('시간 초과')); },15000);
+  });
+  return tessLoading;
+}
+function ocrWithTimeout(file,mode){
+  return loadTesseract().then(function(T){
+    setOcrMsg(mode,'🔍 글자 인식 준비 중… (처음엔 10~25초 걸려요)');
+    return T.createWorker('kor+eng',1,{
+      logger:function(m){
+        if(m && m.status==='recognizing text'){
+          setOcrMsg(mode,'🔍 글자 읽는 중 '+Math.round((m.progress||0)*100)+'%');
+        }
+      }
+    });
+  }).then(function(worker){
+    return worker.recognize(file).then(function(r){
+      try{ worker.terminate(); }catch(e){}
+      return (r && r.data && r.data.text) ? r.data.text : '';
+    },function(e){ try{ worker.terminate(); }catch(x){} throw e; });
+  });
+}
+function aiTranslateFile(file, mode){
+  return new Promise(function(resolve,reject){
+    if(!gemReady()){ var e=new Error('키 없음'); e.status='NOKEY'; reject(e); return; }
+    resolve();
+  }).then(function(){
+    return fileToB64(file).then(function(b64){
+      var isTrip=(mode==='m3');
+      var prompt=isTrip
+        ? '여행지 음식점 메뉴판 또는 영수증 사진입니다. 화폐를 다음 중 하나로 추정하세요: JPY, THB, VND, USD, EUR. 실제 주문/메뉴 항목만 뽑아 JSON 으로만 답하세요. 규칙: 각 항목은 원어 이름(name), 한국어 번역(name_ko), 현지 통화 금액(price, 정수)을 가집니다. 합계·세금·봉사료·할인·결제수단·주소·전화·사업자번호는 제외합니다. 금액 기호와 콤마는 빼고 정수로 적으세요. 확실하지 않은 줄은 넣지 마세요. 형식: {"currency":"JPY","items":[{"name":"ラーメン","name_ko":"라멘","price":980}]}'
+        : '한국 영수증 사진입니다. 실제로 주문한 메뉴와 그 줄의 결제 금액만 뽑아 JSON 으로만 답하세요. 규칙: name 은 한국어 메뉴 이름(수량이 있으면 "소주 3병"처럼 포함), price 는 원 단위 정수입니다. 합계·부가세·할인·결제수단·포인트·사업자번호·주소·전화·날짜는 제외하세요. 확정할 수 없는 줄은 넣지 마세요. 형식: {"items":[{"name":"김치찌개","price":9000}]}';
+      return gemGenerate(function(){
+        return {
+          contents:[{parts:[{text:prompt},{inline_data:{mime_type:'image/jpeg',data:b64}}]}],
+          generationConfig:{temperature:0, responseMimeType:'application/json'}
+        };
+      }).then(function(res){
+        var txt=res.text.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+        var j=JSON.parse(txt);
+        if(!j || !j.items || !j.items.length) throw new Error('EMPTY');
+        return j;
+      });
+    });
+  });
+}
+function withTimeout(p, ms){
+  return new Promise(function(resolve,reject){
+    var done=false;
+    var t=setTimeout(function(){ if(done) return; done=true; reject(new Error('시간 초과')); }, ms);
+    p.then(function(v){ if(done) return; done=true; clearTimeout(t); resolve(v); },
+           function(e){ if(done) return; done=true; clearTimeout(t); reject(e); });
+  });
+}
+function fileToB64(file){
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file);
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height;
+        var sc=Math.min(1,1600/Math.max(W,H));
+        var cv=document.createElement('canvas');
+        cv.width=Math.max(1,Math.round(W*sc)); cv.height=Math.max(1,Math.round(H*sc));
+        var g=cv.getContext('2d');
+        g.fillStyle='#fff'; g.fillRect(0,0,cv.width,cv.height);
+        g.drawImage(img,0,0,cv.width,cv.height);
+        var data=cv.toDataURL('image/jpeg',0.9);
+        URL.revokeObjectURL(url);
+        resolve(data.slice(data.indexOf(',')+1));
+      }catch(e){ URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); reject(new Error('사진을 읽지 못했어요')); };
+    img.src=url;
+  });
+}
+
+/* 사진 버튼 → 파일 선택 → 처리 */
+function wirePhoto(mode, basicHandler, aiHandler){
+  var input=$('#'+mode+'-file');
+  $('#'+mode+'-photo').addEventListener('click',function(){ input.dataset.mode='basic'; input.click(); });
+  var aiBtn=$('#'+mode+'-ai');
+  if(aiBtn) aiBtn.addEventListener('click',function(){ input.dataset.mode='ai'; input.click(); });
+  input.addEventListener('change',function(){
+    var f=input.files && input.files[0];
+    if(!f) return;
+    var how=input.dataset.mode==='ai' ? 'ai' : 'basic';
+    input.value='';
+    if(how==='ai'){
+      setOcrMsg(mode,'✨ AI가 사진을 읽고 있어요…');
+      aiHandler(f).catch(function(e){
+        var m=String(e&&e.message||e);
+        setOcrMsg(mode,'⚠️ AI 인식 실패('+gemErrShort(e)+') — 무료 인식이나 직접 입력을 써 주세요',true);
+      });
+    }else{
+      setOcrMsg(mode,'🔍 사진에서 글자를 읽는 중…');
+      basicHandler(f).catch(function(e){
+        setOcrMsg(mode,'⚠️ 사진 인식이 안 됐어요('+String(e&&e.message||'연결 문제')+'). 텍스트 붙여넣기나 샘플을 써 주세요.',true);
+      });
+    }
+  });
+}
+wirePhoto('m1', function(file){
+  return withTimeout(ocrWithTimeout(file,'m1'),OCR_LS_TIMEOUT).then(function(text){
+    if(!text || !text.trim()) throw new Error('글자를 못 찾음');
+    $('#m1-text').value=text;
+    $('#m1-textbox').classList.remove('hidden');
+    var items=parseMenuText(text);
+    if(!items.length) throw new Error('가격 줄을 못 찾음');
+    S.m1.items=items.map(function(it){ return {id:nid(), name:it.name, price:it.price, alloc:'all', eaters:S.m1.people.map(function(p){return p.id;})}; });
+    renderItems('m1'); renderResultM1();
+    setOcrMsg('m1','✅ '+items.length+'개 메뉴를 읽었어요. 금액을 확인해 주세요.');
+    toast(items.length+'개 메뉴를 읽었어요', true);
+  });
+}, function(file){
+  return aiTranslateFile(file,'m1').then(function(j){
+    S.m1.items=(j.items||[]).map(function(it){
+      return {id:nid(), name:String(it.name||'메뉴'), price:Math.max(0,Math.round(Number(it.price)||0)), alloc:'all', eaters:S.m1.people.map(function(p){return p.id;})};
+    });
+    renderItems('m1'); renderResultM1();
+    setOcrMsg('m1','✅ AI가 '+S.m1.items.length+'개 메뉴를 읽었어요.');
+    toast('AI가 메뉴를 읽었어요', true);
+  });
+});
+wirePhoto('m2', function(file){
+  return withTimeout(ocrWithTimeout(file,'m2'),OCR_LS_TIMEOUT).then(function(text){
+    if(!text || !text.trim()) throw new Error('글자를 못 찾음');
+    $('#m2-text').value=text;
+    $('#m2-textbox').classList.remove('hidden');
+    var items=parseMenuText(text);
+    if(!items.length) throw new Error('가격 줄을 못 찾음');
+    S.m2.menus=[]; S.m2.orders={};
+    items.forEach(function(it){
+      var m={id:nid(), name:it.name, price:it.price};
+      S.m2.menus.push(m);
+      var o={}; S.m2.people.forEach(function(p){ o[p.id]=0; }); S.m2.orders[m.id]=o;
+    });
+    renderMenus(); renderOrder(); renderResultM2();
+    setOcrMsg('m2','✅ '+items.length+'개 메뉴를 읽었어요.');
+    toast(items.length+'개 메뉴를 읽었어요', true);
+  });
+}, function(file){
+  return aiTranslateFile(file,'m2').then(function(j){
+    S.m2.menus=[]; S.m2.orders={};
+    (j.items||[]).forEach(function(it){
+      var m={id:nid(), name:String(it.name||'메뉴'), price:Math.max(0,Math.round(Number(it.price)||0))};
+      S.m2.menus.push(m);
+      var o={}; S.m2.people.forEach(function(p){ o[p.id]=0; }); S.m2.orders[m.id]=o;
+    });
+    renderMenus(); renderOrder(); renderResultM2();
+    setOcrMsg('m2','✅ AI가 '+S.m2.menus.length+'개 메뉴를 읽었어요.');
+    toast('AI가 메뉴를 읽었어요', true);
+  });
+});
+wirePhoto('m3', function(file){
+  return withTimeout(ocrWithTimeout(file,'m3'),OCR_LS_TIMEOUT).then(function(text){
+    if(!text || !text.trim()) throw new Error('글자를 못 찾음');
+    $('#m3-text').value=text;
+    $('#m3-textbox').classList.remove('hidden');
+    var items=parseMenuText(text);
+    if(!items.length) throw new Error('가격 줄을 못 찾음');
+    S.m3.items=items.map(function(it){ return {id:nid(), name:it.name, ko:'', price:it.price, alloc:'all', eaters:S.m3.people.map(function(p){return p.id;})}; });
+    renderItems('m3'); renderResultM3();
+    setOcrMsg('m3','✅ '+items.length+'개 메뉴를 읽었어요. 한국어 이름은 직접 넣을 수 있어요.');
+    toast(items.length+'개 메뉴를 읽었어요', true);
+  });
+}, function(file){
+  return aiTranslateFile(file,'m3').then(function(j){
+    var cur=String(j.currency||'').toUpperCase();
+    if(CUR[cur]){ S.m3.cur=cur; syncCurUi(); }
+    S.m3.items=(j.items||[]).map(function(it){
+      return {id:nid(), name:String(it.name||'메뉴'), ko:String(it.name_ko||''), price:Math.max(0,Math.round(Number(it.price)||0)), alloc:'all', eaters:S.m3.people.map(function(p){return p.id;})};
+    });
+    renderItems('m3'); renderResultM3();
+    setOcrMsg('m3','✅ AI가 '+S.m3.items.length+'개 메뉴를 번역했어요.');
+    toast('AI가 번역·금액 추출을 했어요', true);
+  });
+});
+
+/* ---------------- Gemini (선택) ---------------- */
+var GEM={key:'',model:''};
+try{ var g0=JSON.parse(localStorage.getItem(LS_GEM)||'{}'); GEM.key=String(g0.key||''); GEM.model=String(g0.model||''); }catch(e){}
+function gemReady(){ return String(GEM.key||'').trim().length>=20; }
+var GEM_PREF=['gemini-3.5-flash-lite','gemini-3.5-flash','gemini-3-flash-lite','gemini-3-flash','gemini-2.5-flash-lite','gemini-2.5-flash'];
+var GEM_SKIP=/(tts|image|banana|transcribe|lyria|computer-use|robotics|deep-research|antigravity|embedding|gemma|pro)/;
+var gemPool={at:0,list:null};
+function gemVerScore(n){
+  var m=/^gemini-(\d+)(?:\.(\d+))?-flash(-lite)?(-preview)?/.exec(n);
+  if(!m) return -1;
+  return (+m[1])*1000+(+(m[2]||0))*10+(m[3]?0:2)-(m[4]?1:0);
+}
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function gemModels(force){
+  var now=Date.now();
+  if(!force && gemPool.list && now-gemPool.at<600000) return Promise.resolve(gemPool.list);
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key='+encodeURIComponent(GEM.key),{cache:'no-store'})
+    .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){
+      if(!r.ok) throw new Error((j&&j.error&&j.error.message)||('HTTP '+r.status));
+      return j;
+    }); })
+    .then(function(j){
+      var names=[];
+      ((j&&j.models)||[]).forEach(function(m){
+        var n=String((m&&m.name)||'').replace(/^models\//,'');
+        var sm=(m&&m.supportedGenerationMethods)||[];
+        if(!n||sm.indexOf('generateContent')<0||GEM_SKIP.test(n)) return;
+        names.push(n);
+      });
+      var pick=[];
+      GEM_PREF.forEach(function(n){ if(names.indexOf(n)>=0) pick.push(n); });
+      names.filter(function(n){ return n.indexOf('flash')>=0 && pick.indexOf(n)<0; })
+        .sort(function(a,b){ return gemVerScore(b)-gemVerScore(a); })
+        .forEach(function(n){ pick.push(n); });
+      if(GEM.model && pick.indexOf(GEM.model)>0){ pick.splice(pick.indexOf(GEM.model),1); pick.unshift(GEM.model); }
+      gemPool={at:now,list:pick.slice(0,6)};
+      return pick.length?pick.slice(0,6):null;
+    })
+    .catch(function(){ gemPool={at:now,list:null}; return null; });
+}
+function gemSend(model,body,ms){
+  var url='https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+encodeURIComponent(GEM.key);
+  var ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var timedOut=false, tid=0;
+  if(ctl) tid=setTimeout(function(){ timedOut=true; try{ ctl.abort(); }catch(e){} },ms||25000);
+  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+    .then(function(r){ return r.json().catch(function(){ return null; }).then(function(j){
+      if(!r.ok){
+        var err=new Error((j&&j.error&&j.error.message)||('HTTP '+r.status));
+        err.status=r.status; throw err;
+      }
+      return j;
+    }); })
+    .catch(function(e){
+      if(timedOut||(e&&e.name==='AbortError')){ var t=new Error('응답 지연'); t.status='TIMEOUT'; throw t; }
+      if(e&&e.status) throw e;
+      var ne=new Error('인터넷 연결을 확인해 주세요'); ne.status='NET'; throw ne;
+    })
+    .then(function(j){ if(tid) clearTimeout(tid); return j; },function(e){ if(tid) clearTimeout(tid); throw e; });
+}
+function gemGenerate(buildBody){
+  if(!gemReady()){ var e=new Error('키 없음'); e.status='NOKEY'; return Promise.reject(e); }
+  return gemModels().then(function(list){
+    var models=(list&&list.length)?list:GEM_PREF.slice();
+    var i=0, lastErr=null;
+    function next(){
+      if(i>=models.length) return Promise.reject(lastErr||new Error('AI 호출 실패'));
+      var model=models[i++];
+      return gemSend(model, buildBody(model), 25000).then(function(j){
+        var cands=(j&&j.candidates)||[];
+        var parts=((cands[0]||{}).content||{}).parts||[];
+        var txt=parts.map(function(p){ return p.text||''; }).join('');
+        if(!txt) throw Object.assign(new Error('빈 답'),{status:'PARSE'});
+        if(GEM.model!==model){ GEM.model=model; try{ localStorage.setItem(LS_GEM,JSON.stringify(GEM)); }catch(e){} }
+        return {model:model, text:txt};
+      }).catch(function(err){
+        lastErr=err;
+        var st=err&&err.status;
+        if(st==='NET'||st==='NOKEY') throw err;
+        if(st===404||st===400||st===403||st===401) return next();
+        if((st===429||st===503)&&i<models.length) return sleep(1200).then(next);
+        return next();
+      });
+    }
+    return next();
+  });
+}
+function gemErrShort(e){
+  var st=e&&e.status, m=String((e&&e.message)||e||'');
+  if(st==='NOKEY') return '키 없음';
+  if(st==='NET') return '인터넷 없음';
+  if(st==='TIMEOUT') return '응답 지연';
+  if(st==='PARSE') return '답 해석 실패';
+  if(st===429) return '무료 한도 초과';
+  if(st===503) return '서버 과부하';
+  if(st===404) return '모델 없음';
+  if(st===400) return '요청 거부';
+  if(st===401||st===403||/API key|permission|denied/i.test(m)) return '키·권한 문제';
+  if(/EMPTY/.test(m)) return '메뉴를 못 찾음';
+  return '오류';
+}
+function renderGemUi(){
+  var on=gemReady();
+  ['m1','m2','m3'].forEach(function(m){
+    var b=$('#'+m+'-ai');
+    if(b) b.classList.toggle('hidden', !on);
+  });
+  var msg=$('#gemMsg');
+  if(msg) msg.textContent = on ? ('✅ AI 키 저장됨'+(GEM.model?(' · '+GEM.model):'')+' — 사진을 읽을 때만 구글로 보냅니다') : 'AI 키가 없어도 모든 계산·샘플은 그대로 동작합니다.';
+  var k=$('#gemKey');
+  if(k && document.activeElement!==k) k.value=GEM.key;
+}
+$('#openSettings').addEventListener('click',function(){ $('#settings').hidden=false; renderGemUi(); });
+$('#closeSettings').addEventListener('click',function(){ $('#settings').hidden=true; });
+$('#settings').addEventListener('click',function(e){ if(e.target===this) this.hidden=true; });
+$('#gemSave').addEventListener('click',function(){
+  var v=String($('#gemKey').value||'').trim();
+  if(v.length<20){ $('#gemMsg').textContent='키가 너무 짧아요 — aistudio에서 받은 긴 키(AIza… 또는 AQ.…)를 넣어 주세요'; return; }
+  GEM.key=v;
+  try{ localStorage.setItem(LS_GEM,JSON.stringify(GEM)); }catch(e){}
+  gemPool={at:0,list:null};
+  renderGemUi();
+  toast('AI 키를 저장했어요', true);
+});
+$('#gemClear').addEventListener('click',function(){
+  GEM.key=''; GEM.model='';
+  try{ localStorage.removeItem(LS_GEM); }catch(e){}
+  gemPool={at:0,list:null};
+  renderGemUi();
+  toast('AI 키를 지웠어요');
+});
+
+/* ---------------- 시작 ---------------- */
+function boot(){
+  $$('.acct').forEach(function(i){ i.value=S.account; });
+  syncCurUi();
+  renderPeople('m1'); renderItems('m1'); renderResultM1();
+  renderMenus(); renderPeople('m2'); renderOrder(); renderResultM2();
+  renderPeople('m3'); renderItems('m3'); renderResultM3();
+  renderGemUi();
+  syncPreviews();
+}
+boot();
+
+/* 테스트용(계산·문구 확인) — 화면 동작에는 영향 없음 */
+window.__dp={
+  S:S, computeShare:computeShare, parseMenuText:parseMenuText, itemInfo:itemInfo,
+  textM1:textM1, textM2:textM2, textM2Order:textM2Order, textM3:textM3,
+  krwOf:function(v){ return v*S.m3.rates[S.m3.cur]/CUR[S.m3.cur].unit; },
+  fillSample1:fillSample1, fillSample2:fillSample2, fillSample3:fillSample3,
+  APP_URL:APP_URL
+};
+})();
+</script>
+</body>
+</html>
