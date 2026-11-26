@@ -526,9 +526,9 @@ function renderItems(mode){
     var nameRow = mode==='m3'
       ? '<div class="r1"><input class="i-name" value="'+esc(it.name)+'" maxlength="30" placeholder="원어 메뉴명" aria-label="원어 메뉴명"><button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button></div>'
         + '<div class="r2"><input class="i-ko ko" value="'+esc(it.ko||'')+'" maxlength="30" placeholder="한국어 이름" aria-label="한국어 이름">'
-        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price||'')+'" placeholder="0" aria-label="현지 금액"><span class="cur">'+sym+'</span></div></div>'
+        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price?won(it.price):'')+'" placeholder="0" aria-label="현지 금액"><span class="cur">'+sym+'</span></div></div>'
       : '<div class="irow"><input class="i-name" value="'+esc(it.name)+'" maxlength="30" placeholder="메뉴 이름" aria-label="메뉴 이름">'
-        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price||'')+'" placeholder="0" aria-label="금액"><span class="cur">원</span></div>'
+        + '<div class="iwrap"><input class="i-price" inputmode="numeric" value="'+(it.price?won(it.price):'')+'" placeholder="0" aria-label="금액"><span class="cur">원</span></div>'
         + '<button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button></div>';
     return '<div class="item" data-id="'+it.id+'">'
       + nameRow
@@ -571,7 +571,7 @@ function renderMenus(){
   host.innerHTML=st.menus.map(function(m){
     return '<div class="mrow" data-id="'+m.id+'">'
       + '<input class="m-name" value="'+esc(m.name)+'" maxlength="30" aria-label="메뉴 이름" placeholder="메뉴 이름">'
-      + '<div class="iwrap"><input class="m-price" inputmode="numeric" value="'+(m.price||'')+'" placeholder="0" aria-label="가격"><span class="cur">원</span></div>'
+      + '<div class="iwrap"><input class="m-price" inputmode="numeric" value="'+(m.price?won(m.price):'')+'" placeholder="0" aria-label="가격"><span class="cur">원</span></div>'
       + '<button class="icon-btn" data-act="del" aria-label="메뉴 삭제">✕</button>'
       + '</div>';
   }).join('');
