@@ -2681,7 +2681,7 @@
   function renderCalDay(){
     var host = $('#calDayList');
     var ds = periodState.sel;
-    if(!ds){ host.innerHTML = '<p class="hint" style="margin:0">날짜를 톡 누르면 그날 근무가 여기 나와요.</p>'; return; }
+    if(!ds){ host.innerHTML = ''; return; }
     var list = data.records.filter(function(r){ return r.date === ds; });
     if(!list.length){
       host.innerHTML = '<div class="mrow"><span class="mrowTop"><b>' + dateFull(ds) + '</b>' +
