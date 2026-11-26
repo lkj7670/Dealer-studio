@@ -550,6 +550,27 @@
   .scsub{font-size:14.5px; color:var(--muted); font-weight:600; line-height:1.55}
   .steplabel{font-size:15.5px; font-weight:800; color:#2f6d66; margin-bottom:8px}
   .bigmenu{display:grid; gap:10px}
+
+  /* ---------- 📢 소리샘 (불편·개선 의견 설문) ---------- */
+  .sorisaem{
+    display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0;
+    background:var(--brand-w); border:1.5px solid var(--line); border-radius:14px; padding:9px 11px;
+    box-shadow:0 1px 2px rgba(15,23,36,.04);
+  }
+  .sorisaem:active{transform:translateY(1px)}
+  .sorisaem .si{
+    flex:0 0 auto; width:36px; height:36px; border-radius:12px; background:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1;
+    box-shadow:0 1px 2px rgba(15,23,36,.06);
+  }
+  .sorisaem .st{flex:1 1 auto; min-width:0}
+  .sorisaem .st b{display:block; font-size:15px; font-weight:800; letter-spacing:-.3px; line-height:1.3; color:var(--brand-d)}
+  .sorisaem .st small{display:block; font-size:12px; color:var(--muted); font-weight:700; margin-top:1px; line-height:1.35}
+  .sorisaem .sg{
+    flex:0 0 auto; font-size:13px; font-weight:800; white-space:nowrap;
+    background:var(--brand); color:#fff; border-radius:999px; padding:7px 11px;
+  }
+  .sorisaem-card .sorisaem{margin-top:12px}
   .bigbtn{
     display:flex; align-items:center; gap:12px; width:100%; min-height:70px; padding:12px 14px;
     border-radius:16px; border:1px solid var(--line); background:#fff; text-align:left;
@@ -1100,6 +1121,12 @@
         <p class="exhint" id="Lcost" style="margin-top:6px"></p>
         <p class="exhint" id="Lexample" hidden>예) 근무 22일 · 예상 3,602,671원 · 3.3% 1명 / 일용직 3명</p>
       </div>
+
+      <a class="sorisaem" href="https://forms.gle/X8fLcv4JhwbA4MVcA" target="_blank" rel="noopener">
+        <span class="si" aria-hidden="true">📢</span>
+        <span class="st"><b>소리샘</b><small>불편한 점·바꿀 점을 알려주세요</small></span>
+        <span class="sg">보내기 ›</span>
+      </a>
 
       <div class="bigmenu">
         <button class="bigbtn" data-go="scr-emp"><span class="bi">👤</span><span class="bt">직원별로 보기<i>누가 얼마 받았는지</i></span><span class="bc">›</span></button>
@@ -1707,10 +1734,20 @@
     <!-- ============ 의견 · 도움말 ============ -->
     <section class="screen" id="scr-feedback">
       <div class="backbar"><button data-back="1">← 뒤로</button><span class="bct">의견 · 도움말</span></div>
+      <div class="card sorisaem-card">
+        <h2 class="sctitle">📢 소리샘</h2>
+        <p class="scsub">쓰시다가 불편한 점·바꿀 점·새로 있었으면 하는 기능을 적어 주세요. 짧은 설문지로 바로 보내집니다. 이름은 안 써도 됩니다.</p>
+        <a class="sorisaem" href="https://forms.gle/X8fLcv4JhwbA4MVcA" target="_blank" rel="noopener">
+          <span class="si" aria-hidden="true">📢</span>
+          <span class="st"><b>소리샘에 의견 보내기</b><small>1분이면 끝나요 · 직원용·관리자용 둘 다</small></span>
+          <span class="sg">열기 ›</span>
+        </a>
+        <p class="hint" style="margin-top:8px">보낸 의견은 설문지 <b>응답</b> 화면에 차곡차곡 쌓입니다. 급여·직원 기록은 설문지로 가지 않습니다.</p>
+      </div>
       <div class="card">
-        <h2 class="sctitle">도움말 · 의견 보내기</h2>
+        <h2 class="sctitle">접수함에 적어 두기</h2>
         <p class="scsub" id="fbVersion">딜러리의 입금대장 v1.0 · 최종 수정 2026-11-26</p>
-        <p class="noteone" style="margin-top:8px">기록은 이 기기 안에만 저장되고 판매자에게 전송되지 않습니다. 아래 내용은 <b>복사해서 직접</b> 보내는 방식입니다.</p>
+        <p class="noteone" style="margin-top:8px">위 <b>소리샘</b>으로 바로 보내거나, 여기에 적어 <b>이 기기에만</b> 저장해 둘 수 있습니다. 아래 내용은 <b>복사해서 직접</b> 보내는 방식입니다.</p>
         <label class="f big" style="margin-top:12px"><span>불편한 점을 적어 주세요</span>
           <textarea id="fbText" style="width:100%; min-height:100px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:16px; line-height:1.6" placeholder="예) 카톡 파일을 올렸는데 이름이 미등록으로 나와요"></textarea>
         </label>
@@ -6729,7 +6766,7 @@ var GUIDE_HTML = '' +
   '<div class="qa"><b>직원이 자기 폰에서 쓰려면?</b><p>직원용 주소(https://lkj7670.github.io/Dealer-studio/daily-pay.html)와 4자리 비밀번호를 알려 주세요. 직원은 <b>설정</b>에서 자기 이름을 바꾸고 자기 근무만 넣습니다.</p></div>' +
   '<div class="qa"><b>.xlsx 파일이 안 열려요.</b><p>폰에서는 엑셀 원본(.xlsx)을 읽지 못합니다. 엑셀에서 <b>다른 이름으로 저장 → CSV UTF-8</b>로 저장한 뒤 올려 주세요.</p></div>' +
   '<div class="qa"><b>아이폰에서도 되나요?</b><p>됩니다. 사파리에서 같은 주소를 열고 공유 → 홈 화면에 추가를 누르면 됩니다.</p></div>' +
-  '<div class="qa"><b>불편한 점은 어떻게 알리나요?</b><p><b>설정 → 의견 보내기 · 접수함</b>에서 적고 <b>내용 복사</b>를 눌러 판매자 카톡·메일로 보내 주세요. 접수함에 저장해 두면 처리 상태도 관리할 수 있습니다.</p></div>' +
+  '<div class="qa"><b>불편한 점은 어떻게 알리나요?</b><p><b>대장 화면 맨 위의 📢 소리샘</b>을 누르면 설문지가 열려 바로 보낼 수 있습니다. 설문지가 안 열리면 <b>설정 → 의견 보내기 · 접수함</b>에서 적고 <b>내용 복사</b>를 눌러 판매자 카톡·메일로 보내 주세요.</p></div>' +
 '</div>' +
 
 /* ⚖️ 노동법 안내 (설명서 마지막) */
@@ -6752,7 +6789,7 @@ var GUIDE_HTML = '' +
 '</div>' +
 
 '<div class="card">' +
-  '<p class="hint">이 설명서는 앱 화면과 같은 이름을 그대로 썼습니다. 화면과 다르게 보이면 <b>설정 → 의견 보내기</b>로 알려 주세요.</p>' +
+  '<p class="hint">이 설명서는 앱 화면과 같은 이름을 그대로 썼습니다. 화면과 다르게 보이면 <b>📢 소리샘</b>이나 <b>설정 → 의견 보내기</b>로 알려 주세요.</p>' +
   '<p class="exhint">딜러리의 입금대장 v1.0 (테스트) · 2026-11-26</p>' +
 '</div>';
 
