@@ -1,0 +1,32 @@
+{
+  "name": "딜러리 급여계산",
+  "short_name": "급여계산",
+  "description": "출퇴근과 카톡 근무 보고로 일급·시급 급여를 계산하는 직원용 앱",
+  "start_url": "./daily-pay.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f7",
+  "theme_color": "#0f766e",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-employee-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-employee-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-employee-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
