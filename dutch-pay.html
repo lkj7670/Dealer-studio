@@ -713,12 +713,12 @@ function textM1(){
     L.push('');
     if(drinkItems.length){
       var dn=st.people.filter(function(p){ return p.drink; }).map(function(p){ return p.name; });
-      L.push('🍺 술값('+drinkItems.map(function(i){return i.name;}).join(', ')+')은 술 마신 '+(dn.length?dn.join('·'):'전원')+'끼리만 나눴어요.');
+      L.push('🍺 술값은 술 마신 '+(dn.length?dn.join('·'):'전원')+'끼리만 나눴어요. ('+drinkItems.map(function(i){return i.name;}).join(' · ')+')');
       var nn=st.people.filter(function(p){ return !p.drink; }).map(function(p){ return p.name; });
       if(nn.length) L.push('🚫 술 안 마신 '+nn.join('·')+'에게는 술값이 없어요.');
     }
     if(eatItems.length){
-      L.push('🍽 '+eatItems.map(function(i){return i.name;}).join(', ')+'은 먹은 사람끼리만 나눴어요.');
+      L.push('🍽 먹은 사람끼리만 나눈 메뉴: '+eatItems.map(function(i){return i.name;}).join(' · '));
     }
   }
   return L.concat(footerLines()).join('\n');
