@@ -5772,12 +5772,14 @@ function buildStatement(name, month){
   var ex = empExtraOf(c, name);
   var total = t.net + t.fixed - ex.taxDed - ex.ded + wh.total;
   var alist = empAllowList(c, name);
+  var dst = dedStateOf(c, name);
+  var dedTxt = dedLabel(type) + (dst.custom ? ' · 항목 조정' : '');
   var head = '딜러리의 입금대장 · 급여 명세서\n' +
     '회사: ' + coName(c) + '\n' +
     '직원: ' + name + '\n' +
     '기간: ' + (month === 'all' ? '전체' : month + ' (' + monthLabel(month) + ')') + '\n' +
-    '공제: ' + dedLabel(type) + '\n\n';
-  var humanBlock = '[명세]\n' + name + ' · ' + (month === 'all' ? '전체 기간' : monthLabel(month)) + ' (' + dedLabel(type) + ')\n' +
+    '공제: ' + dedTxt + '\n\n';
+  var humanBlock = '[명세]\n' + name + ' · ' + (month === 'all' ? '전체 기간' : monthLabel(month)) + ' (' + dedTxt + ')\n' +
     (human.length ? human.join('\n') : '(기록 없음)') + '\n';
   if(t.fixed){
     humanBlock += '매달 고정 수당: ' + alist.map(function(a){ return a.name + ' ' + num(a.amount) + (a.on === false ? '(끔)' : ''); }).join(' · ') + ' = ' + num(t.fixed) + '원\n';
