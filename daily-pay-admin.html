@@ -791,6 +791,42 @@
     background:var(--brand-w); border-color:var(--brand); color:var(--brand-d);
   }
   body[data-theme] .stat.ok b, body[data-theme] .calstats .cs.ok b, body[data-theme] .dedsum b.ok{color:var(--green)}
+
+  /* ---------- 🎛️ 수당·공제 버튼판 ---------- */
+  .bprev{display:grid; grid-template-columns:1fr 1fr 1.25fr; gap:7px; margin-top:10px}
+  .bprev > div{border:1px solid var(--line); border-radius:14px; padding:8px 9px; background:#fbfcfe; min-width:0}
+  .bprev span{display:block; font-size:11px; font-weight:800; color:var(--muted); letter-spacing:-.2px}
+  .bprev b{display:block; font-size:16px; font-weight:900; letter-spacing:-.6px; font-variant-numeric:tabular-nums; word-break:break-all}
+  .bprev b.dn{color:var(--red)}
+  .bprev > div.ok{background:var(--green-w); border-color:#bfe6d5}
+  .bprev > div.ok b{color:var(--green); font-size:19px}
+  .bsec{display:flex; align-items:baseline; gap:7px; margin:16px 2px 8px}
+  .bsec b{font-size:14px; font-weight:900; color:#22304a}
+  .bsec small{font-size:11.5px; font-weight:700; color:var(--muted)}
+  .itgrid{display:grid; grid-template-columns:1fr 1fr; gap:7px}
+  .itcell{position:relative; min-width:0}
+  .itbtn{
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px;
+    width:100%; min-height:64px; padding:8px 10px; border-radius:14px;
+    border:1.5px solid var(--line); background:#fff; text-align:left; min-width:0;
+    transition:background .12s, border-color .12s;
+  }
+  .itbtn .itn{font-size:13px; font-weight:800; color:#3c4a60; letter-spacing:-.3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .itbtn .ita{font-size:12.5px; font-weight:900; color:var(--muted); font-variant-numeric:tabular-nums; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .itbtn .its{font-size:10.5px; font-weight:800; color:#b3bdcb; letter-spacing:-.2px}
+  .itbtn.on{background:var(--brand-w); border-color:var(--brand); box-shadow:inset 0 0 0 1px var(--brand)}
+  .itbtn.on .itn, .itbtn.on .ita{color:var(--brand-d)}
+  .itbtn.on .its{color:var(--brand)}
+  .itbtn.lock{background:#f4f6fa; border-style:dashed; opacity:.95}
+  .itbtn.lock .its{color:#9aa6b8}
+  .itbtn.add{border-style:dashed; align-items:center; justify-content:center; text-align:center; color:var(--brand-d)}
+  .itbtn.add .itn{color:var(--brand-d); font-size:13.5px; white-space:normal}
+  .itbtn.add .ita{color:#7b8899; font-size:11px; white-space:normal}
+  .itedit{
+    position:absolute; top:4px; right:4px; width:26px; height:26px; padding:0; border-radius:9px;
+    border:1px solid var(--line); background:#fff; color:#8b97a9; font-size:12px; line-height:1;
+  }
+  body[data-theme] .itbtn.on{background:var(--brand-w); border-color:var(--brand); box-shadow:inset 0 0 0 1px var(--brand)}
   .themepills{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
   .themepill{
     border-radius:999px; border:1.5px solid var(--line); background:#fff; padding:9px 12px;
@@ -1073,6 +1109,7 @@
         <button class="bigbtn soft" id="btnAddRow"><span class="bi">➕</span><span class="bt">기록 직접 추가<i>출퇴근을 손으로 넣기</i></span><span class="bc">›</span></button>
       </div>
       <button class="bigbtn receipt" data-go="scr-emp-month" style="margin-bottom:8px"><span class="bi">🧾</span><span class="bt">월별 명세 한 장<i>직원 한 명 · 한 달치를 한 화면에</i></span><span class="bc">›</span></button>
+      <button class="bigbtn receipt" id="btnGoBoard"><span class="bi">🎛️</span><span class="bt">수당·공제 버튼<i>직원을 골라 켜고 끄기 · 실수령 바로</i></span><span class="bc">›</span></button>
       <button class="bigbtn receipt" data-go="scr-cal"><span class="bi">📅</span><span class="bt">달력 · 기간별 합계<i>날짜별 금액을 달력으로 · 기간 합계 바로</i></span><span class="bc">›</span></button>
       <button class="linkwide" data-go="scr-table">표로 보기 (엑셀처럼)</button>
       <p class="exhint" style="text-align:center">딜러리의 입금대장 v1.0 · 기록은 이 기기 안에만 저장되고 판매자에게 전송되지 않습니다.</p>
@@ -1103,6 +1140,7 @@
         <div id="empDMonth"></div>
       </div>
       <div class="card" id="empDSummary"></div>
+      <div class="card" id="empDBoard"></div>
       <p class="steplabel" style="margin:2px 4px 0">날짜별로 이렇게 들어갔어요</p>
       <div id="empDList" class="biglist"></div>
     </section>
@@ -2038,7 +2076,7 @@ function calc(r, s){
    ============================================================ */
 function allowSum(list){
   var t = 0;
-  (list || []).forEach(function(a){ t += r0(a && a.amount); });
+  (list || []).forEach(function(a){ if(a && a.on === false) return; t += r0(a.amount); });
   return t;
 }
 function recordAllow(rec){
@@ -2189,8 +2227,25 @@ function ensureCompany(c){
     if(!e.type) e.type = 'inherit';
     if(!Array.isArray(e.allowances)) e.allowances = [];
     e.allowances = e.allowances.map(function(a){
-      return { id:(a && a.id) || uid('al'), name:String((a && a.name) || '').slice(0,16), amount:Math.max(0, r0(a && a.amount)) };
+      return {
+        id:(a && a.id) || uid('al'), name:String((a && a.name) || '').slice(0,16),
+        amount:Math.max(0, r0(a && a.amount)),
+        on:(a && a.on) !== false,
+        tax:!!(a && a.tax)
+      };
     });
+    if(e.ded && typeof e.ded === 'object'){
+      e.ded.custom = !!e.ded.custom;
+      if(!e.ded.on || typeof e.ded.on !== 'object') e.ded.on = {};
+      e.ded.extras = (Array.isArray(e.ded.extras) ? e.ded.extras : []).map(function(x){
+        return {
+          id:(x && x.id) || uid('dx'), name:String((x && x.name) || '기타공제').slice(0,16),
+          amount:Math.max(0, r0(x && x.amount)), on:(x && x.on) !== false
+        };
+      });
+    } else {
+      e.ded = null;
+    }
   }
   for(i=0;i<c.records.length;i++){
     var r = c.records[i];
@@ -2285,8 +2340,9 @@ function recordMoney(c, rec){
   pc.allow = allow;
   if((!rec.start || !rec.end) && r0(rec.baseAmount) > 0) pc.net = r0(rec.baseAmount);
   pc.net += allow;          /* 수당은 떼지 않고 그대로 더합니다(식대·교통비처럼) */
-  var t = resolveType(c, rec);
-  var d = insuranceCalc(pc.net - allow, t, c, { simple:true });
+  var st = dedStateOf(c, rec);
+  var t = st.type;
+  var d = applyDedOn(insuranceCalc(pc.net - allow, t, c, { simple:true }), st.on);
   var net = pc.net - d.workerTotal;
   var expected = (c.insurance.deposit === 'net') ? net : pc.net;
   return { pay:pc, type:t, ded:d, net:net, expected:expected, allow:allow, base:pc.net - allow };
@@ -2332,6 +2388,100 @@ function dedModeOf(type){ return DED_MODES.filter(function(m){ return m.key === 
 function dedLabel(type){
   var m = dedModeOf(type || 'daily');
   return m.label;
+}
+
+/* ============================================================
+   수당·공제 버튼판 — 항목별 켜고 끄기
+   ============================================================ */
+var DED_ITEMS = [
+  { key:'pension', label:'국민연금', ico:'🏦' },
+  { key:'health',  label:'건강보험', ico:'🏥' },
+  { key:'care',    label:'장기요양', ico:'🧓' },
+  { key:'employ',  label:'고용보험', ico:'🧾' },
+  { key:'income',  label:'소득세 3%', ico:'💰' },
+  { key:'local',   label:'지방소득세', ico:'🏛' }
+];
+/* 공제 방식(프리셋)별로 기본으로 켜지는 항목 */
+function typeDedOn(type){
+  return {
+    pension: type === 'permanent' ? 1 : 0,
+    health:  type === 'permanent' ? 1 : 0,
+    care:    type === 'permanent' ? 1 : 0,
+    employ:  (type === 'permanent' || type === 'daily') ? 1 : 0,
+    income:  type === 'freelance' ? 1 : 0,
+    local:   type === 'freelance' ? 1 : 0
+  };
+}
+function empById(c, id){
+  if(!id) return null;
+  for(var i=0;i<c.employees.length;i++) if(c.employees[i].id === id) return c.employees[i];
+  return null;
+}
+/* 한 사람(이름 또는 기록)의 공제 상태 — 프리셋(type) + 개별 스위치(on) + 기타공제(extras) */
+function dedStateOf(c, who){
+  var e = null, type = (c.insurance && c.insurance.type) || 'daily';
+  if(who && typeof who === 'object'){
+    type = resolveType(c, who);
+    e = empById(c, who.empId) || findEmp(c, who.empName);
+  } else {
+    e = findEmp(c, who);
+    var t = e ? e.type : 'inherit';
+    type = (!t || t === 'inherit') ? ((c.insurance && c.insurance.type) || 'daily') : t;
+  }
+  var on = typeDedOn(type), custom = false, extras = [];
+  if(e && e.ded){
+    custom = !!e.ded.custom;
+    if(custom && e.ded.on){
+      for(var k in on){ if(e.ded.on[k] != null) on[k] = e.ded.on[k] ? 1 : 0; }
+    }
+    extras = (e.ded.extras || []).filter(function(x){ return x && x.on !== false && r0(x.amount) > 0; });
+  }
+  return { emp:e, type:type, on:on, custom:custom, extras:extras };
+}
+/* 계산된 4대보험·3.3%에서 꺼 둔 항목을 0으로 만들고 합계를 다시 셉니다 */
+function applyDedOn(d, on){
+  on = on || {};
+  ['pension','health','care','employ','income','local'].forEach(function(k){
+    if(!on[k]){ d.worker[k] = 0; d.employer[k] = 0; }
+  });
+  if(!on.employ) d.employer.stable = 0;
+  d.workerTotal = d.worker.pension + d.worker.health + d.worker.care + d.worker.employ + d.worker.income + d.worker.local;
+  d.employerTotal = d.employer.pension + d.employer.health + d.employer.care + d.employer.employ +
+    d.employer.stable + d.employer.injury + d.employer.income + d.employer.local;
+  return d;
+}
+/* 그 직원의 이 달 고정 항목 — 수당 합계 / 과세 수당 / 그 과세 수당에서 뗄 돈 / 기타공제 합계 */
+function empExtraOf(c, name){
+  var e = findEmp(c, name);
+  var out = { allow:0, taxAllow:0, taxDed:0, ded:0 };
+  if(!e) return out;
+  (e.allowances || []).forEach(function(a){
+    if(!a || a.on === false) return;
+    var v = Math.max(0, r0(a.amount));
+    out.allow += v;
+    if(a.tax) out.taxAllow += v;
+  });
+  var st = dedStateOf(c, name);
+  st.extras.forEach(function(x){ out.ded += Math.max(0, r0(x.amount)); });
+  if(out.taxAllow > 0){
+    out.taxDed = applyDedOn(insuranceCalc(out.taxAllow, st.type, c, { simple:true }), st.on).workerTotal;
+  }
+  return out;
+}
+/* 그 달에 근무가 있는 직원들의 고정 수당·기타공제 합계 */
+function fixedMoneyOf(c, m){
+  var out = { allow:0, taxDed:0, ded:0 };
+  if(!m) return out;
+  var names = {};
+  monthRecords(c, m).forEach(function(r){ if(r.empName) names[normName(r.empName)] = 1; });
+  (c.employees || []).forEach(function(e){
+    if(!names[normName(e.name)]) return;
+    var x = empExtraOf(c, e.name);
+    out.allow += x.allow;
+    out.taxDed += x.taxDed;
+    out.ded += x.ded;
+  });
+  return out;
 }
 function payDateOf(dateStr, c){
   if(!dateStr) return '';
@@ -2644,7 +2794,7 @@ function empTypeLabel(c, name){
    ============================================================ */
 function aggOf(c, list, m){
   var a = { gross:0, ded:0, net:0, exp:0, paid:0, diff:0, unpaidN:0, unpaidAmt:0,
-            employer:0, allow:0, fixed:0, dates:{}, names:{}, byType:{} };
+            employer:0, allow:0, fixed:0, fixedTax:0, fixedDed:0, dates:{}, names:{}, byType:{} };
   list.forEach(function(r){
     var m2 = recordMoney(c, r);
     a.gross += m2.pay.net;
@@ -2671,7 +2821,12 @@ function aggOf(c, list, m){
     }
   });
   a.fixed = m ? fixedAllowOf(c, m) : 0;
-  a.net += a.fixed;
+  a.fixedTax = 0; a.fixedDed = 0;
+  if(m){
+    var fx = fixedMoneyOf(c, m);
+    a.fixedTax = fx.taxDed; a.fixedDed = fx.ded;
+  }
+  a.net += a.fixed - a.fixedTax - a.fixedDed;
   a.dayCount = Object.keys(a.dates).length;
   a.peopleCount = Object.keys(a.names).length;
   Object.keys(a.byType).forEach(function(k){ a.byType[k].n = Object.keys(a.byType[k].names).length; });
@@ -2699,6 +2854,7 @@ function renderLedgerMain(){
   $('#Lnet').textContent = money(a.net);
   var sub = '줄 돈 ' + money(a.gross) + (a.ded ? ' − 공제 ' + money(a.ded) : '') + ' · 근무 ' + a.dayCount + '일 · ' + a.peopleCount + '명';
   if(a.fixed) sub += ' · 고정수당 ' + money(a.fixed) + ' 포함';
+  if(a.fixedDed) sub += ' · 기타공제 ' + money(a.fixedDed);
   $('#Lsub').textContent = sub;
   $('#Lpaid').textContent = '지급완료 ' + money(a.paid);
   $('#Lunpaid').textContent = '미지급 ' + money(a.unpaidAmt);
@@ -2882,19 +3038,24 @@ function renderEmpList(){
 }
 function empDetailCalc(c, name, month){
   var list = statementList(name, month);
-  var e = { n:0, worked:0, gross:0, ded:0, net:0, paidN:0, unpaid:0, allow:0, night:0, employer:0, fixed:empAllow(c, name), paidAmt:0 };
+  var ex = empExtraOf(c, name);
+  var e = { n:0, worked:0, gross:0, ded:0, net:0, paidN:0, unpaid:0, allow:0, night:0, employer:0,
+            fixed:ex.allow, fixedTax:ex.taxDed, fixedDed:ex.ded, paidAmt:0,
+            ins:{ pension:0, health:0, care:0, employ:0, income:0, local:0 } };
   list.forEach(function(r){
     var m = recordMoney(c, r);
     e.n++; e.worked += m.pay.worked;
     e.gross += m.pay.net; e.ded += m.ded.workerTotal; e.net += m.net;
     e.allow += m.allow; e.night += m.pay.nightMin;
     e.employer += m.ded.employerTotal;
+    ['pension','health','care','employ','income','local'].forEach(function(k){ e.ins[k] += r0(m.ded.worker[k]); });
     if(r.paid){ e.paidN++; e.paidAmt += r0(r.paidAmount); } else e.unpaid++;
   });
   var wh = weeklyHolidayOf(c, name, month);
   e.weekly = wh.total;
   e.weeks = wh.weeks;
-  e.total = e.net + e.fixed + e.weekly;
+  e.dedAll = e.ded + e.fixedTax + e.fixedDed;
+  e.total = e.net + e.fixed - e.fixedTax - e.fixedDed + e.weekly;
   e.list = list;
   return e;
 }
@@ -2920,20 +3081,18 @@ function renderEmpDetail(name){
       saveUI(); refresh();
     };
   });
-  var rows = '';
-  if(e.fixed) rows += '<div class="allowline"><span>매달 고정 수당</span><b>+' + money(e.fixed) + '</b></div>';
-  var alist = empAllowList(c, name);
-  if(alist.length) rows += '<p class="exhint" style="margin:2px 0 0">' + alist.map(function(a){ return esc(a.name) + ' ' + money0(a.amount); }).join(' · ') + '</p>';
   $('#empDSummary').innerHTML =
     '<div class="statgrid">' +
       '<div class="stat"><span>줄 돈(공제 전)</span><b>' + money(e.gross + e.fixed) + '</b></div>' +
-      '<div class="stat"><span>공제(세금·보험)</span><b>' + money(e.ded) + '</b></div>' +
+      '<div class="stat"><span>공제(세금·보험)</span><b>' + money(e.dedAll) + '</b></div>' +
       '<div class="stat ok"><span>실수령(실제 받는 돈)</span><b>' + money(e.total) + '</b></div>' +
       '<div class="stat"><span>지급 / 미지급</span><b>' + e.paidN + ' / ' + e.unpaid + '</b></div>' +
     '</div>' +
     (e.allow ? '<div class="allowline"><span>그날 붙인 수당</span><b>+' + money(e.allow) + '</b></div>' : '') +
     (e.weekly ? '<div class="allowline"><span>주휴수당 ' + e.weeks.length + '주</span><b>+' + money(e.weekly) + '</b></div>' : '') +
-    rows +
+    (e.fixed ? '<div class="allowline"><span>매달 고정 수당</span><b>+' + money(e.fixed) + '</b></div>' : '') +
+    (e.fixedTax ? '<div class="allowline"><span>과세 수당에서 뗀 돈</span><b>−' + money(e.fixedTax) + '</b></div>' : '') +
+    (e.fixedDed ? '<div class="allowline"><span>기타공제(매달)</span><b>−' + money(e.fixedDed) + '</b></div>' : '') +
     (e.night ? '<div class="allowline"><span>야간 근무</span><b>' + hm(e.night) + '</b></div>' : '') +
     (e.employer ? '<div class="allowline"><span>회사가 더 내는 돈(사업주 부담)</span><b>' + money(e.employer) + '</b></div>' : '') +
     '<button class="btn big" id="btnStmt" style="margin-top:10px">📤 이 직원에게 명세 보내기</button>' +
@@ -2955,6 +3114,158 @@ function renderEmpDetail(name){
   if(bs) bs.onclick = function(){ openStatement(name); };
   var bm = $('#btnEmpMonth');
   if(bm) bm.onclick = function(){ monthStmt = { name:name, month:ui.month }; go('scr-emp-month', { name:name }); };
+  renderBoard(c, name);
+}
+
+/* ============================================================
+   🎛️ 수당·공제 버튼판 (관리자)
+   ============================================================ */
+function boardItemHtml(o){
+  return '<div class="itcell">' +
+    '<button type="button" class="itbtn' + (o.on ? ' on' : '') + (o.lock ? ' lock' : '') + '"' +
+      (o.lock ? ' disabled aria-disabled="true"' : ' data-t="' + o.act + '" data-k="' + esc(o.id) + '"') + '>' +
+      '<span class="itn">' + o.ico + ' ' + esc(o.name) + '</span>' +
+      '<span class="ita">' + o.amt + '</span>' +
+      '<span class="its">' + (o.lock ? '근무 기록에서 자동' : (o.on ? '✓ 적용 중' : '적용 안 함')) + '</span>' +
+    '</button>' +
+    (o.edit ? '<button type="button" class="itedit" data-e="' + o.edit + '" data-k="' + esc(o.id) + '" aria-label="이름·금액 고치기">✎</button>' : '') +
+    '</div>';
+}
+function renderBoard(c, name){
+  var host = $('#empDBoard');
+  if(!host) return;
+  var e = empDetailCalc(c, name, ui.month);
+  var emp = findEmp(c, name);
+  var st = dedStateOf(c, name);
+  var gross = e.gross + e.fixed;
+  var dedAll = e.dedAll;
+  var html = '';
+  html += '<h2 class="sctitle" style="font-size:16px">🎛️ 수당·공제 버튼</h2>' +
+    '<p class="scsub">누르면 바로 켜지고 꺼져요. 위 실수령이 즉시 다시 계산됩니다.</p>' +
+    '<div class="bprev">' +
+      '<div><span>줄 돈</span><b>' + num(gross) + '</b></div>' +
+      '<div><span>공제</span><b class="dn">−' + num(dedAll) + '</b></div>' +
+      '<div class="ok"><span>실수령</span><b>' + num(e.total) + '</b></div>' +
+    '</div>';
+  /* 수당 */
+  html += '<div class="bsec"><b>💰 수당</b><small>더 받는 항목</small></div><div class="itgrid">';
+  html += boardItemHtml({ act:'base', id:'base', ico:'💵', name:'기본급·일당', amt:num(e.gross - e.allow) + '원', on:true, lock:true });
+  var als = emp ? (emp.allowances || []) : [];
+  als.forEach(function(a){
+    html += boardItemHtml({
+      act:'altoggle', id:a.id, ico:a.tax ? '💳' : '🎁', name:a.name || '수당',
+      amt:(a.tax ? '' : '') + '+' + num(a.amount) + '원', on:a.on !== false, edit:'al'
+    });
+  });
+  html += '<button type="button" class="itbtn add" id="btnItemAddAllow"><span class="itn">＋ 새 항목</span><span class="ita">수당 더하기</span></button>';
+  html += '</div>';
+  if(!als.length) html += '<p class="exhint" style="margin:6px 2px 0">식대·교통비·직급수당처럼 매달 붙는 수당을 [＋ 새 항목]으로 넣어 두세요.</p>';
+  /* 공제 */
+  html += '<div class="bsec"><b>🧾 공제</b><small>떼는 항목 · 위 네 버튼은 한 번에</small></div>';
+  html += '<div class="dedquick small">' + DED_MODES.map(function(m){
+    return '<button type="button" class="dqbtn' + (st.type === m.key ? ' on' : '') + '" data-t="dtype" data-k="' + m.key + '">' + m.label + '</button>';
+  }).join('') + '</div>';
+  html += '<div class="itgrid" style="margin-top:8px">';
+  var fits = {
+    pension: st.type === 'permanent', health: st.type === 'permanent', care: st.type === 'permanent',
+    employ: st.type === 'permanent' || st.type === 'daily',
+    income: st.type === 'freelance', local: st.type === 'freelance'
+  };
+  DED_ITEMS.forEach(function(it){
+    var v = r0(e.ins[it.key]);
+    if(!fits[it.key]){
+      html += '<div class="itcell"><button type="button" class="itbtn lock" data-t="notfit" disabled aria-disabled="true">' +
+        '<span class="itn">' + it.ico + ' ' + esc(it.label) + '</span>' +
+        '<span class="ita">—</span>' +
+        '<span class="its">이 방식 아님</span></button></div>';
+      return;
+    }
+    html += boardItemHtml({
+      act:'dedtoggle', id:it.key, ico:it.ico, name:it.label,
+      amt: st.on[it.key] ? ('−' + num(v) + '원') : '0원',
+      on: !!st.on[it.key]
+    });
+  });
+  (st.emp && st.emp.ded ? st.emp.ded.extras : []).forEach(function(x){
+    html += boardItemHtml({ act:'extoggle', id:x.id, ico:'📌', name:x.name, amt:'−' + num(x.amount) + '원', on:x.on !== false, edit:'dx' });
+  });
+  html += '<button type="button" class="itbtn add" id="btnItemAddDed"><span class="itn">＋ 기타공제</span><span class="ita">정액으로 떼기</span></button>';
+  html += '</div>';
+  if(st.custom) html += '<p class="exhint" style="margin:8px 2px 0">개별로 조정 중이에요. 위 네 버튼을 누르면 그 방식에 맞게 한 번에 돌아갑니다.</p>';
+  else html += '<p class="exhint" style="margin:8px 2px 0">지금은 <b>' + esc(dedLabel(st.type)) + '</b> 방식이에요. 아래 버튼을 하나 누르면 이 사람만 따로 조정됩니다.</p>';
+  host.innerHTML = html;
+
+  var who = name;
+  function rerender(){ saveData(); refresh(); }
+  /* 수당 켜고 끄기 */
+  $$('#empDBoard [data-t="altoggle"]').forEach(function(b){
+    b.onclick = function(){
+      var emp2 = findEmp(c, who);
+      if(!emp2) return;
+      var it = null;
+      (emp2.allowances || []).forEach(function(a){ if(a.id === b.getAttribute('data-k')) it = a; });
+      if(!it) return;
+      it.on = (it.on === false);
+      rerender();
+      toast((it.name || '수당') + (it.on ? ' 켰어요' : ' 껐어요'));
+    };
+  });
+  /* 기타공제 켜고 끄기 */
+  $$('#empDBoard [data-t="extoggle"]').forEach(function(b){
+    b.onclick = function(){
+      var emp2 = findEmp(c, who);
+      if(!emp2 || !emp2.ded) return;
+      var it = null;
+      (emp2.ded.extras || []).forEach(function(x){ if(x.id === b.getAttribute('data-k')) it = x; });
+      if(!it) return;
+      it.on = (it.on === false);
+      rerender();
+      toast((it.name || '기타공제') + (it.on ? ' 켰어요' : ' 껐어요'));
+    };
+  });
+  /* 공제 방식 프리셋 — 개별 버튼도 그 방식에 맞게 함께 바뀝니다 */
+  $$('#empDBoard [data-t="dtype"]').forEach(function(b){
+    b.onclick = function(){
+      var emp2 = findEmp(c, who);
+      var key = b.getAttribute('data-k');
+      if(emp2){ emp2.type = key; if(emp2.ded) emp2.ded.custom = false; }
+      else {
+        /* 명단에 없는 이름이면 회사 기본값에 맞춰 그 기록만 */
+        c.insurance.type = key;
+      }
+      rerender();
+      toast(dedLabel(key) + ' 방식으로 바꿨어요');
+    };
+  });
+  /* 공제 항목 하나씩 켜고 끄기 */
+  $$('#empDBoard [data-t="dedtoggle"]').forEach(function(b){
+    b.onclick = function(){
+      var emp2 = findEmp(c, who);
+      var key = b.getAttribute('data-k');
+      if(!emp2){ toast('설정 → 직원 명단에 먼저 넣어 주세요'); return; }
+      var tNow = (emp2.type && emp2.type !== 'inherit') ? emp2.type : (c.insurance.type || 'daily');
+      if(!emp2.ded) emp2.ded = { custom:false, on:{}, extras:[] };
+      if(!emp2.ded.custom){
+        emp2.ded.on = typeDedOn(tNow);
+        emp2.ded.custom = true;
+      }
+      var now = emp2.ded.on[key] ? 1 : 0;
+      emp2.ded.on[key] = now ? 0 : 1;
+      rerender();
+      var it = DED_ITEMS.filter(function(x){ return x.key === key; })[0];
+      toast((it ? it.label : key) + (emp2.ded.on[key] ? ' 켰어요' : ' 껐어요'));
+    };
+  });
+  /* 이름·금액 고치기 */
+  $$('#empDBoard [data-e]').forEach(function(b){
+    b.onclick = function(){
+      openItemSheet(b.getAttribute('data-e') === 'dx' ? 'ded' : 'allow', who, b.getAttribute('data-k'));
+    };
+  });
+  var ba = $('#btnItemAddAllow');
+  if(ba) ba.onclick = function(){ openItemSheet('allow', who, ''); };
+  var bd = $('#btnItemAddDed');
+  if(bd) bd.onclick = function(){ openItemSheet('ded', who, ''); };
 }
 
 /* ============================================================
@@ -3009,13 +3320,15 @@ function renderEmpMonth(name){
     '<div class="statgrid">' +
       '<div class="stat"><span>근무일 · 시간</span><b>' + e.n + '일 · ' + hm(e.worked) + '</b></div>' +
       '<div class="stat"><span>지급(공제 전)</span><b>' + money(e.gross + e.fixed) + '</b></div>' +
-      '<div class="stat"><span>공제(세금·보험)</span><b>' + money(e.ded) + '</b></div>' +
+      '<div class="stat"><span>공제(세금·보험)</span><b>' + money(e.dedAll) + '</b></div>' +
       '<div class="stat ok"><span>실수령</span><b>' + money(e.total) + '</b></div>' +
     '</div>' +
     '<div class="allowline"><span>회사 부담(4대보험 사업주 몫)</span><b>' + money(e.employer) + '</b></div>' +
     (e.allow ? '<div class="allowline"><span>기타 수당(그날 붙임)</span><b>+' + money(e.allow) + '</b></div>' : '') +
     (e.weekly ? '<div class="allowline"><span>주휴수당 ' + e.weeks.length + '주</span><b>+' + money(e.weekly) + '</b></div>' : '') +
-    (e.fixed ? '<div class="allowline"><span>매달 고정 수당</span><b>+' + money(e.fixed) + '</b></div>' : '');
+    (e.fixed ? '<div class="allowline"><span>매달 고정 수당</span><b>+' + money(e.fixed) + '</b></div>' : '') +
+    (e.fixedTax ? '<div class="allowline"><span>과세 수당에서 뗀 돈</span><b>−' + money(e.fixedTax) + '</b></div>' : '') +
+    (e.fixedDed ? '<div class="allowline"><span>기타공제(매달)</span><b>−' + money(e.fixedDed) + '</b></div>' : '');
   var rows = e.list.map(function(r){
     var m = recordMoney(c, r);
     return '<button class="mrow" data-rec="' + r.id + '">' +
@@ -3037,7 +3350,7 @@ function renderEmpMonth(name){
   });
   $('#empMonthFoot').innerHTML = who
     ? ('<span>' + e.n + '일 · ' + hm(e.worked) + '</span><span>지급 <b>' + money(e.gross + e.fixed) + '</b></span>' +
-       '<span>공제 <b>' + money(e.ded) + '</b></span><span class="tt">실수령 <b>' + money(e.total) + '</b></span>')
+       '<span>공제 <b>' + money(e.dedAll) + '</b></span><span class="tt">실수령 <b>' + money(e.total) + '</b></span>')
     : '';
   var dis = !who || !e.n;
   ['#empMonthCopy', '#empMonthTxt', '#empMonthCsv'].forEach(function(sel){
@@ -4888,6 +5201,7 @@ function renderSetEmp(){
       var e = findEmpById(b.getAttribute('data-eqtype'));
       if(!e) return;
       e.type = b.getAttribute('data-t');
+      if(e.ded) e.ded.custom = false;
       saveData(); renderSetEmp(); refresh();
       toast('공제 방식을 바꿨어요');
     };
@@ -4949,6 +5263,83 @@ function addAllowRow(id, name){
   var idx = e.allowances.length - 1;
   var am = $('[data-alamt="' + id + '|' + idx + '"]');
   if(am) am.focus();
+}
+
+/* ============================================================
+   수당·공제 항목 추가 · 이름/금액 고치기 · 삭제
+   ============================================================ */
+function openItemSheet(kind, empName, itemId){
+  var c = company();
+  var e = findEmp(c, empName);
+  if(!e){ toast('설정 → 직원 명단에 먼저 넣어 주세요'); return; }
+  var isAllow = kind !== 'ded';
+  if(!isAllow && !e.ded) e.ded = { custom:false, on:{}, extras:[] };
+  var list = isAllow ? (e.allowances || []) : ((e.ded && e.ded.extras) || []);
+  var it = null;
+  for(var i=0;i<list.length;i++) if(list[i].id === itemId) it = list[i];
+  var old = $('#itemWrap');
+  if(old) old.remove();
+  var wrap = document.createElement('div');
+  wrap.className = 'sheet-wrap';
+  wrap.id = 'itemWrap';
+  wrap.innerHTML = '<div class="sheet-bg" id="itemBg"></div><div class="sheet">' +
+    '<div class="sheet-h"><b>' + (it ? '고치기' : (isAllow ? '＋ 수당 항목' : '＋ 기타공제')) + '</b>' +
+      '<button class="xbtn" id="itemClose" type="button">✕</button></div>' +
+    '<div class="sheet-body">' +
+      '<p class="scsub" style="margin:0 0 8px">' + esc(empName) + ' 님에게 매달 붙는 ' + (isAllow ? '수당' : '공제') + '이에요.</p>' +
+      '<label class="f big"><span>이름</span>' +
+        '<input id="itemName" maxlength="16" placeholder="' + (isAllow ? '예) 식대 · 직급수당' : '예) 숙소비 · 장비대여') + '" value="' + esc(it ? it.name : '') + '"></label>' +
+      '<div class="alchips" style="margin:6px 0 4px">' + (isAllow ? ALLOW_CHIPS : ['기타공제','숙소비','식비','교통비']).map(function(n){
+        return '<button class="fchip" type="button" data-itemchip="' + n + '">' + n + '</button>';
+      }).join('') + '</div>' +
+      '<label class="f big" style="margin-top:8px"><span>금액 (원)</span>' +
+        '<input id="itemAmt" inputmode="numeric" placeholder="예) 100000" value="' + (it ? r0(it.amount) : '') + '"></label>' +
+      (isAllow ? '<label class="switch" style="margin-top:10px"><input id="itemTax" type="checkbox"' + (it && it.tax ? ' checked' : '') + '>' +
+        '<span>과세 (세금·보험을 뗌)<small>끄면 식대·교통비처럼 떼지 않고 그대로 더해요</small></span></label>' : '') +
+      '<p class="hint" id="itemHint" style="margin-top:8px">켜 둔 항목만 급여에 들어갑니다. 위 버튼판에서 켜고 끌 수 있어요.</p>' +
+      '<button class="btn big" id="itemSave" type="button" style="margin-top:10px">' + (it ? '저장' : '추가하기') + '</button>' +
+      (it ? '<button class="btn ghost big" id="itemDel" type="button" style="margin-top:8px; color:var(--red)">이 항목 지우기</button>' : '') +
+    '</div></div>';
+  document.body.appendChild(wrap);
+  function close(){ wrap.remove(); }
+  $('#itemClose').onclick = close;
+  $('#itemBg').onclick = close;
+  $$('#itemWrap [data-itemchip]').forEach(function(b){
+    b.onclick = function(){ $('#itemName').value = b.getAttribute('data-itemchip'); $('#itemName').focus(); };
+  });
+  $('#itemAmt').addEventListener('input', function(){
+    var v = numOf(this.value);
+    $('#itemHint').textContent = v > 0
+      ? (isAllow ? '매달 +' : '매달 −') + num(v) + '원이 실수령에 바로 반영됩니다.'
+      : '금액을 넣으면 실수령에 바로 반영돼요.';
+  });
+  $('#itemSave').onclick = function(){
+    var nm = ($('#itemName').value || '').trim() || (isAllow ? '수당' : '기타공제');
+    var am = Math.max(0, numOf($('#itemAmt').value));
+    if(!am){ toast('금액을 넣어 주세요'); return; }
+    if(it){
+      it.name = nm.slice(0,16);
+      it.amount = am;
+      if(isAllow) it.tax = !!$('#itemTax').checked;
+    } else if(isAllow){
+      e.allowances = e.allowances || [];
+      e.allowances.push({ id:uid('al'), name:nm.slice(0,16), amount:am, on:true, tax:!!$('#itemTax').checked });
+    } else {
+      e.ded.extras = e.ded.extras || [];
+      e.ded.extras.push({ id:uid('dx'), name:nm.slice(0,16), amount:am, on:true });
+    }
+    saveData(); close(); refresh();
+    toast(it ? '고쳤어요' : '항목을 넣었어요');
+  };
+  var dl = $('#itemDel');
+  if(dl) dl.onclick = function(){
+    askConfirm('이 항목을 지울까요?', (it ? it.name : '') + ' 항목을 지웁니다. 이미 넣은 근무 기록은 그대로예요.', '지우기', function(){
+      if(isAllow) e.allowances = (e.allowances || []).filter(function(x){ return x.id !== it.id; });
+      else e.ded.extras = (e.ded.extras || []).filter(function(x){ return x.id !== it.id; });
+      saveData(); closeConfirm(); close(); refresh();
+      toast('지웠어요');
+    });
+  };
 }
 function findEmpById(id){
   var c = company();
@@ -5378,7 +5769,8 @@ function buildStatement(name, month){
   });
   var type = list.length ? recordMoney(c, list[0]).type : empTypeLabel(c, name);
   var wh = weeklyHolidayOf(c, name, month);
-  var total = t.net + t.fixed + wh.total;
+  var ex = empExtraOf(c, name);
+  var total = t.net + t.fixed - ex.taxDed - ex.ded + wh.total;
   var alist = empAllowList(c, name);
   var head = '딜러리의 입금대장 · 급여 명세서\n' +
     '회사: ' + coName(c) + '\n' +
@@ -5388,8 +5780,10 @@ function buildStatement(name, month){
   var humanBlock = '[명세]\n' + name + ' · ' + (month === 'all' ? '전체 기간' : monthLabel(month)) + ' (' + dedLabel(type) + ')\n' +
     (human.length ? human.join('\n') : '(기록 없음)') + '\n';
   if(t.fixed){
-    humanBlock += '매달 고정 수당: ' + alist.map(function(a){ return a.name + ' ' + num(a.amount); }).join(' · ') + ' = ' + num(t.fixed) + '원\n';
+    humanBlock += '매달 고정 수당: ' + alist.map(function(a){ return a.name + ' ' + num(a.amount) + (a.on === false ? '(끔)' : ''); }).join(' · ') + ' = ' + num(t.fixed) + '원\n';
   }
+  if(ex.ded) humanBlock += '기타공제: ' + num(ex.ded) + '원\n';
+  if(ex.taxDed) humanBlock += '과세 수당에서 뗀 돈: ' + num(ex.taxDed) + '원\n';
   if(wh.total){
     humanBlock += '주휴수당: ' + wh.weeks.map(function(w){ return '(' + dateShort(w.week) + ' 주 ' + (Math.round(w.hours*10)/10) + '시간 ' + num(w.pay) + ')'; }).join(' · ') + ' = ' + num(wh.total) + '원\n';
   }
@@ -5405,6 +5799,8 @@ function buildStatement(name, month){
     '직원이 받는 돈 ' + money(total) + '\n' +
     (t.allow ? '기타 수당 ' + money(t.allow) + '\n' : '') +
     (t.fixed ? '고정 수당 ' + money(t.fixed) + '\n' : '') +
+    (ex.taxDed ? '과세 수당 공제 ' + money(ex.taxDed) + '\n' : '') +
+    (ex.ded ? '기타공제 ' + money(ex.ded) + '\n' : '') +
     (wh.total ? '주휴수당 ' + money(wh.total) + '\n' : '') +
     (t.employer ? '회사 부담(사업주) ' + money(t.employer) + '\n' : '') +
     '지급완료 ' + money(t.paid) + ' · 미지급 ' + money(t.unpaid) + '\n\n' +
@@ -5576,6 +5972,7 @@ function bindAll(){
   });
   on($('#btnAddRow'), 'click', function(){ openEdit(null); });
   on($('#btnAddRow2'), 'click', function(){ openEdit(null); });
+  on($('#btnGoBoard'), 'click', function(){ go('scr-emp'); });
   on($('#btnPayGo'), 'click', openBatch);
   on($('#btnBatch2'), 'click', openBatch);
   on($('#btnExport'), 'click', function(){ openSheet('export'); });

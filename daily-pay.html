@@ -588,6 +588,34 @@
   .modepill.on{background:var(--brand-w); border-color:var(--brand); color:var(--brand-d)}
 
   /* ---------- 와이엘솔루션 인력 아웃소싱 배너 ---------- */
+  /* ---------- 🧾 내 수당·공제 버튼 ---------- */
+  .mylbl{display:flex; align-items:baseline; gap:6px; margin:12px 2px 6px; font-size:13px; font-weight:900; color:#33415c}
+  .mylbl small{font-size:11px; font-weight:700; color:#8b97a9}
+  .mygrid{display:grid; grid-template-columns:1fr 1fr; gap:7px}
+  .mycell{position:relative; min-width:0}
+  .mybtn{
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px;
+    width:100%; min-height:62px; padding:8px 10px; border-radius:14px;
+    border:1.5px solid var(--line); background:#fff; text-align:left; min-width:0;
+  }
+  .mybtn .myn{font-size:13px; font-weight:800; color:#3c4a60; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .mybtn .mya{font-size:12.5px; font-weight:900; color:var(--muted); font-variant-numeric:tabular-nums; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .mybtn .mys{font-size:10.5px; font-weight:800; color:#b3bdcb}
+  .mybtn.on{background:var(--brand-w); border-color:var(--brand); box-shadow:inset 0 0 0 1px var(--brand)}
+  .mybtn.on .myn, .mybtn.on .mya{color:var(--brand-d)}
+  .mybtn.on .mys{color:var(--brand)}
+  .mybtn.empty{border-style:dashed; align-items:center; justify-content:center; text-align:center; color:#8b97a9}
+  .myedit{
+    position:absolute; top:4px; right:4px; width:26px; height:26px; padding:0; border-radius:9px;
+    border:1px solid var(--line); background:#fff; color:#8b97a9; font-size:12px; line-height:1;
+  }
+  .myform{margin-top:8px; border:1px dashed var(--line); border-radius:12px; padding:8px}
+  .mynet{margin-top:12px; border:1px solid var(--line); border-radius:14px; background:#f7fbfa; padding:10px 12px}
+  .mynet .mr{display:flex; justify-content:space-between; gap:8px; font-size:12.5px; font-weight:700; color:#5b6a80; padding:2px 0}
+  .mynet .mr b{font-weight:900; color:#22304a; font-variant-numeric:tabular-nums}
+  .mynet .mr.total{margin-top:6px; padding-top:8px; border-top:1px dashed #cfe3de}
+  .mynet .mr.total span{font-size:13px; font-weight:900; color:#0b5a55}
+  .mynet .mr.total b{font-size:19px; color:var(--green); letter-spacing:-.5px}
   .ylad{
     display:flex; align-items:center; gap:10px; justify-content:space-between; flex-wrap:wrap;
     background:var(--brand-w); border:1px solid var(--brand-l); border-radius:16px; padding:12px 14px;
@@ -682,6 +710,28 @@
         <p class="card-sub">회사에서 정한 방식 <b>하나만</b> 누르면 시트·월 합계까지 바로 다시 계산돼요.</p>
         <div class="dedquick" id="dedQuick"></div>
         <div class="deddetail" id="dedDetail"></div>
+      </section>
+
+      <section class="card" id="myItemsCard">
+        <h2 class="card-h">🧾 내 수당·공제</h2>
+        <p class="card-sub">내가 받는 항목이에요. <b>버튼을 누르면 켜지고 꺼져요.</b> 끄면 금액이 바로 바뀝니다.</p>
+        <div class="mylbl">받는 수당 <small>식대 · 직급수당처럼 매달 붙는 것</small></div>
+        <div class="mygrid" id="myAllowGrid"></div>
+        <button class="linkwide" id="btnMyAllowAdd" type="button">＋ 수당 추가</button>
+        <div class="myform" id="myAllowForm" hidden>
+          <div class="alrow">
+            <input id="myAllowName" maxlength="16" placeholder="수당 이름 (예) 직급수당">
+            <input id="myAllowAmt" inputmode="numeric" placeholder="금액">
+          </div>
+          <div class="row-btns" style="margin-top:6px">
+            <button class="btn" id="btnMyAllowSave" type="button">저장</button>
+            <button class="btn ghost" id="btnMyAllowCancel" type="button">닫기</button>
+            <button class="btn ghost danger" id="btnMyAllowDel" type="button" hidden>지우기</button>
+          </div>
+        </div>
+        <div class="mylbl">떼는 항목 <small>위 네 버튼은 한 번에 · 여기선 하나씩</small></div>
+        <div class="mygrid" id="myDedGrid"></div>
+        <div class="mynet" id="myNetBox"></div>
       </section>
 
       <section class="dash">
@@ -1324,14 +1374,16 @@
     name:'이광준', preset:'A', baseMode:'net', dailyPay:140000, baseHours:8, hourly:15480,
     multiplier:1, breakMin:60, taxRate:3.3, fullPayShort:false, dawnFix:true, dupMode:'keep',
     dedMode:'tax33', nightOn:true, nightMode:'mult', nightMult:0.5, nightAmount:0,
-    workMode:'daily', hourlyPay:10320, weeklyHoliday:true, fivePlus:true, lockOn:false
+    workMode:'daily', hourlyPay:10320, weeklyHoliday:true, fivePlus:true, lockOn:false,
+    myAllow:[], dedCustom:false, dedOn:{pension:false,health:false,care:false,employ:false,income:false,local:false},
+    ownerLink:{ on:false }
   };
   var DATA_KEY = 'dealerPay.v1.data';
   var PIN_KEY = 'dealerPay.v1.pin';
   var AUTH_KEY = 'dealerPay.v1.auth';
   var SNAP_KEY = 'dealerPay.v1.snapshot';
 
-  var data = { settings: clone(DEFAULTS), records: [] };
+  var data = { settings: normalizeSettings(clone(DEFAULTS)), records: [] };
   var storageOK = true;
   var editingId = null;
   var viewMonth = '';
@@ -1426,8 +1478,47 @@
     return DED_MODES[1];
   }
   function dedLabel(s){ return dedModeInfo(s).label; }
+  /* ===== 내 수당·공제 항목 (켜고 끄기) ===== */
+  var MY_DED = [
+    { key:'pension', label:'국민연금', ico:'🏦' },
+    { key:'health',  label:'건강보험', ico:'🏥' },
+    { key:'care',    label:'장기요양', ico:'🧓' },
+    { key:'employ',  label:'고용보험', ico:'🧾' },
+    { key:'income',  label:'소득세', ico:'💰' },
+    { key:'local',   label:'지방소득세', ico:'🏛' }
+  ];
+  /* 공제 방식(4버튼)별 기본 켜짐 */
+  function modeDedOn(mode){
+    return {
+      pension: mode === 'full', health: mode === 'full', care: mode === 'full',
+      employ: mode === 'full' || mode === 'daily',
+      income: mode === 'tax33', local: mode === 'tax33'
+    };
+  }
+  function myDedOn(s){
+    s = s || data.settings;
+    if(!s.dedCustom) return modeDedOn(dedModeOf(s));
+    return (s.dedOn && typeof s.dedOn === 'object') ? s.dedOn : modeDedOn(dedModeOf(s));
+  }
+  /* 항목별 요율(%) — 근로자가 떼는 몫 */
+  function dedItemRate(key, s){
+    s = s || data.settings;
+    var tax = Math.min(100, Math.max(0, Number(s.taxRate) || 0));
+    if(key === 'pension') return INS_RATE.pension;
+    if(key === 'health')  return INS_RATE.health;
+    if(key === 'care')    return INS_RATE.health * INS_RATE.careRatio / 100;
+    if(key === 'employ')  return INS_RATE.employ;
+    if(key === 'income')  return tax * 3 / 3.3;
+    if(key === 'local')   return tax * 0.3 / 3.3;
+    return 0;
+  }
   function dedRate(s){
     s = s || data.settings;
+    if(s.dedCustom){
+      var on = myDedOn(s), t = 0;
+      MY_DED.forEach(function(it){ if(on[it.key]) t += dedItemRate(it.key, s); });
+      return Math.min(100, Math.max(0, t)) / 100;
+    }
     var m = dedModeOf(s);
     if(m === 'none') return 0;
     if(m === 'daily') return INS_RATE.employ / 100;
@@ -1437,22 +1528,16 @@
   /* 공제 항목별 금액 (작은 요약 박스에 표시) */
   function dedBreakdown(pretax, s){
     s = s || data.settings;
-    var m = dedModeOf(s), out = [];
+    var on = myDedOn(s), out = [];
     pretax = Math.max(0, r0(pretax));
     if(!pretax) return out;
-    if(m === 'tax33'){
-      out.push(['소득세 3%', Math.round(pretax * 0.03)]);
-      out.push(['지방소득세 0.3%', Math.round(pretax * 0.003)]);
-    } else if(m === 'daily'){
-      out.push(['고용보험 0.9%', Math.round(pretax * INS_RATE.employ / 100)]);
-    } else if(m === 'full'){
-      var pen = Math.round(pretax * INS_RATE.pension / 100);
-      var hea = Math.round(pretax * INS_RATE.health / 100);
-      out.push(['국민연금 4.75%', pen]);
-      out.push(['건강보험 3.595%', hea]);
-      out.push(['장기요양 ' + INS_RATE.careRatio + '%', Math.round(hea * INS_RATE.careRatio / 100)]);
-      out.push(['고용보험 0.9%', Math.round(pretax * INS_RATE.employ / 100)]);
-    }
+    MY_DED.forEach(function(it){
+      if(!on[it.key]) return;
+      var rate = dedItemRate(it.key, s);
+      var v = Math.round(pretax * rate / 100);
+      var pct = Math.round(rate * 1000) / 1000;
+      out.push([it.label + ' ' + pct + '%', v]);
+    });
     return out;
   }
   function allowTotal(list){
@@ -1602,7 +1687,22 @@
       hourlyPay: clampNum(s.hourlyPay, 0, 1000000, 10320),
       weeklyHoliday: s.weeklyHoliday !== false,
       fivePlus: s.fivePlus !== false,
-      lockOn: !!s.lockOn
+      lockOn: !!s.lockOn,
+      myAllow: (Array.isArray(s.myAllow) ? s.myAllow : []).filter(function(a){ return a && typeof a === 'object'; }).map(function(a, i){
+        return {
+          id: String(a.id || ('ma' + i + Date.now().toString(36))),
+          name: String(a.name || '수당').slice(0,16),
+          amount: clampNum(a.amount, 0, 100000000, 0),
+          on: a.on !== false
+        };
+      }),
+      dedCustom: !!s.dedCustom,
+      dedOn: (function(){
+        var src = (s.dedOn && typeof s.dedOn === 'object') ? s.dedOn : {}, out = {};
+        ['pension','health','care','employ','income','local'].forEach(function(k){ out[k] = !!src[k]; });
+        return out;
+      })(),
+      ownerLink: { on: !!(s.ownerLink && s.ownerLink.on) }
     };
   }
   function normalizeRecordAllows(list){
@@ -2011,6 +2111,9 @@
     $$('#dedQuick [data-ded]').forEach(function(b){
       b.addEventListener('click', function(){
         data.settings.dedMode = b.getAttribute('data-ded');
+        /* 프리셋을 누르면 개별 버튼도 그 방식에 맞게 함께 바뀝니다 */
+        data.settings.dedCustom = false;
+        data.settings.dedOn = modeDedOn(data.settings.dedMode);
         save(); renderAll();
         var info = dedModeInfo(data.settings);
         toast(info.label + '로 바꿨어요. 시트·월 합계도 다시 계산했습니다.');
@@ -2018,6 +2121,130 @@
     });
     renderDedDetail(null);
   }
+
+  /* ================= 🧾 내 수당·공제 (내가 켜고 끄기) ================= */
+  var myAllowEdit = '';
+  function myAllowSum(){
+    var t = 0;
+    (data.settings.myAllow || []).forEach(function(a){ if(a && a.on !== false) t += r0(a.amount); });
+    return t;
+  }
+  function renderMyItems(){
+    var s = data.settings;
+    var ag = $('#myAllowGrid');
+    if(!ag) return;
+    var list = s.myAllow || [];
+    ag.innerHTML = list.length ? list.map(function(a){
+      return '<div class="mycell">' +
+        '<button type="button" class="mybtn' + (a.on !== false ? ' on' : '') + '" data-myalt="' + a.id + '">' +
+          '<span class="myn">🎁 ' + escapeHtml(a.name) + '</span>' +
+          '<span class="mya">+' + num(a.amount) + '원</span>' +
+          '<span class="mys">' + (a.on !== false ? '✓ 받는 중' : '안 받음') + '</span>' +
+        '</button>' +
+        '<button type="button" class="myedit" data-myaled="' + a.id + '" aria-label="이름·금액 고치기">✎</button></div>';
+    }).join('') : '<button type="button" class="mybtn empty" id="myAllowEmpty"><span class="myn">아직 없어요</span><span class="mys">＋ 수당 추가로 넣기</span></button>';
+
+    var dg = $('#myDedGrid');
+    var on = myDedOn(s);
+    dg.innerHTML = MY_DED.map(function(it){
+      return '<button type="button" class="mybtn' + (on[it.key] ? ' on' : '') + '" data-myded="' + it.key + '">' +
+        '<span class="myn">' + it.ico + ' ' + it.label + '</span>' +
+        '<span class="mya">' + (on[it.key] ? Math.round(dedItemRate(it.key, s) * 100) / 100 + '%' : '0%') + '</span>' +
+        '<span class="mys">' + (on[it.key] ? '✓ 떼는 중' : '안 뗌') + '</span></button>';
+    }).join('');
+
+    var t = totals(monthRecords());
+    var wh = weeklyHolidayOf(monthRecords());
+    var allow = myAllowSum();
+    var net = t.net + wh.total + allow;
+    var box = $('#myNetBox');
+    if(box) box.innerHTML =
+      '<div class="mr"><span>이번 달 공제 전</span><b>' + money(t.pre) + '</b></div>' +
+      '<div class="mr"><span>떼는 돈(공제)</span><b>−' + money(t.ded) + '</b></div>' +
+      (allow ? '<div class="mr"><span>' + monthLabel(viewMonth) + ' 수당</span><b>+' + money(allow) + '</b></div>' : '') +
+      (wh.total ? '<div class="mr"><span>주휴수당</span><b>+' + money(wh.total) + '</b></div>' : '') +
+      '<div class="mr total"><span>' + monthLabel(viewMonth) + ' 실수령</span><b>' + money(net) + '</b></div>';
+
+    $$('#myAllowGrid [data-myalt]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-myalt');
+        (data.settings.myAllow || []).forEach(function(a){ if(a.id === id) a.on = (a.on === false); });
+        save(); renderAll();
+        var it = (data.settings.myAllow || []).filter(function(a){ return a.id === id; })[0];
+        if(it) toast(it.name + (it.on !== false ? ' 켰어요' : ' 껐어요'));
+      });
+    });
+    $$('#myAllowGrid [data-myaled]').forEach(function(b){
+      b.addEventListener('click', function(){ openMyAllow(b.getAttribute('data-myaled')); });
+    });
+    var em = $('#myAllowEmpty');
+    if(em) em.addEventListener('click', function(){ openMyAllow(''); });
+    $$('#myDedGrid [data-myded]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var key = b.getAttribute('data-myded');
+        var s2 = data.settings;
+        if(!s2.dedCustom){
+          s2.dedOn = modeDedOn(dedModeOf(s2));
+          s2.dedCustom = true;
+        }
+        s2.dedOn[key] = !s2.dedOn[key];
+        save(); renderAll();
+        var it = MY_DED.filter(function(x){ return x.key === key; })[0];
+        toast((it ? it.label : key) + (s2.dedOn[key] ? ' 뗍니다' : ' 안 뗍니다'));
+      });
+    });
+  }
+  function openMyAllow(id){
+    myAllowEdit = id || '';
+    var it = null;
+    (data.settings.myAllow || []).forEach(function(a){ if(a.id === id) it = a; });
+    $('#myAllowForm').hidden = false;
+    $('#myAllowName').value = it ? it.name : '';
+    $('#myAllowAmt').value = it ? r0(it.amount) : '';
+    $('#btnMyAllowDel').hidden = !it;
+    $('#myAllowName').focus();
+  }
+  function closeMyAllow(){
+    myAllowEdit = '';
+    $('#myAllowForm').hidden = true;
+  }
+  function bindMyItems(){
+    var add = $('#btnMyAllowAdd');
+    if(add) add.addEventListener('click', function(){
+      if(!$('#myAllowForm').hidden && !myAllowEdit){ closeMyAllow(); return; }
+      openMyAllow('');
+    });
+    var sv = $('#btnMyAllowSave');
+    if(sv) sv.addEventListener('click', function(){
+      var nm = ($('#myAllowName').value || '').trim() || '수당';
+      var am = Math.max(0, r0(Number(String($('#myAllowAmt').value).replace(/[^0-9]/g, '')) || 0));
+      if(!am){ toast('금액을 넣어 주세요'); return; }
+      if(!Array.isArray(data.settings.myAllow)) data.settings.myAllow = [];
+      if(myAllowEdit){
+        data.settings.myAllow.forEach(function(a){ if(a.id === myAllowEdit){ a.name = nm.slice(0,16); a.amount = am; } });
+      } else {
+        data.settings.myAllow.push({ id:'ma' + Date.now().toString(36), name:nm.slice(0,16), amount:am, on:true });
+      }
+      save(); closeMyAllow(); renderAll();
+      toast('내 수당에 넣었어요 · ' + nm + ' ' + num(am) + '원');
+    });
+    var cc = $('#btnMyAllowCancel');
+    if(cc) cc.addEventListener('click', closeMyAllow);
+    var dl = $('#btnMyAllowDel');
+    if(dl) dl.addEventListener('click', function(){
+      if(!myAllowEdit) return;
+      var nm = '';
+      data.settings.myAllow = (data.settings.myAllow || []).filter(function(a){ if(a.id === myAllowEdit) nm = a.name; return a.id !== myAllowEdit; });
+      save(); closeMyAllow(); renderAll();
+      toast((nm || '수당') + '을 지웠어요');
+    });
+  }
+
+  /* [확장 지점 · 2026-11-26] 사장님 연결(수당 신청·승인) 모드 — 지금은 만들지 않았습니다.
+     나중에 쓰려면 settings.ownerLink.on 을 켜고, 여기서 '[수당신청]' 블록을 만들어
+     카톡으로 보내고 관리자 앱 접수함에서 읽는 흐름을 붙이면 됩니다. */
+  function ownerLinkOn(){ return !!(data.settings && data.settings.ownerLink && data.settings.ownerLink.on); }
+
   function resetForm(keepTimes){
     $('#fDate').value = todayISO();
     if(!keepTimes){ $('#fIn').value = '08:30'; $('#fOut').value = '19:30'; }
@@ -2087,10 +2314,13 @@
     $('#dPre').textContent = money(t.pre);
     $('#dPreSub').textContent = '기본 ' + num(t.base) + ' + 연장 ' + num(t.otPay);
     var wh = weeklyHolidayOf(monthRecords());
-    $('#dNet').textContent = money(t.net + wh.total);
-    $('#dNetSub').textContent = s.workMode === 'hourly'
-      ? ('공제 ' + num(t.ded) + '원' + (wh.total ? ' · 주휴수당 ' + num(wh.total) + '원 포함' : ''))
-      : (netMode ? '회사 실수령 기준' : ('공제 ' + num(t.ded) + '원'));
+    var fx = myAllowSum();
+    $('#dNet').textContent = money(t.net + wh.total + fx);
+    var dsub = [];
+    if(t.ded) dsub.push('공제 ' + num(t.ded) + '원');
+    if(wh.total) dsub.push('주휴수당 ' + num(wh.total) + '원');
+    if(fx) dsub.push('수당 ' + num(fx) + '원');
+    $('#dNetSub').textContent = dsub.length ? (dsub.join(' · ') + ' 포함') : (netMode ? '회사 실수령 기준' : '공제 0원');
   }
   function renderPaid(){
     var t = totals(monthRecords());
@@ -2158,9 +2388,11 @@
     var sumEl = $('#sheetSum');
     if(sumEl){
       var wh2 = weeklyHolidayOf(recs);
-      sumEl.innerHTML = '<b>' + t.days + '일 · ' + fmtHM(t.worked) + '</b> · 실수령 <b class="ok">' + money(t.net + wh2.total) + '</b>' +
+      var fx2 = myAllowSum();
+      sumEl.innerHTML = '<b>' + t.days + '일 · ' + fmtHM(t.worked) + '</b> · 실수령 <b class="ok">' + money(t.net + wh2.total + fx2) + '</b>' +
         ' · 세전 ' + money(t.pre) + (t.ded ? ' (공제 ' + money(t.ded) + ')' : '') +
         (wh2.total ? ' · 주휴수당 ' + money(wh2.total) + ' 포함' : '') +
+        (fx2 ? ' · 수당 ' + money(fx2) + ' 포함' : '') +
         (t.paidDays ? '<br>입금 확인 ' + t.paidDays + '일 · ' + money(t.paidNet) : '');
     }
     renderPaid();
@@ -2212,11 +2444,13 @@
     var paid = 0, unpaid = 0, unpaidN = 0;
     list.forEach(function(r){ var c = calc(r, data.settings); if(r.paid) paid += c.net; else { unpaid += c.net; unpaidN++; } });
     var whp = weeklyHolidayOf(list);
-    t.net += whp.total;
+    /* 매달 붙는 내 수당은 '이번 달' 전체를 볼 때만 더합니다 */
+    var fxPeriod = (periodState.key === 'month') ? myAllowSum() : 0;
+    t.net += whp.total + fxPeriod;
     $('#periodStats').innerHTML =
       '<div class="cs"><span>🧾 근무</span><b>' + list.length + '건</b> <small>' + t.days + '일 · ' + fmtHM(t.worked) + '</small></div>' +
       '<div class="cs"><span>💰 지급(세전)</span><b>' + money(t.pre) + '</b></div>' +
-      '<div class="cs"><span>🧮 공제</span><b>' + money(t.ded) + '</b></div>' +
+      '<div class="cs"><span>🧮 공제</span><b>' + money(t.ded) + '</b>' + (fxPeriod ? ' <small>수당 ' + num(fxPeriod) + ' 포함</small>' : '') + '</div>' +
       '<div class="cs ok"><span>🙌 실수령</span><b>' + money(t.net) + '</b>' + (whp.total ? ' <small>주휴 ' + num(whp.total) + ' 포함</small>' : '') + '</div>' +
       '<div class="cs wait"><span>⏳ 아직 못 받음</span><b>' + money(unpaid) + '</b> <small>' + unpaidN + '건</small></div>' +
       '<div class="cs"><span>✅ 받은 돈</span><b>' + money(paid) + '</b></div>';
@@ -2396,6 +2630,7 @@
     renderBasis();
     renderMode();
     renderDedQuick();
+    renderMyItems();
     renderDash();
     renderSheet();
     renderPeriod();
@@ -3669,6 +3904,7 @@
     $('#dawnFix').checked = data.settings.dawnFix !== false;
     if(!storageOK) $('#storageWarn').hidden = false;
     bind();
+    bindMyItems();
     bindReceived();
     renderReceived();
     bindRights();
