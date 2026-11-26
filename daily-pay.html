@@ -1536,7 +1536,7 @@
       var rate = dedItemRate(it.key, s);
       var v = Math.round(pretax * rate / 100);
       var pct = Math.round(rate * 1000) / 1000;
-      out.push([it.label + ' ' + pct + '%', v]);
+      out.push([it.label + ' ' + pct + '%', v, it.key]);
     });
     return out;
   }
@@ -2146,11 +2146,22 @@
 
     var dg = $('#myDedGrid');
     var on = myDedOn(s);
+    /* 이번 달 기록에서 항목별로 실제 얼마 떼이는지 모아 둡니다 */
+    var byKey = {};
+    monthRecords().forEach(function(r){
+      var c2 = calc(r, s);
+      var pre = Math.max(0, c2.pretax - c2.allow);
+      dedBreakdown(pre, s).forEach(function(row){
+        if(row[2]) byKey[row[2]] = (byKey[row[2]] || 0) + row[1];
+      });
+    });
     dg.innerHTML = MY_DED.map(function(it){
+      var amt = byKey[it.key] || 0;
+      var pct = Math.round(dedItemRate(it.key, s) * 100) / 100;
       return '<button type="button" class="mybtn' + (on[it.key] ? ' on' : '') + '" data-myded="' + it.key + '">' +
         '<span class="myn">' + it.ico + ' ' + it.label + '</span>' +
-        '<span class="mya">' + (on[it.key] ? Math.round(dedItemRate(it.key, s) * 100) / 100 + '%' : '0%') + '</span>' +
-        '<span class="mys">' + (on[it.key] ? '✓ 떼는 중' : '안 뗌') + '</span></button>';
+        '<span class="mya">' + (on[it.key] ? '−' + num(amt) + '원' : '0원') + '</span>' +
+        '<span class="mys">' + (on[it.key] ? '✓ 떼는 중 · ' + pct + '%' : '안 뗌') + '</span></button>';
     }).join('');
 
     var t = totals(monthRecords());
