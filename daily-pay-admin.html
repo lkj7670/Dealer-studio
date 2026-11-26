@@ -751,22 +751,78 @@
   .calstats .cs.ok b{color:var(--green)}
   .calstats .cs.wait{background:#fffaf0; border-color:#f3e3c0}
   .calstats .cs.wait b{color:#b45309}
-  .calgrid2{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
-  .calgrid2 .dow{text-align:center; font-size:10.5px; font-weight:800; color:#94a1b3; padding-bottom:2px}
+  .calgrid2{display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin:0 -6px}
+  .calgrid2 .dow{text-align:center; font-size:11px; font-weight:800; color:#9aa6b8; padding-bottom:5px}
+  .calgrid2 .dow.sun{color:#d86a6a}
+  .calgrid2 .dow.sat{color:#7194c4}
   .calcell{
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:1px;
-    min-height:58px; padding:4px 2px; border-radius:10px; border:1px solid transparent; background:#f7f9fc;
-    font-size:11px; color:#3c4a60;
+    display:flex; flex-direction:column; align-items:center; gap:1px;
+    min-height:60px; min-width:0; padding:3px 0 5px; overflow:hidden;
+    border-radius:11px; border:1px solid transparent; background:transparent;
+    font-size:10.5px; color:var(--ink);
   }
   .calcell.empty{background:transparent}
-  .calcell .cd{font-size:12px; font-weight:800; color:#5b6a80; line-height:1.2}
-  .calcell .cm{font-size:9.5px; font-weight:700; color:#8b97a8; line-height:1.1}
-  .calcell .ca{font-size:10.5px; font-weight:800; color:var(--brand-d); font-variant-numeric:tabular-nums; line-height:1.15; white-space:nowrap}
-  .calcell.has{background:#eef7f5; border-color:#d5eae5}
-  .calcell.in{background:#fff}
-  .calcell.today{outline:2px solid #f97316; outline-offset:-2px}
+  .calcell .cd{
+    font-size:15px; font-weight:800; line-height:1; color:var(--ink);
+    min-width:28px; height:28px; padding:0 1px; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .calcell.sun .cd{color:#d14343}
+  .calcell.sat .cd{color:#2f6fb5}
+  .calcell .cm{font-size:8.5px; font-weight:700; line-height:1.1; color:#8b97a8; white-space:nowrap}
+  .calcell .ca{
+    max-width:100%; font-size:10.5px; font-weight:800; letter-spacing:-.3px; line-height:1.15;
+    color:#1b6ad4; font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .calcell .ca.l9{font-size:9.5px; letter-spacing:-.4px}
+  .calcell .ca.l10{font-size:8.5px; letter-spacing:-.5px}
+  .calcell .ca.l11{font-size:8px; letter-spacing:-.6px}
+  .calcell.has{background:var(--brand-w)}
+  .calcell.today .cd{background:var(--brand); color:#fff}
   .calcell.sel{background:var(--brand); border-color:var(--brand)}
   .calcell.sel .cd, .calcell.sel .cm, .calcell.sel .ca{color:#fff}
+  .calcell.sel.today .cd{background:#fff; color:var(--brand-d)}
+  /* 인원 필터(전체 + 직원별) */
+  .calfilter{
+    display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -2px 8px;
+    padding:2px; scrollbar-width:none;
+  }
+  .calfilter::-webkit-scrollbar{display:none}
+  .calfilter .cfbtn{
+    flex:0 0 auto; border:0; background:transparent; color:#8b97a8; font-size:14px; font-weight:800;
+    padding:7px 4px 9px; border-bottom:2.5px solid transparent; white-space:nowrap; letter-spacing:-.3px;
+  }
+  .calfilter .cfbtn.on{color:var(--ink); border-bottom-color:var(--brand)}
+  /* 달력 아래 이번 달 요약 바 */
+  .calbar{
+    display:flex; align-items:stretch; margin-top:10px; background:#fff; border:1px solid var(--line);
+    border-radius:16px; box-shadow:0 1px 3px rgba(15,23,36,.05); overflow:hidden;
+  }
+  .calbar .cseg{
+    position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px;
+    flex:1 1 0; min-width:0; padding:9px 24px 9px 12px; border:0; background:transparent;
+    text-align:left; color:var(--ink);
+  }
+  .calbar .cseg + .cseg{border-left:1px solid var(--line)}
+  .calbar .cseg .k{font-size:10.5px; font-weight:800; color:var(--muted); line-height:1.1}
+  .calbar .cseg .v{
+    max-width:100%; font-size:16px; font-weight:800; letter-spacing:-.5px; line-height:1.2;
+    font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .calbar .cseg.main .v{color:var(--brand-d); font-size:17px}
+  .calbar .cseg .ar{position:absolute; right:9px; top:50%; transform:translateY(-50%);
+    font-size:13px; font-weight:800; color:#a9b4c4}
+  .calcard2 .montbar .monthlab{
+    background:transparent; border:0; font-size:20px; font-weight:800; letter-spacing:-.6px; color:var(--ink);
+    display:flex; align-items:baseline; justify-content:center; gap:5px; position:relative; padding:0;
+    text-align:center;
+  }
+  .calcard2 .montbar .monthlab .cyear{font-size:11.5px; font-weight:800; color:var(--muted)}
+  .calcard2 .montbar .monthlab #calMonthPick{
+    position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
+    opacity:0; border:0; background:transparent; cursor:pointer;
+  }
+  .calcard2 .montbar .nbtn{color:var(--brand-d)}
   .caldayhead{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
   .caldayhead b{font-size:17px; letter-spacing:-.3px}
   .caldayhead span{font-size:13px; font-weight:800; color:var(--brand-d)}
@@ -1208,12 +1264,16 @@
       </div>
       <div class="card" id="calStats"></div>
       <div class="card calcard2">
+        <div class="calfilter" id="calFilter"></div>
         <div class="montbar" style="margin:0 0 8px">
           <button class="nbtn" id="calPrev" aria-label="이전 달">‹</button>
-          <span class="monthlab" id="calMonthLabel">2026년 11월</span>
+          <div class="monthlab" id="calMonthLabel">11월 <span class="cyear">2026</span>
+            <input type="month" id="calMonthPick" aria-label="월 선택">
+          </div>
           <button class="nbtn" id="calNext" aria-label="다음 달">›</button>
         </div>
         <div class="calgrid2" id="calGrid2"></div>
+        <div class="calbar" id="calBar"></div>
         <p class="hint" style="margin-top:8px">날짜를 톡 누르면 그날 근무자와 금액이 아래에 펼쳐져요.</p>
       </div>
       <div id="calDayPanel"></div>
@@ -3635,7 +3695,7 @@ function undoBatch(bid){
 /* ============================================================
    달력 · 기간별 합계 (버튼만 누르면 바로)
    ============================================================ */
-var calState = { start:'', end:'', key:'month', month:'', sel:'' };
+var calState = { start:'', end:'', key:'month', month:'', sel:'', emp:'' };
 function monthStartISO(m){ return m + '-01'; }
 function monthEndISO(m){
   var p = m.split('-');
@@ -3714,52 +3774,151 @@ function renderCal(){
       '<div class="cs wait"><span>⏳ 미지급</span><b>' + money(a.unpaidAmt) + '</b><small>' + a.unpaidN + '건 남음</small></div>' +
       '<div class="cs"><span>✅ 지급완료</span><b>' + money(a.paid) + '</b><small>' + (list.length - a.unpaidN) + '건</small></div>' +
     '</div>';
-  $('#calMonthLabel').textContent = monthLabel(calState.month);
+  $('#calMonthLabel').innerHTML = (function(){
+    var p = String(calState.month || nowMonth()).split('-');
+    return Number(p[1]) + '월 <span class="cyear">' + p[0] + '</span>';
+  })();
+  var mpick = $('#calMonthPick');
+  if(mpick && mpick.value !== calState.month) mpick.value = calState.month;
+  renderCalFilter(c);
   buildPayCalendar(c);
 }
 function dateShort2(s){ if(!s) return '-'; var p = s.split('-'); return p[0] + '.' + p[1] + '.' + p[2]; }
+/* 달력에 쓸 직원 목록 — 등록된 직원 + 그 달에 기록이 있는 이름 */
+function calEmpList(c){
+  var m = calState.month || nowMonth();
+  var seen = {}, out = [];
+  function push(name){
+    var n = normName(name);
+    if(!n || seen[n]) return;
+    seen[n] = 1;
+    out.push(String(name).trim());
+  }
+  (c.employees || []).forEach(function(e){ push(e.name); });
+  c.records.forEach(function(r){ if(r.date.slice(0,7) === m) push(r.empName); });
+  return out;
+}
+function calEmpOn(name){
+  if(!calState.emp) return false;
+  return normName(name) === normName(calState.emp);
+}
+function calMonthRecords(c){
+  var m = calState.month || nowMonth();
+  return c.records.filter(function(r){
+    if(r.date.slice(0,7) !== m) return false;
+    if(calState.emp && !calEmpOn(r.empName)) return false;
+    return true;
+  });
+}
+function calAmtClass(s){
+  var n = String(s || '').length;
+  if(n >= 11) return ' l11';
+  if(n >= 10) return ' l10';
+  if(n >= 9) return ' l9';
+  return '';
+}
+/* 휴대폰 폭이 좁아도 금액이 잘리지 않게 칸에 맞춰 글자를 줄입니다 */
+function fitCalAmounts(rootSel){
+  var nodes = document.querySelectorAll(rootSel + ' .ca');
+  for(var i=0;i<nodes.length;i++){
+    var el = nodes[i];
+    var fs = parseFloat(window.getComputedStyle(el).fontSize) || 10;
+    var guard = 0;
+    while(el.scrollWidth > el.clientWidth && fs > 7.4 && guard < 20){
+      fs = Math.round((fs - 0.4) * 10) / 10;
+      el.style.fontSize = fs + 'px';
+      guard++;
+    }
+  }
+}
+function renderCalFilter(c){
+  var host = $('#calFilter');
+  if(!host) return;
+  var names = calEmpList(c);
+  if(calState.emp && !names.some(function(n){ return calEmpOn(n); })) calState.emp = '';
+  var html = '<button type="button" class="cfbtn' + (calState.emp ? '' : ' on') + '" data-calemp="">전체</button>';
+  html += names.map(function(n){
+    return '<button type="button" class="cfbtn' + (calEmpOn(n) ? ' on' : '') + '" data-calemp="' + esc(n) + '">' + esc(n) + '</button>';
+  }).join('');
+  host.innerHTML = html;
+  $$('#calFilter [data-calemp]').forEach(function(b){
+    b.onclick = function(){
+      calState.emp = b.getAttribute('data-calemp') || '';
+      calState.sel = '';
+      renderCal();
+    };
+  });
+  var on2 = host.querySelector('.cfbtn.on');
+  if(on2 && on2.scrollIntoView){ try{ on2.scrollIntoView({ block:'nearest', inline:'center' }); }catch(e){} }
+}
+function renderCalBar(c){
+  var host = $('#calBar');
+  if(!host) return;
+  var list = calMonthRecords(c);
+  var ded = 0, net = 0;
+  list.forEach(function(r){ var mm = recordMoney(c, r); ded += mm.ded.workerTotal; net += mm.net; });
+  host.innerHTML =
+    '<button type="button" class="cseg" data-calbar="ded"><span class="k">공제</span>' +
+      '<span class="v">' + money(ded) + '</span><span class="ar">›</span></button>' +
+    '<button type="button" class="cseg main" data-calbar="net"><span class="k">실수령</span>' +
+      '<span class="v">' + money(net) + '</span><span class="ar">›</span></button>';
+  $$('#calBar [data-calbar]').forEach(function(b){
+    b.onclick = function(){ var st = $('#calStats'); if(st && st.scrollIntoView) st.scrollIntoView({ behavior:'smooth', block:'center' }); };
+  });
+}
 function buildPayCalendar(c){
   var m = calState.month || nowMonth();
   var first = m + '-01';
   var startDow = dow(first);
   var days = Number(monthEndISO(m).slice(8, 10));
   var sums = {};
-  c.records.forEach(function(r){
-    if(r.date.slice(0,7) !== m) return;
-    if(!sums[r.date]) sums[r.date] = { n:0, gross:0, net:0, names:[] };
+  calMonthRecords(c).forEach(function(r){
+    if(!sums[r.date]) sums[r.date] = { n:0, net:0, names:[] };
     var mm = recordMoney(c, r);
     sums[r.date].n++;
-    sums[r.date].gross += mm.expected;
     sums[r.date].net += mm.net;
     sums[r.date].names.push(r.empName || '?');
   });
-  var heads = ['일','월','화','수','목','금','토'].map(function(d){ return '<span class="dow">' + d + '</span>'; }).join('');
+  var heads = ['일','월','화','수','목','금','토'].map(function(d, i){
+    return '<span class="dow' + (i === 0 ? ' sun' : (i === 6 ? ' sat' : '')) + '">' + d + '</span>';
+  }).join('');
   var cells = '';
   for(var i=0;i<startDow;i++) cells += '<span class="calcell empty"></span>';
   for(var d=1; d<=days; d++){
     var iso = m + '-' + pad(d);
     var s2 = sums[iso];
-    var inRange = calState.start && calState.end && iso >= calState.start && iso <= calState.end;
-    var cls = 'calcell' + (s2 ? ' has' : '') + (inRange ? ' in' : '') + (iso === todayISO() ? ' today' : '');
-    if(calState.sel === iso) cls += ' sel';
-    cells += '<button class="' + cls + '" data-cald="' + iso + '">' +
+    var dw = dow(iso);
+    var isToday = (iso === todayISO());
+    var cls = 'calcell' + (s2 ? ' has' : '') + (dw === 0 ? ' sun' : (dw === 6 ? ' sat' : '')) +
+      (isToday ? ' today' : '') + (calState.sel === iso ? ' sel' : '');
+    var amt = s2 ? '+' + num(s2.net) : '';
+    var sub = s2 ? (calState.emp ? (s2.n > 1 ? s2.n + '건' : '') : s2.n + '명') : '';
+    cells += '<button class="' + cls + '" data-cald="' + iso + '"' + (isToday ? ' aria-current="date"' : '') + '>' +
       '<span class="cd">' + d + '</span>' +
-      (s2 ? '<span class="cm">' + s2.n + '명</span><span class="ca">' + mansu(s2.gross) + '</span>' : '') +
+      (s2 ? (sub ? '<span class="cm">' + sub + '</span>' : '') +
+            '<span class="ca' + calAmtClass(amt) + '">' + amt + '</span>' : '') +
       '</button>';
   }
   $('#calGrid2').innerHTML = heads + cells;
+  fitCalAmounts('#calGrid2');
   $$('#calGrid2 [data-cald]').forEach(function(b){
     b.onclick = function(){ calState.sel = b.getAttribute('data-cald'); renderCal(); renderCalDay(); };
   });
+  renderCalBar(c);
   renderCalDay();
 }
 function renderCalDay(){
   var c = company();
   var host = $('#calDayPanel');
   if(!calState.sel){ host.innerHTML = '<div class="card emptybox"><b>날짜를 톡 누르면</b>그날 근무자와 금액이 여기 펼쳐져요.</div>'; return; }
-  var list = c.records.filter(function(r){ return r.date === calState.sel; });
+  var list = c.records.filter(function(r){
+    if(r.date !== calState.sel) return false;
+    if(calState.emp && !calEmpOn(r.empName)) return false;
+    return true;
+  });
   if(!list.length){
-    host.innerHTML = '<div class="card emptybox"><b>' + dateLabel(calState.sel) + ' · 기록 없음</b>' +
+    host.innerHTML = '<div class="card emptybox"><b>' + dateLabel(calState.sel) +
+      (calState.emp ? ' · ' + esc(calState.emp) + ' 기록 없음' : ' · 기록 없음') + '</b>' +
       '<button class="btn big" id="calDayAdd" style="margin-top:10px">➕ 이 날 기록 추가</button></div>';
     $('#calDayAdd').onclick = function(){ openEdit(null, calState.sel); };
     return;
@@ -3767,7 +3926,8 @@ function renderCalDay(){
   var net = 0, gross = 0;
   list.forEach(function(r){ var mm = recordMoney(c, r); gross += mm.expected; net += mm.net; });
   host.innerHTML = '<div class="card" style="padding:14px 16px">' +
-    '<div class="caldayhead"><b>' + dateLabel(calState.sel) + '</b><span>' + list.length + '명 · ' + money(net) + '</span></div>' +
+    '<div class="caldayhead"><b>' + dateLabel(calState.sel) + (calState.emp ? ' · ' + esc(calState.emp) : '') + '</b><span>' +
+    list.length + (calState.emp ? '건' : '명') + ' · ' + money(net) + '</span></div>' +
     '<div class="biglist" style="margin-top:8px">' + list.map(function(r){
       var mm = recordMoney(c, r);
       return '<button class="lrow" data-calrec="' + r.id + '">' +
@@ -6212,8 +6372,11 @@ function bindAll(){
     calState.key = 'custom';
     renderCal();
   });
-  on($('#calPrev'), 'click', function(){ calState.month = monthAdd(calState.month || nowMonth(), -1); renderCal(); });
-  on($('#calNext'), 'click', function(){ calState.month = monthAdd(calState.month || nowMonth(), 1); renderCal(); });
+  on($('#calPrev'), 'click', function(){ calState.month = monthAdd(calState.month || nowMonth(), -1); calState.sel = ''; renderCal(); });
+  on($('#calNext'), 'click', function(){ calState.month = monthAdd(calState.month || nowMonth(), 1); calState.sel = ''; renderCal(); });
+  on($('#calMonthPick'), 'change', function(){
+    if(/^\d{4}-\d{2}$/.test(this.value)){ calState.month = this.value; calState.sel = ''; renderCal(); }
+  });
 
   /* 월별 명세 한 장 */
   on($('#empMonthCopy'), 'click', function(){

@@ -544,20 +544,81 @@
     font-size:13.5px; font-weight:800; color:#4a5a70;
   }
   .segtoggle button.on{background:var(--brand-w); border-color:var(--brand); color:var(--brand-d)}
-  .calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:8px}
-  .calgrid .dow{text-align:center; font-size:10px; font-weight:800; color:#94a1b3; padding-bottom:2px}
+  /* 사진(카카오페이) 스타일 달력 — < 11월 > 머리 · 날짜 아래 파란 급여 · 오늘 원형 배지 */
+  .calnav{display:flex; align-items:center; gap:6px; margin:6px 0 2px}
+  .calnav .cnav{
+    width:46px; height:46px; flex:0 0 auto; border-radius:13px; border:1px solid var(--line);
+    background:#fff; color:var(--brand-d); font-size:19px; font-weight:800; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .calnav .cnav:active{background:var(--brand-w)}
+  .calnav-mid{flex:1; min-width:0; position:relative; text-align:center; padding:3px 0}
+  .calnav-mid .cmlbl{display:inline-flex; align-items:baseline; gap:5px}
+  .calnav-mid .cmlbl b{font-size:20px; font-weight:800; letter-spacing:-.6px; color:var(--ink)}
+  .calnav-mid .cmlbl span{font-size:11.5px; font-weight:800; color:var(--muted)}
+  .calnav-mid #calMonthPick{
+    position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
+    opacity:0; border:0; background:transparent; cursor:pointer;
+  }
+  .calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-top:4px}
+  .calgrid.calwide{margin:0 -6px}
+  .calgrid .dow{text-align:center; font-size:11px; font-weight:800; color:#9aa6b8; padding-bottom:5px}
+  .calgrid .dow.sun{color:#d86a6a}
+  .calgrid .dow.sat{color:#7194c4}
   .calcell2{
-    display:flex; flex-direction:column; align-items:center; gap:1px; min-height:56px; padding:4px 2px;
-    border-radius:10px; border:1px solid transparent; background:#f7f9fc; font-size:10.5px; color:#3c4a60;
+    display:flex; flex-direction:column; align-items:center; gap:1px;
+    min-height:60px; min-width:0; padding:3px 0 5px; overflow:hidden;
+    border-radius:11px; border:1px solid transparent; background:transparent;
+    font-size:10.5px; color:var(--ink);
   }
   .calcell2.empty{background:transparent}
-  .calcell2 .cd{font-size:11.5px; font-weight:800; color:#5b6a80}
-  .calcell2 .ca{font-size:10px; font-weight:800; color:var(--brand-d); font-variant-numeric:tabular-nums; white-space:nowrap}
-  .calcell2 .cn{font-size:9px; font-weight:700; color:#8b97a8}
-  .calcell2.has{background:#eef7f5; border-color:#d5eae5}
+  .calcell2 .cd{
+    font-size:15px; font-weight:800; line-height:1; color:var(--ink);
+    min-width:28px; height:28px; padding:0 1px; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .calcell2.sun .cd{color:#d14343}
+  .calcell2.sat .cd{color:#2f6fb5}
+  .calcell2 .ca{
+    max-width:100%; font-size:10.5px; font-weight:800; letter-spacing:-.3px; line-height:1.15;
+    color:#1b6ad4; font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .calcell2 .ca.l9{font-size:9.5px; letter-spacing:-.4px}
+  .calcell2 .ca.l10{font-size:8.5px; letter-spacing:-.5px}
+  .calcell2 .ca.l11{font-size:8px; letter-spacing:-.6px}
+  .calcell2 .cn{font-size:8.5px; font-weight:700; line-height:1.1; color:#8b97a8}
+  .calcell2.has{background:var(--brand-w)}
+  .calcell2.today .cd{background:var(--brand); color:#fff}
   .calcell2.sel{background:var(--brand); border-color:var(--brand)}
   .calcell2.sel .cd, .calcell2.sel .ca, .calcell2.sel .cn{color:#fff}
-  .calcell2.today{outline:2px solid #f97316; outline-offset:-2px}
+  .calcell2.sel.today .cd{background:#fff; color:var(--brand-d)}
+  .calbar{
+    display:flex; align-items:stretch; margin-top:10px; background:#fff; border:1px solid var(--line);
+    border-radius:16px; box-shadow:0 1px 3px rgba(15,23,36,.05); overflow:hidden;
+  }
+  .calbar .cseg{
+    position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px;
+    flex:1 1 0; min-width:0; padding:9px 24px 9px 12px; border:0; background:transparent;
+    text-align:left; color:var(--ink);
+  }
+  .calbar .cseg + .cseg{border-left:1px solid var(--line)}
+  .calbar .cseg .k{font-size:10.5px; font-weight:800; color:var(--muted); line-height:1.1}
+  .calbar .cseg .v{
+    max-width:100%; font-size:16px; font-weight:800; letter-spacing:-.5px; line-height:1.2;
+    font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .calbar .cseg.main .v{color:var(--brand-d); font-size:17px}
+  .calbar .cseg .ar{position:absolute; right:9px; top:50%; transform:translateY(-50%);
+    font-size:13px; font-weight:800; color:#a9b4c4}
+  .mrow{
+    display:block; width:100%; text-align:left; border:1px solid var(--line); background:#fff;
+    border-radius:13px; padding:11px 12px;
+  }
+  .mrowTop{display:flex; align-items:baseline; gap:7px}
+  .mrowTop b{font-size:13.5px; font-weight:800; letter-spacing:-.3px}
+  .mrowAmt{margin-left:auto; font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--brand-d)}
+  .mrowMid{display:block; font-size:12px; font-weight:700; color:var(--muted); margin-top:3px}
+  .mrowBot{display:block; font-size:11.5px; font-weight:600; color:#9aa6b8; margin-top:2px}
   .pstats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
   .pstats .cs{border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:#fbfcfe}
   .pstats .cs span{display:block; font-size:11px; font-weight:800; color:var(--muted)}
@@ -923,8 +984,18 @@
         </div>
         <p class="scroll-hint">← 옆으로 밀면 금액까지 보여요 · 행을 누르면 수정</p>
         <div id="calWrap" hidden>
-          <div class="calgrid" id="payCal"></div>
-          <div id="calDayList" class="alrows" style="margin-top:10px"></div>
+          <div class="calnav">
+            <button class="cnav" id="calPrevMonth" type="button" aria-label="이전 달">‹</button>
+            <div class="calnav-mid">
+              <div class="cmlbl"><b id="calMonthTxt">11월</b><span id="calYearTxt">2026</span></div>
+              <input id="calMonthPick" type="month" aria-label="월 선택">
+            </div>
+            <button class="cnav" id="calNextMonth" type="button" aria-label="다음 달">›</button>
+          </div>
+          <div class="calgrid calwide" id="payCal"></div>
+          <div class="calbar" id="payCalBar"></div>
+          <p class="hint" style="margin:8px 2px 0">날짜를 톡 누르면 그날 근무가 아래에 펼쳐져요.</p>
+          <div id="calDayList" class="alrows" style="margin-top:8px"></div>
         </div>
       </section>
 
@@ -2518,24 +2589,92 @@
       byDay[r.date].n++;
       byDay[r.date].net += c.net;
     });
-    var heads = ['일','월','화','수','목','금','토'].map(function(d){ return '<span class="dow">' + d + '</span>'; }).join('');
+    renderCalHead();
+    var heads = ['일','월','화','수','목','금','토'].map(function(d, i){
+      return '<span class="dow' + (i === 0 ? ' sun' : (i === 6 ? ' sat' : '')) + '">' + d + '</span>';
+    }).join('');
     var cells = '';
     for(var i=0;i<startDow;i++) cells += '<span class="calcell2 empty"></span>';
     for(var d=1; d<=days; d++){
       var iso = m + '-' + pad(d);
       var v = byDay[iso];
-      var cls = 'calcell2' + (v ? ' has' : '') + (iso === todayISO() ? ' today' : '') + (periodState.sel === iso ? ' sel' : '');
-      cells += '<button type="button" class="' + cls + '" data-cald2="' + iso + '">' +
+      var dow = new Date(iso + 'T00:00:00').getDay();
+      var isToday = (iso === todayISO());
+      var cls = 'calcell2' + (v ? ' has' : '') + (dow === 0 ? ' sun' : (dow === 6 ? ' sat' : '')) +
+        (isToday ? ' today' : '') + (periodState.sel === iso ? ' sel' : '');
+      var amt = v ? '+' + num(v.net) : '';
+      cells += '<button type="button" class="' + cls + '" data-cald2="' + iso + '"' +
+        (isToday ? ' aria-current="date"' : '') + '>' +
         '<span class="cd">' + d + '</span>' +
-        (v ? '<span class="ca">' + mansu(v.net) + '</span>' + (v.n > 1 ? '<span class="cn">' + v.n + '건</span>' : '') : '') +
+        (v ? '<span class="ca' + calAmtClass(amt) + '">' + amt + '</span>' +
+             (v.n > 1 ? '<span class="cn">' + v.n + '건</span>' : '') : '') +
         '</button>';
     }
     $('#payCal').innerHTML = heads + cells;
+    fitCalAmounts('#payCal');
     $$('#payCal [data-cald2]').forEach(function(b){
       b.addEventListener('click', function(){
         periodState.sel = b.getAttribute('data-cald2');
         renderPayCalendar();
         renderCalDay();
+      });
+    });
+    renderCalBar();
+  }
+  function calMonthParts(){
+    var m = viewMonth || nowMonth();
+    var p = m.split('-');
+    return { mon: Number(p[1]) + '월', year: p[0] };
+  }
+  function renderCalHead(){
+    var t = calMonthParts();
+    if($('#calMonthTxt')) $('#calMonthTxt').textContent = t.mon;
+    if($('#calYearTxt')) $('#calYearTxt').textContent = t.year;
+    var mp = $('#calMonthPick');
+    if(mp && mp.value !== viewMonth) mp.value = viewMonth;
+  }
+  function calAmtClass(s){
+    var n = String(s || '').length;
+    if(n >= 11) return ' l11';
+    if(n >= 10) return ' l10';
+    if(n >= 9) return ' l9';
+    return '';
+  }
+  /* 휴대폰 폭이 좁아도 금액이 잘리지 않게 칸에 맞춰 글자를 줄입니다 */
+  function fitCalAmounts(rootSel){
+    var nodes = document.querySelectorAll(rootSel + ' .ca');
+    for(var i=0;i<nodes.length;i++){
+      var el = nodes[i];
+      var fs = parseFloat(window.getComputedStyle(el).fontSize) || 10;
+      var guard = 0;
+      while(el.scrollWidth > el.clientWidth && fs > 7.4 && guard < 20){
+        fs = Math.round((fs - 0.4) * 10) / 10;
+        el.style.fontSize = fs + 'px';
+        guard++;
+      }
+    }
+  }
+  function calMonthTotals(){
+    var m = viewMonth || nowMonth();
+    var list = data.records.filter(function(r){ return r.date.slice(0, 7) === m; });
+    var t = totals(list);
+    var wh = weeklyHolidayOf(list);
+    var fx = myAllowSum();
+    return { list:list, t:t, net:t.net + wh.total + fx, wh:wh.total, fx:fx };
+  }
+  function renderCalBar(){
+    var host = $('#payCalBar');
+    if(!host) return;
+    var s = calMonthTotals();
+    host.innerHTML =
+      '<button type="button" class="cseg" data-calbar="ded"><span class="k">공제</span>' +
+        '<span class="v">' + money(s.t.ded) + '</span><span class="ar">›</span></button>' +
+      '<button type="button" class="cseg main" data-calbar="net"><span class="k">실수령</span>' +
+        '<span class="v">' + money(s.net) + '</span><span class="ar">›</span></button>';
+    $$('#payCalBar [data-calbar]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var card = $('#periodCard');
+        if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
       });
     });
   }
@@ -2545,7 +2684,12 @@
     if(!ds){ host.innerHTML = '<p class="hint" style="margin:0">날짜를 톡 누르면 그날 근무가 여기 나와요.</p>'; return; }
     var list = data.records.filter(function(r){ return r.date === ds; });
     if(!list.length){
-      host.innerHTML = '<p class="hint" style="margin:0">' + dateFull(ds) + ' · 기록이 없어요.</p>';
+      host.innerHTML = '<div class="mrow"><span class="mrowTop"><b>' + dateFull(ds) + '</b>' +
+          '<span class="mrowAmt" style="color:#9aa6b8">기록 없음</span></span>' +
+        '<span class="mrowMid" style="margin-top:4px">이 날 근무를 넣어 둘까요?</span></div>' +
+        '<button class="btn ghost small" type="button" id="calDayAdd" style="margin-top:6px">➕ 이 날 기록 추가</button>';
+      var add = $('#calDayAdd');
+      if(add) add.addEventListener('click', function(){ addRecordOn(ds); });
       return;
     }
     host.innerHTML = list.map(function(r){
@@ -2553,17 +2697,29 @@
       return '<button type="button" class="mrow" data-calrec="' + r.id + '">' +
         '<span class="mrowTop"><b>' + dateFull(ds) + '</b>' +
           (r.paid ? '<span class="rbadge ok">입금 확인</span>' : '') +
-          '<span class="mrowAmt">' + money(c.net) + '</span></span>' +
+          '<span class="mrowAmt">+' + num(c.net) + '</span></span>' +
         '<span class="mrowMid">' + (r.start || '--:--') + '~' + (r.end || '--:--') + ' · ' + fmtHM(c.worked) +
           (c.nightMin ? ' · 야간 ' + fmtHM(c.nightMin) : '') + (c.allow ? ' · 수당 +' + num(c.allow) : '') + '</span>' +
         '<span class="mrowBot">세전 ' + num(c.pretax) + ' · 공제 ' + num(c.ded) + ' · 실수령 ' + num(c.net) + '원</span></button>';
-    }).join('');
+    }).join('') +
+      '<button class="btn ghost small" type="button" id="calDayAdd2" style="margin-top:2px">➕ 이 날 기록 추가</button>';
     $$('#calDayList [data-calrec]').forEach(function(b){
       b.addEventListener('click', function(){
         var rec = findRecord(b.getAttribute('data-calrec'));
         if(rec) startEdit(rec);
       });
     });
+    var add2 = $('#calDayAdd2');
+    if(add2) add2.addEventListener('click', function(){ addRecordOn(ds); });
+  }
+  function addRecordOn(ds){
+    editingId = null;
+    setEditMode(false);
+    resetForm(true);
+    if(ds) $('#fDate').value = ds;
+    switchView('calc');
+    updatePreview();
+    $('#entryTitle').scrollIntoView({ behavior:'smooth', block:'center' });
   }
   function renderSheetMode(){
     $('#sheetTableWrap').hidden = sheetMode !== 'list';
@@ -2571,7 +2727,15 @@
     $$('#sheetModeToggle [data-sheetmode]').forEach(function(b){
       b.classList.toggle('on', b.getAttribute('data-sheetmode') === sheetMode);
     });
+    syncMonthBar();
     if(sheetMode === 'cal'){ renderPayCalendar(); renderCalDay(); }
+  }
+  /* 달력 보기에서는 달력 안의 < 11월 >로 달을 넘기므로 위의 월 바를 접습니다 */
+  function syncMonthBar(){
+    var bar = $('#monthBar');
+    if(!bar) return;
+    var inCal = (currentView === 'sheet' && sheetMode === 'cal');
+    bar.hidden = !((currentView === 'sheet' || currentView === 'calc') && !inCal);
   }
 
   /* ================= 🏪 알바생 모드 ================= */
@@ -3210,6 +3374,12 @@
   }
 
   /* ================= 월 이동 ================= */
+  function shiftToMonth(m){
+    if(!/^\d{4}-\d{2}$/.test(m || '')) return;
+    viewMonth = m;
+    periodState.sel = '';
+    renderMonth(); renderDash(); renderSheet(); renderPeriod(); renderSheetMode();
+  }
   function shiftMonth(delta){
     var p = viewMonth.split('-');
     var y = Number(p[0]), m = Number(p[1]) + delta;
@@ -3232,6 +3402,7 @@
     }
     $$('.tab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-view') === name); });
     $('#monthBar').hidden = !(name === 'calc' || name === 'sheet');
+    syncMonthBar();
     if(name === 'sheet' || name === 'calc'){ renderDash(); renderSheet(); }
     if(name === 'settings') fillSettingsForm();
     if(name === 'received') renderReceived();
@@ -3268,8 +3439,13 @@
     /* 월 */
     $('#prevMonth').addEventListener('click', function(){ shiftMonth(-1); });
     $('#nextMonth').addEventListener('click', function(){ shiftMonth(1); });
+    if($('#calPrevMonth')) $('#calPrevMonth').addEventListener('click', function(){ shiftMonth(-1); });
+    if($('#calNextMonth')) $('#calNextMonth').addEventListener('click', function(){ shiftMonth(1); });
+    if($('#calMonthPick')) $('#calMonthPick').addEventListener('change', function(){
+      if(/^\d{4}-\d{2}$/.test(this.value)) shiftToMonth(this.value);
+    });
     $('#monthPick').addEventListener('change', function(){
-      if(/^\d{4}-\d{2}$/.test(this.value)){ viewMonth = this.value; renderMonth(); renderDash(); renderSheet(); }
+      if(/^\d{4}-\d{2}$/.test(this.value)){ viewMonth = this.value; renderMonth(); renderDash(); renderSheet(); renderSheetMode(); }
     });
 
     /* 입력 폼 */
