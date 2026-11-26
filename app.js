@@ -1,7 +1,8 @@
 /* 딜러리세상 작업실 — app.js
    외부 API·서버 없이 localStorage 에만 저장합니다.
    v2(2026-11-22): AI 사무실 현황(축·자동 루틴) + 보관실(아카이브) 탭 신설.
-   v3(2026-11-22): 📅 주간 일정표(매일 공통 + 월~일 + 날짜 확인) 추가, 루틴 11개로 정정. */
+   v3(2026-11-22): 📅 주간 일정표(매일 공통 + 월~일 + 날짜 확인) 추가, 루틴 11개로 정정.
+   v4(2026-11-27): 급여 앱 2종·자동 더치페이·공식 사이트 2곳·타로 자료 반영, 루틴을 가동/일시정지로 구분. */
 (function () {
   'use strict';
 
@@ -9,7 +10,7 @@
   var KEY_V1 = 'dealer-studio-v1';
 
   /* 화면 기준 시각 — 배포할 때마다 이 값만 고치면 배지가 바뀝니다. */
-  var SYNCED_AT = '2026-11-22 08:40 KST';
+  var SYNCED_AT = '2026-11-27 05:00 KST';
 
   /* =========================================================
      1. 기본 데이터
@@ -100,7 +101,11 @@
     { title: '11/22 매일 콘텐츠·체험단 세트 검토 (티스토리·영상 3편·HNF)', owner: 'content', stage: 'review' },
     { title: '파이 글로벌 #01 네이버 블로그 발행', owner: 'asset', stage: 'done' },
     { title: '주간 액시스 #01 티스토리 발행 (lkj7670.tistory.com/85)', owner: 'asset', stage: 'done' },
-    { title: '글로브마크·키핀 브랜드 커넥트 신청 완료', owner: 'campaign', stage: 'done' }
+    { title: '글로브마크·키핀 브랜드 커넥트 신청 완료', owner: 'campaign', stage: 'done' },
+    { title: '물류 앱·입금대장 현장 테스트 (전표 인식·급여 입력)', owner: 'leader', stage: 'doing' },
+    { title: '틱톡 판테놀 숏폼 — 내 댓글 1개 고정', owner: 'shorts', stage: 'doing' },
+    { title: '티스토리 연말정산 글 발행', owner: 'content', stage: 'doing' },
+    { title: '파이 해커톤 1호 재개 (11/30 09:00) — 클로드 수정본 검수부터', owner: 'contest', stage: 'review' }
   ];
 
   var DEFAULT_MANUAL = [
@@ -280,6 +285,33 @@
       href: 'https://www.youtube.com/channel/UClViYzluay2NCENqKBf0e9Q'
     },
     {
+      id: 'pay-apps', icon: '🧮', name: '딜러리 급여 앱 2종', sub: '일급계산기(직원용) · 입금대장(관리자용)', tone: 'soft',
+      state: '라이브 · 15개국 다국어',
+      detail: '직원용 일급계산기가 15개국 언어(헤더·설정·잠금화면 세 곳에서 전환)와 사진 스타일 달력(하루 금액·오늘 배지·요약 바)을 갖췄고, 입금대장은 인원별 보기와 달력 개편을 마쳤다. 두 앱 모두 하단 소리샘(구글 설문)으로 의견을 받는다. 관리자용은 잠금번호가 있어 여기서는 일급계산기만 바로 연다.',
+      href: 'https://lkj7670.github.io/Dealer-studio/daily-pay.html',
+      path: 'work/daily-pay/'
+    },
+    {
+      id: 'dutch', icon: '🍻', name: '딜러리의 자동 더치페이', sub: '영수증·메뉴판·해외여행 3모드', tone: 'gold',
+      state: '라이브 · 3모드',
+      detail: '영수증 사진 한 장으로 술 마신 사람만 빼고 1원 오차 없이 나누고, 메뉴판은 식당에 부를 주문 수량까지 뽑는다. 해외여행은 5개 통화 환율까지. 결과는 카톡 정산 문구로 복사된다.',
+      href: 'https://lkj7670.github.io/Dealer-studio/dutch-pay.html',
+      path: 'work/dutch-pay/'
+    },
+    {
+      id: 'ds-portal', icon: '🌟', name: '딜러리세상 메인 포털', sub: '무료 앱·채널을 한 곳에', tone: 'soft',
+      state: '오픈 · 앱 3종 연결',
+      detail: '일급계산기·더치페이·타로(곧 공개)와 블로그·티스토리·유튜브 2채널·틱톡·샵·전자명함을 한 화면에 모았다. 외부 라이브러리 없는 단일 파일이라 유지비 0원.',
+      href: 'https://lkj7670.github.io/dealerisesang/',
+      path: 'work/dealerisesang-web/'
+    },
+    {
+      id: 'yl-site', icon: '🏢', name: '주식회사 와이엘솔루션 홈페이지', sub: '인력 도급·아웃소싱 B2B', tone: 'blue',
+      state: '오픈 · 문의 폼 연결',
+      detail: '현장을 아는 인력 도급 파트너로 포지셔닝하고, 인력을 맡기면 입금대장 급여·명세서 관리를 무료로 지원한다는 점을 앞세웠다. 대표 전화와 도급 문의 폼이 붙어 있다.',
+      href: 'https://lkj7670.github.io/yl-solution/'
+    },
+    {
       id: 'market', icon: '🛍️', name: '마켓 · 핫템 플레이스 11개 관', sub: '드라마·연예인·SNS·연령대 핫템', tone: 'coral',
       state: '439개 · 11관 · 티켓관 신설',
       detail: '11-22 「핫템 플레이스」로 10개 관을 전면 리뉴얼하고 🎟️ 티켓·예약·이용권 관(15개)을 새로 만들어 439개. 1번(드라마·영화)·4번(10대)·9번(6070 효도)은 새 상품으로 교체했고, 나머지 관은 아직 옛 상품이라 주제별 인기템 브리핑을 조사 중이다.',
@@ -308,8 +340,8 @@
     },
     {
       id: 'pi-hackathon', icon: '🚀', name: '파이 해커톤 앱 1', sub: 'Pi Next 출품작 · 9대 카테고리', tone: 'gold',
-      state: '기획서 완성 · 사전 신청 전',
-      detail: '마감 2027-01-06 16:59 KST. 놀이터(고스톱·바둑·장기)·배움터까지 9대 카테고리와 Pi 로그인·1Pi 결제·생태계 연결 10장을 반영했다.',
+      state: '참가 등록 완료 · 11/30 재개',
+      detail: '마감 2027-01-06 16:59 KST, @lkj7670 참가 등록 완료. 11-30(월) 09:00 알림으로 다시 시작한다 — 클로드 수정본(304줄) 검수·확정과 무료 결제 서버(Cloudflare Workers) 승인부터.',
       path: 'work/pi-hackathon-app-1/기획서.md'
     },
     {
@@ -320,68 +352,81 @@
     }
   ];
 
-  /* ---------- 자동 실행 루틴 (scheduled-actions 확인분) ---------- */
+  /* ---------- 자동 실행 루틴 (scheduled-actions 확인분 · 2026-11-27 기준 가동분) ---------- */
   var ROUTINES = [
+    { time: '05:00', days: '매일', name: '🔄 딜러리세상 작업실 자동 업데이트', note: '현황·보관실 최신화 → 재배포 (새벽 5시 한 번)' },
+    { time: '06:00', days: '매일', name: '🟣 네이버 블로그 파이', note: '파이 소식 글 1편' },
     { time: '06:14', days: '매일', name: '☀️ 아침 브리핑', note: '날씨·대기질, 기기 일정, 임박 공모전 스캔' },
-    { time: '07:30', days: '매일', name: '🎬 콘텐츠·체험단 준비', note: '블로그 1 + 티스토리 1 + 숏폼 3편을 「올리기 직전」까지' },
-    { time: '08:00', days: '월·수·금', name: '🌏 딜러스월드 한국소개', note: '해외 전용 대본과 저작권 안전 출처 준비' },
     { time: '08:15', days: '월요일', name: '🏛️ 2027 창업지원사업 브리핑', note: '공고·준비사항 점검 (법인·개인 트랙)' },
-    { time: '08:30', days: '매일', name: '📈 양자컴퓨터 주식 브리핑', note: '아이온큐 등 양자 축 뉴스 정리' },
-    { time: '08:35·20:30', days: '매일', name: '🔄 딜러리세상 작업실 자동 업데이트', note: '현황·보관실 최신화 → 재배포 (배포 정지 중엔 로컬만)' },
-    { time: '09:00', days: '토요일', name: '🌐 주간 파이·액시스 연재 준비', note: '네이버 파이 글로벌 + 티스토리 액시스 초안' },
-    { time: '09:00', days: '일요일', name: '🟣 주간 아이온큐 연재 준비', note: '네이버 블로그 초안' },
-    { time: '4시간마다', days: '매일', name: '⛏️ 인터링크 채굴 알림', note: '09·13·17·21시 — 하루 네 번 채굴 알림' },
-    { time: '10:00', days: '매일', name: '🔬 화장품·건강 논문 리서치', note: '출처를 확인한 논문만 논문·성분 보관함에 적재' },
-    { time: '18:30', days: '매일', name: '🎁 돈되는 이벤트 알림', note: '지금 응모 가능한 것만 추려 알림' }
+    { time: '08:30', days: '매일', name: '🏛️ 티스토리 국가 필수정보', note: '정책·지원금·세금 글 1편' },
+    { time: '09:00', days: '일요일', name: '🌍 주간 파이 세계 뉴스', note: '일주일 파이 소식 정리 (1회차 11-29)' },
+    { time: '10:00', days: '화·목·토', name: '🌿 네이버 블로그 건강·뷰티', note: '혈당·혈압·체중 생활 관리 관점' },
+    { time: '11:00', days: '날짜 지정', name: '🎁 체험단·퀴즈 발표 확인', note: '응모한 캠페인 결과만 모아서' },
+    { time: '09:00', days: '11-30 한 번', name: '🟣 파이 해커톤 1호 재개', note: '클로드 수정본 검수 → 결제 서버 승인' },
+    { time: '21:00', days: '매일', name: '🛡️ 계정 보안 점검', note: '이상 징후가 있으면 바로 알림 (11-26 등록)' }
+  ];
+  /* 지금은 꺼 둔 루틴 — 다시 켜면 위 목록으로 올라온다. */
+  var PAUSED_ROUTINES = [
+    '🎬 콘텐츠·체험단 준비', '🌏 딜러스월드 한국소개', '🟣 딜러리세상 파이 쇼츠', '🎭 틱톡 재미 쇼츠',
+    '🩺 유튜브 건강 논문 쇼츠', '📈 양자컴퓨터 주식', '⛏️ 인터링크 채굴', '🔬 논문·성분 리서치',
+    '🎁 돈되는 이벤트', '🌐 주간 파이·액시스', '🟣 주간 아이온큐'
   ];
 
   /* ---------- 📅 주간 일정표 (scheduled-actions 등록분을 요일별로 다시 묶음) ---------- */
   /* 매일 공통 — 시간순 */
   var WEEKLY_DAILY = [
+    { time: '05:00', name: '🔄 작업실 동기화', note: '현황·보관실 최신화 → 재배포 (새벽 5시 한 번)' },
+    { time: '06:00', name: '🟣 네이버 블로그 파이', note: '파이 소식 글 1편' },
     { time: '06:14', name: '☀️ 아침 브리핑', note: '날씨·대기질, 기기 일정, 임박 공모전' },
-    { time: '07:30', name: '🎬 블로그·티스토리·틱톡·쇼츠·체험단', note: '블로그 1 + 티스토리 1 + 숏폼 3편, 올리기 직전까지' },
-    { time: '08:30', name: '📈 양자 주식 브리핑', note: '아이온큐 중심, 직전 미장 종가 기준' },
-    { time: '08:35 · 20:30', name: '🔄 작업실 동기화', note: '현황·보관실 최신화 → 재배포 (하루 두 번)' },
-    { time: '09 · 13 · 17 · 21', name: '⛏️ 인터링크 채굴', note: '4시간마다 네 번 — 버튼은 직접' },
-    { time: '10:00', name: '🔬 논문·성분 리서치', note: '출처를 확인한 논문만 보관함에 적재' },
-    { time: '18:30', name: '🎁 돈되는 이벤트', note: '오늘 새로 뜬 응모·혜택만' }
+    { time: '07:30', name: '⏸ 콘텐츠·체험단 준비', note: '일시정지 — 다시 켜면 블로그·숏폼 세트로 돕니다' },
+    { time: '08:30', name: '🏛️ 티스토리 국가 필수정보', note: '정책·지원금·세금 글 1편' },
+    { time: '08:30', name: '⏸ 양자 주식 브리핑', note: '일시정지 — 아이온큐 중심 뉴스' },
+    { time: '09 · 13 · 17 · 21', name: '⏸ 인터링크 채굴', note: '일시정지 — 버튼은 직접' },
+    { time: '10:00', name: '⏸ 논문·성분 리서치', note: '일시정지 — 출처 확인한 논문만 적재' },
+    { time: '18:30', name: '⏸ 돈되는 이벤트', note: '일시정지 — 새로 뜬 응모·혜택만' },
+    { time: '21:00', name: '🛡️ 계정 보안 점검', note: '이상 없으면 조용히, 있으면 바로 알림' }
   ];
   /* 요일별 — 월요일부터 */
   var WEEKLY_DAYS = [
     { key: 'mon', day: '월', items: [
-      { time: '08:00', name: '🌏 Dealer’s World', note: '한국 소개 대본·저작권 안전 출처' },
-      { time: '08:15', name: '🏛️ 2027 창업지원사업', note: '공고·준비사항 점검' }
+      { time: '08:15', name: '🏛️ 2027 창업지원사업', note: '공고·준비사항 점검' },
+      { time: '08:00', name: '⏸ Dealer’s World', note: '일시정지 — 한국 소개 대본' }
     ] },
     { key: 'tue', day: '화', items: [
-      { time: '08:00', name: '🟣 딜러리세상 파이', note: '파이 쇼츠 대본 1편' }
+      { time: '10:00', name: '🌿 건강·뷰티 블로그', note: '생활 관리 관점 1편' },
+      { time: '08:00', name: '⏸ 딜러리세상 파이', note: '일시정지 — 파이 쇼츠 대본' }
     ] },
     { key: 'wed', day: '수', items: [
-      { time: '08:00', name: '🌏 Dealer’s World', note: '한국 소개 대본·저작권 안전 출처' }
+      { time: '08:00', name: '⏸ Dealer’s World', note: '일시정지 — 한국 소개 대본' }
     ] },
     { key: 'thu', day: '목', items: [
-      { time: '08:00', name: '🟣 딜러리세상 파이', note: '파이 쇼츠 대본 1편' }
+      { time: '10:00', name: '🌿 건강·뷰티 블로그', note: '생활 관리 관점 1편' },
+      { time: '08:00', name: '⏸ 딜러리세상 파이', note: '일시정지 — 파이 쇼츠 대본' }
     ] },
     { key: 'fri', day: '금', items: [
-      { time: '08:00', name: '🌏 Dealer’s World', note: '한국 소개 대본·저작권 안전 출처' }
+      { time: '08:00', name: '⏸ Dealer’s World', note: '일시정지 — 한국 소개 대본' }
     ] },
     { key: 'sat', day: '토', items: [
-      { time: '08:00', name: '🟣 딜러리세상 파이', note: '파이 쇼츠 대본 1편' },
-      { time: '09:00', name: '🌐 주간 파이·액시스', note: '네이버 파이 글로벌 + 티스토리 액시스' }
+      { time: '10:00', name: '🌿 건강·뷰티 블로그', note: '생활 관리 관점 1편' },
+      { time: '09:00', name: '⏸ 주간 파이·액시스', note: '일시정지 — 네이버 파이 + 티스토리 액시스' }
     ] },
     { key: 'sun', day: '일', items: [
-      { time: '09:00', name: '🟣 주간 아이온큐', note: '네이버 블로그 초안' }
+      { time: '09:00', name: '🌍 주간 파이 세계 뉴스', note: '일주일 파이 소식 (1회차 11-29)' },
+      { time: '09:00', name: '⏸ 주간 아이온큐', note: '일시정지 — 네이버 블로그 초안' }
     ] }
   ];
   /* 날짜가 정해진 확인 — scheduled-actions 의 once 일정 */
   var WEEKLY_DATES = [
-    { date: '2026-11-23', time: '11:00 · 11:30', name: '🎁 더티린넨 + 체험단·퀴즈 발표', note: '글로브마크·키핀·브리오 결과까지' },
-    { date: '2026-11-24', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
-    { date: '2026-11-25', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
-    { date: '2026-11-26', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
-    { date: '2026-11-27', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
-    { date: '2026-11-30', time: '08:00', name: '👁️ 안과 검진 일정 다시 챙기기', note: '쉬는 날 있으면 예약' },
+    { date: '2026-11-27', time: '11:00', name: '🎁 링블 발표 확인', note: '섬백리향 · AnimalBar' },
+    { date: '2026-11-27', time: '20:00', name: '🎁 글로브마크 리뷰 제출 마감', note: '알림은 일시정지 — 직접 챙기기' },
+    { date: '2026-11-29', time: '09:00', name: '🌍 주간 파이 세계 뉴스 1회차', note: '일요 연재 시작' },
+    { date: '2026-11-30', time: '08:00', name: '👁️ 안과 검진 일정 다시 챙기기', note: '쉬는 날이면 예약' },
+    { date: '2026-11-30', time: '09:00', name: '🟣 파이 해커톤 1호 재개', note: '클로드 수정본 검수부터' },
     { date: '2026-11-30', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
-    { date: '2026-12-04', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' }
+    { date: '2026-12-01', time: '08:00', name: '🗓️ 음성 공모전 날짜 정하기', note: '12월 쉬는 날 확정' },
+    { date: '2026-12-04', time: '11:00', name: '🎁 체험단·퀴즈 발표 확인', note: '' },
+    { date: '2026-12-31', time: '09:00', name: '🎓 큰딸 졸업식 사전 알림', note: '' },
+    { date: '2027-01-07', time: '07:00', name: '🎓 큰딸 졸업식 준비 안내 전화', note: '두 번호로' }
   ];
 
   /* ---------- 보관실(아카이브) ---------- */
@@ -390,6 +435,16 @@
   var RETIRED_IDS = ['a02'];
 
   var DEFAULT_ARCHIVE = [
+    { id: 'a44', date: '2026-11-27', cat: '웹앱', title: '🍻 딜러리의 자동 더치페이 — 3모드 라이브', note: '영수증 정산(사진·텍스트·샘플, 술 마신 사람만 빼기)·메뉴판 취합(식당 주문 수량까지)·해외여행(5개 통화) 3모드. 단일 HTML 77KB, 라이브 파일이 로컬과 바이트 일치(HTTP 200).', url: 'https://lkj7670.github.io/Dealer-studio/dutch-pay.html', path: 'work/dutch-pay/' },
+    { id: 'a45', date: '2026-11-27', cat: '웹앱', title: '🧮 일급계산기 — 15개국 다국어 · 달력 개편 · 소리샘 연결', note: '헤더·설정·잠금화면 세 곳에서 15개 언어 즉시 전환(419문장×14개 언어 내장 사전, 외부 요청 0). 달력은 근무일마다 하루 금액·오늘 배지·요약 바(공제/실수령). 테스트 78/78 + 기존 8종 전부 통과, 라이브 678,994바이트 로컬 일치.', url: 'https://lkj7670.github.io/Dealer-studio/daily-pay.html', path: 'work/daily-pay/' },
+    { id: 'a46', date: '2026-11-27', cat: '웹앱', title: '🧾 입금대장(관리자용) — 달력 개편 · 인원별 보기 · 소리샘 연결', note: '인원 선택 바(전체 또는 직원)로 그날 전원 합계와 그 사람 금액만 보기, 달력 아래 요약 바가 직원별로 즉시 바뀐다. 관리자 화면이라 작업실에는 주소를 적지 않는다(급여 앱 카드에서 열기).', path: 'work/daily-pay/' },
+    { id: 'a47', date: '2026-11-27', cat: '웹앱', title: '🌟 딜러리세상 메인 포털 오픈 — 앱과 채널을 한 곳에', note: '무료 앱 3종(일급계산기·더치페이·타로 곧 공개)과 채널 6곳, 소리샘·제휴 고지. 단일 HTML 33,839바이트, PC·모바일 콘솔 오류 0·가로 넘침 0.', url: 'https://lkj7670.github.io/dealerisesang/', path: 'work/dealerisesang-web/' },
+    { id: 'a48', date: '2026-11-27', cat: '웹앱', title: '🏢 주식회사 와이엘솔루션 공식 홈페이지 오픈', note: '인력 도급·아웃소싱 B2B. 인력을 맡기면 입금대장 급여·명세서 관리를 무료 지원한다는 점을 전면에. 대표 전화·도급 문의 폼 연결, 단일 HTML 46,495바이트, 오류 0.', url: 'https://lkj7670.github.io/yl-solution/' },
+    { id: 'a49', date: '2026-11-27', cat: '웹앱', title: '🪪 전자명함에 직원용 급여 앱 소개 링크 추가', note: '명함 안 「딜러리 급여 앱」 카드에서 일급계산기로 바로 이동. 라이브 페이지에서 링크 확인.', url: 'https://lkj7670.github.io/Dealer-card/' },
+    { id: 'a50', date: '2026-11-27', cat: '웹앱', title: '🔮 타로 78장 풀이 자료 수집 완료 — 앱 제작 대기', note: '메이저 22장 + 마이너 56장(완드·컵·소드·펜타클 각 14장)을 같은 형식으로 정리해 8개 파일로 모았다. 사단 4명이 나눠 맡았고, 다음은 앱 화면과 해석 조합이다.', path: 'work/tarot/' },
+    { id: 'a51', date: '2026-11-27', cat: '유튜브', title: '🎬 차 안 김밥·짜파게티 50초 다큐 쇼츠 (1차 시안)', note: '1080×1920 30fps 50.0초, 선희 톤 내레이션·BGM·자막. 원본 4K를 브라우저로 캡처해 움직임·현장음이 빠진 1차 시안 — 1080p 원본을 받으면 같은 구성으로 다시 뽑는다.', path: 'work/yt-edit/차안-김밥짜파게티-다큐쇼츠.mp4' },
+    { id: 'a52', date: '2026-11-26', cat: '공모전·문서', title: '📑 YL솔루션 급여 앱 사업계획서 (15쪽 PDF)', note: '표지+본문 14쪽+부록 3개. 시장·경쟁·수익모델·3년 시나리오·구글 플레이 출시 절차·법적 행정·30일 체크리스트까지, 출처 9건 부록.', path: 'work/daily-pay/YL솔루션-급여앱-사업계획서.pdf' },
+    { id: 'a53', date: '2026-11-26', cat: '공모전·문서', title: '📊 급여 앱 광고 수익 사업효과 PPT (28장)', note: '직원용(B2C)·관리자용(B2B) 두 제품을 나눠 광고 수익 구조와 3시나리오를 정리. 16:9 PPTX 28장 + PDF, 네이티브 차트 3개.', path: 'work/daily-pay/YL솔루션-광고수익-사업효과-PPT.pptx' },
     { id: 'a39', date: '2026-11-22', cat: '유튜브', title: '「딜러리세상 파이」 1호 공개 — 휴대폰 하나로 시작된 파이', note: '07:43 공개 업로드. 새 채널 @dealerisesangpi. 설명란 링크를 클릭 링크로 만들려면 스튜디오 전화번호 1회 인증이 남았다.', url: 'https://youtube.com/shorts/3jnsXp6Q5mw' },
     { id: 'a40', date: '2026-11-22', cat: '블로그·티스토리', title: '[긴급] 사칭피싱주의 — 액시스 가짜 에어드랍', note: '06:59 발행·전체공개. 가짜 주소 50개 목록과 공식 4종 비교, 업비트 1시간봉. 태그 10개.', url: 'https://blog.naver.com/lkj7670/224486687654', path: 'work/axis-phishing-2026-11-22/published-post.md' },
     { id: 'a41', date: '2026-11-22', cat: '마켓', title: '클룩(Klook) 제휴 파트너 개통 — AID 144466', note: 'KRW 정산 · 사이트명 Dealers World · 커미션 최대 5%. 제휴 링크 8종 발급. 정산 계좌·세금 정보는 미입력(매월 8일까지).', url: 'https://affiliate.klook.com/', path: 'work/klook/affiliate-links-2026-11-22.md' },
@@ -1323,7 +1378,7 @@
     var t = $('#syncTime');
     if (t) t.textContent = SYNCED_AT;
     var m = $('#syncMeta');
-    if (m) m.textContent = '축 ' + AXES.length + '개 · 루틴 ' + ROUTINES.length + '개 · 보관 ' + state.archive.length + '건';
+    if (m) m.textContent = '축 ' + AXES.length + '개 · 루틴 ' + ROUTINES.length + '개 가동 · 보관 ' + state.archive.length + '건';
   }
 
   function renderAxes() {
@@ -1361,8 +1416,15 @@
         '<span class="r-days">' + esc(r.days) + '</span>' +
         '</div>';
     }).join('');
+    var off = $('#routinesOff');
+    if (off) {
+      off.textContent = PAUSED_ROUTINES.length
+        ? '⏸ 지금은 꺼 둔 루틴 ' + PAUSED_ROUTINES.length + '개 — ' + PAUSED_ROUTINES.join(' · ')
+        : '';
+      off.hidden = !PAUSED_ROUTINES.length;
+    }
     var n = $('#routineCount');
-    if (n) n.textContent = ROUTINES.length + '개';
+    if (n) n.textContent = '가동 ' + ROUTINES.length + ' · 정지 ' + PAUSED_ROUTINES.length;
   }
 
   /* =========================================================

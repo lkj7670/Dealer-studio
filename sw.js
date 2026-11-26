@@ -1,5 +1,5 @@
-/* 딜러리세상 작업실 — 오프라인 캐시 (v2 화면부터 v14) */
-var CACHE = 'dealer-studio-v14';
+/* 딜러리세상 작업실 — 오프라인 캐시 (v2 화면부터 v15) */
+var CACHE = 'dealer-studio-v15';
 var FILES = [
   './',
   'index.html',

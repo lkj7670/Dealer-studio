@@ -657,6 +657,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 .r-main b{display:block;font-size:12.5px;line-height:1.35}
 .r-main span{display:block;font-size:11px;color:var(--muted);line-height:1.4}
 .r-days{font-size:11px;font-weight:700;color:#6a6256;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.r-off{margin:8px 0 0;font-size:11px;line-height:1.5;color:#8b8172}
 @media (max-width:400px){
   .routine{gap:6px;padding:9px 8px}
   .r-time{font-size:11px}
