@@ -373,7 +373,17 @@
     background:rgba(255,255,255,.96); backdrop-filter:blur(12px);
     border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom);
   }
-  .tabbar .inner{grid-column:1/-1; display:grid; grid-template-columns:repeat(5,1fr); max-width:680px; margin:0 auto; width:100%}
+  .tabbar .inner{grid-column:1/-1; display:grid; grid-template-columns:repeat(6,1fr); max-width:680px; margin:0 auto; width:100%}
+  .tab{font-size:9.5px}
+  .rolebadge{display:inline-block; font-size:9.5px; font-weight:800; color:#fff; background:#f97316; border-radius:5px; padding:1px 5px; vertical-align:2px; letter-spacing:-.2px; margin-left:4px}
+  .rrow{display:flex; gap:8px; align-items:baseline; padding:8px 0; border-bottom:1px solid #eef1f6; font-size:13px}
+  .rrow:last-child{border-bottom:0}
+  .rrow .rn{font-weight:800; min-width:64px}
+  .rrow .rt{color:var(--muted); font-weight:600; font-size:12px}
+  .rrow .ra{margin-left:auto; font-weight:800}
+  .rbadge{font-size:10px; font-weight:800; padding:1px 6px; border-radius:5px; background:#eef2f7; color:#5b6a80}
+  .rbadge.ok{background:#e8f7f0; color:#047857}
+  .rbadge.diff{background:#fdeceb; color:#dc2626}
   .tab{
     background:none; border:0; padding:7px 2px 8px; display:flex; flex-direction:column; align-items:center; gap:2px;
     color:var(--muted); font-size:10.5px; font-weight:800; min-height:var(--tab-h);
@@ -435,7 +445,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true"><svg viewBox="0 0 64 64" width="25" height="25" fill="none"><rect x="15" y="11" width="34" height="42" rx="6" fill="#fff"/><rect x="20" y="17" width="24" height="9" rx="2.5" fill="#0f766e"/><circle cx="24.5" cy="33.5" r="2.7" fill="#0f766e"/><circle cx="32" cy="33.5" r="2.7" fill="#0f766e"/><circle cx="39.5" cy="33.5" r="2.7" fill="#0f766e"/><circle cx="24.5" cy="42" r="2.7" fill="#0f766e"/><circle cx="32" cy="42" r="2.7" fill="#0f766e"/><circle cx="39.5" cy="42" r="2.7" fill="#f97316"/></svg></div>
       <div class="brand-txt">
-        <h1>딜러리의 일급계산기</h1>
+        <h1>딜러리의 일급계산기<span class="rolebadge">직원용</span></h1>
         <p id="topSub">회사 실수령 기준 · 8시간 140,000원</p>
       </div>
     </div>
@@ -876,6 +886,35 @@
       </section>
     </section>
 
+    <!-- ---------- 받은 명세 ---------- -->
+    <section class="view" id="view-received" hidden>
+      <section class="card">
+        <h2 class="card-h">📥 받은 명세</h2>
+        <p class="card-sub">사장님이 보내 준 급여 명세를 확인합니다. <b>읽기만</b> 되고 내 계산·시트에는 영향이 없어요.</p>
+        <label class="btn ghost" for="stmtFile" style="display:flex; align-items:center; justify-content:center; margin-top:10px; min-height:48px">📎 명세 파일 고르기 (.txt / .csv)</label>
+        <input type="file" id="stmtFile" accept=".txt,.csv,text/plain,text/csv" hidden>
+        <label class="field" style="margin-top:10px"><span class="flabel">또는 받은 글을 그대로 붙여넣기</span>
+          <textarea id="stmtText" style="min-height:120px" placeholder="예)&#10;딜러리의 입금대장 · 급여 명세서&#10;회사: 진천냉동&#10;직원: 홍길동&#10;기간: 2026-11 (2026년 11월)&#10;&#10;[근무]&#10;2026-11-24|08:30|19:30|60|169938|5608|169938|지급완료"></textarea>
+        </label>
+        <button class="btn" id="btnStmtRead" type="button" style="width:100%; margin-top:10px; min-height:52px">명세 읽기</button>
+        <p class="hint" id="stmtInfo" style="margin-top:8px">사장님이 [카톡용 글로 복사]로 보내 준 글을 붙여넣거나, 명세 파일을 고르세요.</p>
+      </section>
+
+      <section class="card" id="stmtResult" hidden>
+        <h2 class="card-h" id="stmtTitle">📄 명세서</h2>
+        <p class="card-sub" id="stmtMeta"></p>
+        <div id="stmtTotals" style="margin-top:10px"></div>
+        <div id="stmtCompare" style="margin-top:10px"></div>
+        <div id="stmtRows" style="margin-top:10px"></div>
+        <p class="tip">이 명세는 <b>읽기 전용</b>이에요. 내 계산과 시트에는 영향이 없고, 이 폰에 저장만 됩니다.</p>
+      </section>
+
+      <section class="card">
+        <h3 class="card-h">저장된 명세</h3>
+        <div id="stmtSaved"></div>
+      </section>
+    </section>
+
     <p class="foot">기록·설정은 이 기기 브라우저에만 저장돼요. 폰을 바꿀 땐 [백업(JSON)] → 새 폰에서 [복원].</p>
   </main>
 
@@ -884,6 +923,7 @@
       <button class="tab on" type="button" data-view="calc"><span class="ti">💰</span>계산</button>
       <button class="tab" type="button" data-view="sheet"><span class="ti">📋</span>시트</button>
       <button class="tab" type="button" data-view="kakao"><span class="ti">💬</span>카톡</button>
+      <button class="tab" type="button" data-view="received"><span class="ti">📥</span>받은 명세</button>
       <button class="tab" type="button" data-view="settings"><span class="ti">⚙️</span>설정</button>
       <button class="tab" type="button" data-view="guide"><span class="ti">📖</span>설명서</button>
     </div>
@@ -2003,13 +2043,14 @@
   /* ================= 화면 전환 ================= */
   function switchView(name){
     currentView = name;
-    ['calc','sheet','kakao','settings','guide'].forEach(function(v){
+    ['calc','sheet','kakao','received','settings','guide'].forEach(function(v){
       $('#view-' + v).hidden = (v !== name);
     });
     $$('.tab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-view') === name); });
     $('#monthBar').hidden = !(name === 'calc' || name === 'sheet');
     if(name === 'sheet' || name === 'calc'){ renderDash(); renderSheet(); }
     if(name === 'settings') fillSettingsForm();
+    if(name === 'received') renderReceived();
     window.scrollTo(0,0);
   }
 
@@ -2293,6 +2334,242 @@
   }
 
   /* ================= 시작 ================= */
+  /* ================= 받은 명세 ================= */
+  var REC_KEY = 'dealerPay.v1.received';
+  var recvList = [];
+  try { var _rv = JSON.parse(localStorage.getItem(REC_KEY) || '[]'); if(Array.isArray(_rv)) recvList = _rv; } catch(e){}
+  function saveRecv(){ try{ localStorage.setItem(REC_KEY, JSON.stringify(recvList)); }catch(e){} }
+
+  function csvRows(text){
+    var rows = [], row = [], cur = '', q = false;
+    for(var i=0;i<text.length;i++){
+      var ch = text[i];
+      if(q){
+        if(ch === '"'){ if(text[i+1] === '"'){ cur += '"'; i++; } else q = false; }
+        else cur += ch;
+      } else {
+        if(ch === '"') q = true;
+        else if(ch === ','){ row.push(cur); cur = ''; }
+        else if(ch === '\n'){ row.push(cur); rows.push(row); row = []; cur = ''; }
+        else if(ch !== '\r') cur += ch;
+      }
+    }
+    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    return rows.filter(function(r){ return r.some(function(c){ return String(c).trim() !== ''; }); });
+  }
+
+  function parseReceived(text){
+    text = String(text || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    var out = { company:'', employee:'', period:'', deduction:'', rows:[], totals:null };
+    var lines = text.split('\n');
+    lines.forEach(function(l){
+      var m;
+      if((m = l.match(/^회사\s*[:：]\s*(.+)$/))) out.company = m[1].trim();
+      if((m = l.match(/^직원\s*[:：]\s*(.+)$/))) out.employee = m[1].trim();
+      if((m = l.match(/^기간\s*[:：]\s*(.+)$/))) out.period = m[1].trim();
+      if((m = l.match(/^공제\s*[:：]\s*(.+)$/))) out.deduction = m[1].trim();
+    });
+    var inWork = false;
+    lines.forEach(function(l){
+      var t = l.trim();
+      if(t.indexOf('[근무]') === 0){ inWork = true; return; }
+      if(t.indexOf('[합계]') === 0){ inWork = false; return; }
+      if(inWork && t.indexOf('|') > 0){
+        var p = t.split('|').map(function(x){ return x.trim(); });
+        if(/^\d{4}-\d{2}-\d{2}$/.test(p[0])){
+          out.rows.push({
+            date:p[0], start:p[1] || '', end:p[2] || '', breakMin:Number(p[3]) || 0,
+            gross:Number(p[4]) || 0, ded:Number(p[5]) || 0, net:Number(p[6]) || 0, status:p[7] || ''
+          });
+        }
+      }
+    });
+    if(!out.rows.length && text.indexOf('근무일') >= 0){
+      var rows = csvRows(text);
+      if(rows.length){
+        var head = rows.shift().map(function(h){ return String(h).replace(/\s/g, ''); });
+        function col(name){
+          for(var i=0;i<head.length;i++){ if(head[i].indexOf(name) >= 0) return i; }
+          return -1;
+        }
+        var iDate = col('근무일'), iName = col('직원'), iIn = col('출근'), iOut = col('퇴근'),
+            iBrk = col('휴게'), iGross = col('예상금액'), iPaid = col('실제입금액'),
+            iStat = col('입금상태'), iCompany = col('회사');
+        rows.forEach(function(r){
+          var d = String(r[iDate] || '').trim();
+          if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+          var g = Number(String(r[iGross] || '').replace(/[^0-9-]/g, '')) || 0;
+          var paidAmt = String(r[iPaid] || '').replace(/[^0-9-]/g, '');
+          var st = String(r[iStat] || '').trim();
+          out.rows.push({
+            date:d, start:String(r[iIn] || '').trim(), end:String(r[iOut] || '').trim(),
+            breakMin:Number(String(r[iBrk] || '').replace(/[^0-9]/g, '')) || 0,
+            gross:g, ded:0, net:g, status:st, paidAmount:Number(paidAmt) || 0
+          });
+          if(!out.company && iCompany >= 0) out.company = String(r[iCompany] || '').trim();
+          if(!out.employee && iName >= 0) out.employee = String(r[iName] || '').trim();
+          if(!out.period) out.period = d.slice(0, 7);
+        });
+      }
+    }
+    var g = 0, d2 = 0, n = 0;
+    out.rows.forEach(function(r){ g += r.gross; d2 += r.ded; n += r.net; });
+    out.totals = { gross:g, ded:d2, net:n, days:out.rows.length };
+    return out;
+  }
+
+  function receivedMonth(st){
+    if(st.period){
+      var m = String(st.period).match(/(\d{4})-(\d{2})/);
+      if(m) return m[1] + '-' + m[2];
+    }
+    if(st.rows.length) return st.rows[0].date.slice(0, 7);
+    return nowMonth();
+  }
+
+  function compareReceived(st){
+    var month = receivedMonth(st);
+    var mine = data.records.filter(function(r){ return r.date.slice(0, 7) === month; });
+    var byDate = {};
+    mine.forEach(function(r){ byDate[r.date] = r; });
+    var res = { month:month, match:0, diff:0, none:0, onlyMine:0, items:[] };
+    st.rows.forEach(function(row){
+      var r = byDate[row.date];
+      if(!r){
+        res.none++;
+        res.items.push({ date:row.date, theirs:row.net, mine:null, type:'none' });
+        return;
+      }
+      var myNet = calc(r, data.settings).net;
+      if(myNet === row.net){
+        res.match++;
+        res.items.push({ date:row.date, theirs:row.net, mine:myNet, type:'ok' });
+      } else {
+        res.diff++;
+        res.items.push({ date:row.date, theirs:row.net, mine:myNet, type:'diff' });
+      }
+    });
+    var set = {};
+    st.rows.forEach(function(r){ set[r.date] = 1; });
+    mine.forEach(function(r){ if(!set[r.date]) res.onlyMine++; });
+    return res;
+  }
+
+  function workedOf(row){
+    if(!row.start || !row.end) return 0;
+    var a = toMin(row.start), b = toMin(row.end);
+    var raw = (b >= a) ? (b - a) : (b + 1440 - a);
+    return Math.max(0, raw - (Number(row.breakMin) || 0));
+  }
+
+  function showReceived(st){
+    var cmp = compareReceived(st);
+    $('#stmtResult').hidden = false;
+    $('#stmtTitle').textContent = '📄 ' + (st.employee ? st.employee + ' 님 명세' : '명세서');
+    var meta = [];
+    if(st.company) meta.push(st.company);
+    if(st.period) meta.push(st.period);
+    if(st.deduction) meta.push(st.deduction);
+    $('#stmtMeta').textContent = meta.join(' · ') || '명세 내용';
+    $('#stmtTotals').innerHTML =
+      '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">' +
+        '<div style="background:#f4faf8; border:1px solid #d9ece8; border-radius:12px; padding:10px">' +
+          '<div style="font-size:11.5px; color:#4f7c76; font-weight:700">받는 돈</div>' +
+          '<b style="font-size:20px; letter-spacing:-.5px">' + money(st.totals.net) + '</b></div>' +
+        '<div style="background:#fbfcfe; border:1px solid #e3e8f0; border-radius:12px; padding:10px">' +
+          '<div style="font-size:11.5px; color:#66748a; font-weight:700">근무 ' + st.totals.days + '일 · 공제 전</div>' +
+          '<b style="font-size:16px">' + money(st.totals.gross) + '</b></div>' +
+      '</div>';
+    var line = '일치 <b>' + cmp.match + '일</b>';
+    if(cmp.diff) line += ' · 금액 차이 <b style="color:#dc2626">' + cmp.diff + '일</b>';
+    if(cmp.none) line += ' · 회사만 <b>' + cmp.none + '일</b>';
+    if(cmp.onlyMine) line += ' · 내 기록만 <b>' + cmp.onlyMine + '일</b>';
+    $('#stmtCompare').innerHTML = '<div class="tip">내 기록과 대조: ' + line +
+      (cmp.diff ? '<br>금액이 다른 날은 아래에서 빨간 글씨로 보여요.' : '') + '</div>';
+    $('#stmtRows').innerHTML = st.rows.map(function(row){
+      var it = null;
+      for(var i=0;i<cmp.items.length;i++){ if(cmp.items[i].date === row.date){ it = cmp.items[i]; break; } }
+      var badge = '';
+      if(it){
+        if(it.type === 'ok') badge = '<span class="rbadge ok">일치</span>';
+        else if(it.type === 'diff') badge = '<span class="rbadge diff">금액 차이</span>';
+        else badge = '<span class="rbadge">내 기록 없음</span>';
+      }
+      var w = workedOf(row);
+      var diffLine = (it && it.type === 'diff') ? '<div style="font-size:11.5px; color:#dc2626; font-weight:700">내 계산 ' + money(it.mine) + '</div>' : '';
+      return '<div class="rrow"><span class="rn">' + row.date.slice(5, 7) + '.' + row.date.slice(8, 10) + ' (' + weekday(row.date) + ')</span>' +
+        '<span class="rt">' + (w ? fmtHM(w) + ' · ' : '') + (row.status || '') + '</span>' +
+        badge + '<span class="ra">' + money(row.net) + diffLine + '</span></div>';
+    }).join('');
+  }
+
+  function renderReceived(){
+    var host = $('#stmtSaved');
+    if(!host) return;
+    if(!recvList.length){
+      host.innerHTML = '<p class="hint">아직 저장된 명세가 없어요. 위에서 파일을 고르거나 글을 붙여넣으면 여기에 쌓입니다.</p>';
+      return;
+    }
+    host.innerHTML = recvList.map(function(s, i){
+      return '<button class="btn ghost" type="button" data-recv="' + i + '" style="width:100%; display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:8px; min-height:54px; text-align:left">' +
+        '<span><b>' + (s.employee || '명세') + '</b><br><small style="color:#66748a">' + (s.company || '') + ' · ' + (s.period || '') + ' · ' + money(s.totals ? s.totals.net : 0) + '</small></span>' +
+        '<span style="color:#8b97a9; font-weight:800">보기 ›</span></button>';
+    }).join('');
+    $$('#stmtSaved [data-recv]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var s = recvList[Number(b.getAttribute('data-recv'))];
+        if(s) showReceived(s);
+      });
+    });
+  }
+
+  function handleStatement(text, src){
+    var st = parseReceived(text);
+    if(!st.rows.length){
+      $('#stmtInfo').textContent = '명세에서 근무 줄을 찾지 못했어요. 사장님이 보내 준 파일이나 글인지 확인해 주세요.';
+      toast('명세를 읽지 못했어요');
+      return;
+    }
+    st.source = src;
+    st.id = 'rv' + Date.now().toString(36);
+    $('#stmtInfo').textContent = src + ' · 근무 ' + st.rows.length + '일을 읽었어요.';
+    showReceived(st);
+    recvList.unshift({
+      id:st.id, savedAt:todayISO(), company:st.company, employee:st.employee,
+      period:st.period, deduction:st.deduction, rows:st.rows, totals:st.totals, source:src
+    });
+    recvList = recvList.slice(0, 10);
+    saveRecv();
+    renderReceived();
+    toast('명세를 읽었어요');
+  }
+
+  function bindReceived(){
+    var f = $('#stmtFile');
+    if(f) f.addEventListener('change', function(){
+      var file = this.files && this.files[0];
+      if(!file) return;
+      var fr = new FileReader();
+      fr.onload = function(){
+        var buf = fr.result, text = null;
+        try{ text = new TextDecoder('utf-8', { fatal:true }).decode(buf); }
+        catch(e){
+          try{ text = new TextDecoder('euc-kr').decode(buf); }
+          catch(e2){ text = new TextDecoder('utf-8').decode(buf); }
+        }
+        handleStatement(text || '', file.name);
+      };
+      fr.readAsArrayBuffer(file);
+      this.value = '';
+    });
+    var b = $('#btnStmtRead');
+    if(b) b.addEventListener('click', function(){
+      var t = $('#stmtText').value;
+      if(!t.trim()){ toast('명세 파일을 고르거나 글을 붙여넣어 주세요'); return; }
+      handleStatement(t, '붙여넣은 글');
+    });
+  }
+
   function init(){
     load();
     viewMonth = nowMonth();
@@ -2304,6 +2581,8 @@
     $('#dawnFix').checked = data.settings.dawnFix !== false;
     if(!storageOK) $('#storageWarn').hidden = false;
     bind();
+    bindReceived();
+    renderReceived();
     renderAll();
     if(!isAuthed()){
       $('#app').hidden = true;

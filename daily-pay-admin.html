@@ -606,6 +606,7 @@
   .tab i{font-size:19px}
   .deskonly{display:none}
   @media (min-width:1000px){ .deskonly{display:block} .bigmenu{grid-template-columns:1fr 1fr} }
+  .rolebadge{display:inline-block; font-size:10px; font-weight:800; color:#fff; background:#f97316; border-radius:5px; padding:1px 5px; vertical-align:2px; letter-spacing:-.2px; margin-left:5px}
   .qmark{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#e3eefc; color:#2f6fb5; font-size:12px; font-weight:800; border:0; margin-left:4px; vertical-align:1px}
   .noteone{background:#f4f8fb; border:1px solid #dde8f2; border-radius:11px; padding:9px 11px; font-size:13px; color:#3c4a60; line-height:1.6}
   .emptybox{text-align:center; padding:24px 8px; color:var(--muted); font-size:15px; font-weight:700; line-height:1.7}
@@ -652,7 +653,7 @@
     <div class="brand">
       <div class="logo">🧾</div>
       <div class="brand-txt">
-        <h1>딜러리의 입금대장</h1>
+        <h1>딜러리의 입금대장<span class="rolebadge">관리자용</span></h1>
         <p id="coSub">회사 1 · 2026년 11월</p>
       </div>
     </div>
