@@ -605,6 +605,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 @media (min-width:760px){
   .pay-cards{grid-template-columns:1fr 1fr}
 }
+@media (max-width:420px){
+  .pay-go{display:none}
+  .pay-ico{flex-basis:34px;width:34px;height:34px;font-size:17px}
+}
 @media (max-width:360px){ .q{font-size:10.5px;min-height:58px} .q span{font-size:16px} }
 @media (min-width:760px){
   .quickbar{display:flex;flex-wrap:wrap}
