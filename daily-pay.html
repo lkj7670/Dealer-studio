@@ -2331,7 +2331,9 @@
     if(t.ded) dsub.push('공제 ' + num(t.ded) + '원');
     if(wh.total) dsub.push('주휴수당 ' + num(wh.total) + '원');
     if(fx) dsub.push('수당 ' + num(fx) + '원');
-    $('#dNetSub').textContent = dsub.length ? (dsub.join(' · ') + ' 포함') : (netMode ? '회사 실수령 기준' : '공제 0원');
+    $('#dNetSub').textContent = dsub.length
+      ? (dsub.join(' · ') + ((wh.total || fx) ? ' 포함' : ''))
+      : (netMode ? '회사 실수령 기준' : '공제 0원');
   }
   function renderPaid(){
     var t = totals(monthRecords());
