@@ -944,6 +944,41 @@
     border-radius:999px; padding:9px 14px; font-size:14px; font-weight:800; font-variant-numeric:tabular-nums;
     box-shadow:0 3px 10px rgba(13,106,98,.18);
   }
+
+  /* ---------- 🆕 새 버전 배너 · 📤 공유 · 📢 새 소식 ---------- */
+  #verBanner{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    margin:8px 12px 0; padding:10px 12px; border-radius:14px;
+    background:linear-gradient(180deg,#fff7e2,#ffedc4); border:1.5px solid #efd48a;
+    color:#7a4d08; font-size:13.5px; font-weight:800; line-height:1.45;
+  }
+  #verBanner[hidden]{display:none}
+  #verBanner .vb-t{flex:1; min-width:0}
+  #verBanner button{
+    flex:0 0 auto; border:0; border-radius:10px; padding:9px 12px; min-height:40px;
+    background:#0f6f65; color:#fff; font-size:13px; font-weight:800;
+  }
+  .sharepick{display:grid; gap:8px}
+  .sharepick .bigbtn{min-height:64px}
+  .wn-body{display:grid; gap:12px; max-height:54vh; overflow-y:auto; margin-top:10px; padding-right:2px}
+  .wn-block{display:grid; gap:6px}
+  .wn-ver{font-size:12px; font-weight:800; color:var(--brand-d)}
+  .wn-list{margin:0; padding:0; list-style:none; display:grid; gap:6px}
+  .wn-list li{
+    display:flex; gap:7px; align-items:flex-start; font-size:13px; line-height:1.6; color:#2c3a50;
+    background:#f7faf9; border:1px solid #e2efec; border-radius:11px; padding:8px 10px;
+  }
+  .wn-list li em{font-style:normal; flex:0 0 auto}
+  @media (max-width:380px){
+    .topbar{gap:6px; padding:10px 8px}
+    .iconbtn{width:36px; height:36px; font-size:15px; border-radius:11px}
+    .logo{width:34px; height:34px; font-size:17px; border-radius:10px}
+    .brand{gap:7px}
+    .brand-txt h1{font-size:15px}
+    .brand-txt p{font-size:10.5px}
+    .cobar{top:56px}
+    #verBanner{margin:8px 8px 0}
+  }
 </style>
 
 <!-- ================= 잠금 ================= -->
@@ -966,6 +1001,10 @@
 
 <!-- ================= 앱 ================= -->
 <div class="app" id="app" hidden>
+  <div id="verBanner" hidden>
+    <span class="vb-t">🆕 새 버전이 나왔어요!</span>
+    <button type="button" id="btnReloadNew">🔄 지금 새로고침</button>
+  </div>
   <header class="topbar">
     <div class="brand">
       <div class="logo">🧾</div>
@@ -974,6 +1013,7 @@
         <p id="coSub">회사 1 · 2026년 11월</p>
       </div>
     </div>
+    <button class="iconbtn" id="btnShare" aria-label="앱 공유하기" title="앱 공유하기">📤</button>
     <button class="iconbtn" id="btnTheme" aria-label="배경 테마 바꾸기" title="배경 테마 바꾸기">🎨</button>
     <button class="iconbtn" id="btnLock" aria-label="바로 잠금" title="바로 잠금">🔒</button>
   </header>
@@ -1600,8 +1640,10 @@
         <button class="bigbtn" data-go="scr-set-data"><span class="bi">💾</span><span class="bt">백업·엑셀<i id="setDataNow">JSON · CSV</i></span><span class="bc">›</span></button>
         <button class="bigbtn" data-go="scr-set-lock"><span class="bi">🔒</span><span class="bt">잠금<i id="setLockNow">받은 비밀번호 4자리</i></span><span class="bc">›</span></button>
         <button class="bigbtn" data-go="scr-feedback"><span class="bi">💬</span><span class="bt">의견 보내기 · 접수함<i>불편한 점을 알려 주세요</i></span><span class="bc">›</span></button>
+        <button class="bigbtn" id="btnWhatsNew" type="button"><span class="bi">📢</span><span class="bt">새 소식 · 업데이트 내역<i id="wnNow">이번에 바뀐 점 다시 보기</i></span><span class="bc">›</span></button>
+        <button class="bigbtn" id="btnForceReload" type="button"><span class="bi">🔄</span><span class="bt">최신 버전으로 새로고침<i>바뀐 내용이 안 보일 때</i></span><span class="bc">›</span></button>
       </div>
-      <p class="exhint" style="text-align:center">딜러리의 입금대장 v1.0 · 기록은 이 기기 안에만 저장됩니다.</p>
+      <p class="exhint" id="setVerFoot" style="text-align:center">딜러리의 입금대장 v1.0 · 기록은 이 기기 안에만 저장됩니다.</p>
     </section>
 
     <section class="screen" id="scr-set-co">
@@ -1927,6 +1969,46 @@
       <button class="btn ghost big" id="btnCsvAll2">전체 기간 엑셀(CSV)</button>
       <button class="btn ghost big" id="btnJsonBackup2">JSON 백업 파일 (폰 이사용)</button>
       <p class="exhint">CSV에는 근무 기록만 들어갑니다. 직원 명단·고정 수당·설정까지 옮기려면 <b>JSON 백업</b>을 쓰세요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 📤 공유하기 ================= -->
+<div class="sheet-wrap" id="shareWrap" hidden>
+  <div class="sheet-bg" data-close="share"></div>
+  <div class="sheet">
+    <div class="sheet-h"><b>📤 공유하기</b><button class="xbtn" data-close="share" aria-label="닫기">✕</button></div>
+    <div class="sheet-body">
+      <p class="hint">보낼 앱을 고르세요. 급여 기록·입금 내역·비밀번호·직원 이름은 함께 보내지 않습니다. 주소만 전해집니다.</p>
+      <div class="sharepick">
+        <button class="bigbtn" id="btnShareEmp" type="button">
+          <span class="bi">🧮</span>
+          <span class="bt">직원용 급여 앱<i>직원이 자기 근무를 넣고 급여를 계산해요</i></span>
+          <span class="bc">›</span>
+        </button>
+        <button class="bigbtn" id="btnShareAdm" type="button">
+          <span class="bi">🧾</span>
+          <span class="bt">관리자용 입금대장<i>사장님·현장 담당자에게 · 기록은 각 폰에만</i></span>
+          <span class="bc">›</span>
+        </button>
+      </div>
+      <p class="exhint">카톡·문자 공유창이 안 뜨면 같은 내용이 복사됩니다. 대화방에 붙여넣기만 하면 돼요.</p>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn ghost" data-close="share" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 📢 새 소식 ================= -->
+<div class="modal" id="whatsNewModal" hidden>
+  <div class="modal-bg" data-close="whatsnew"></div>
+  <div class="modal-box" style="max-width:400px">
+    <b id="wnTitle">📢 새 소식</b>
+    <p id="wnSub">이번에 이렇게 바뀌었어요.</p>
+    <div class="wn-body" id="wnBody"></div>
+    <div class="modal-foot">
+      <button class="btn" id="btnWhatsNewOk" type="button">확인</button>
     </div>
   </div>
 </div>
@@ -2436,10 +2518,11 @@ function recordMoney(c, rec){
   var allow = recordAllow(rec);
   pc.allow = allow;
   if((!rec.start || !rec.end) && r0(rec.baseAmount) > 0) pc.net = r0(rec.baseAmount);
-  pc.net += allow;          /* 수당은 떼지 않고 그대로 더합니다(식대·교통비처럼) */
+  pc.net += allow;          /* 기타 수당도 세전 금액에 포함합니다 */
   var st = dedStateOf(c, rec);
   var t = st.type;
-  var d = applyDedOn(insuranceCalc(pc.net - allow, t, c, { simple:true }), st.on);
+  /* 식대·교통비·직급·특근 같은 기타 수당도 근무 급여와 합쳐서 3.3%·4대보험을 똑같이 뗍니다 (직원용 앱과 같은 계산) */
+  var d = applyDedOn(insuranceCalc(pc.net, t, c, { simple:true }), st.on);
   var net = pc.net - d.workerTotal;
   var expected = (c.insurance.deposit === 'net') ? net : pc.net;
   return { pay:pc, type:t, ded:d, net:net, expected:expected, allow:allow, base:pc.net - allow };
@@ -2894,7 +2977,7 @@ function aggOf(c, list, m){
             employer:0, allow:0, fixed:0, fixedTax:0, fixedDed:0, dates:{}, names:{}, byType:{} };
   list.forEach(function(r){
     var m2 = recordMoney(c, r);
-    a.gross += m2.pay.net;
+    a.gross += m2.pay.net;   /* pay.net은 기타 수당까지 더한 세전 금액입니다 */
     a.ded += m2.ded.workerTotal;
     a.allow += m2.allow;
     a.employer += m2.ded.employerTotal;
@@ -5265,6 +5348,10 @@ function renderSetMenu(){
   $('#setInsNow').textContent = (t === 'freelance' ? '3.3%' : (t === 'permanent' ? '상용직 4대보험' : (t === 'none' ? '공제 없음' : '일용직 · 고용+산재')));
   $('#setRuleNow').textContent = ruleText(c);
   $('#setDataNow').textContent = 'JSON · CSV';
+  var vf = $('#setVerFoot');
+  if(vf) vf.textContent = '딜러리의 입금대장 v' + APP_VERSION + ' · 기록은 이 기기 안에만 저장됩니다.';
+  var wn = $('#wnNow');
+  if(wn) wn.textContent = 'v' + APP_VERSION + ' · 이번에 바뀐 점 다시 보기';
 }
 function ruleText(c){
   var r = (c.payRules || [])[0];
@@ -5968,6 +6055,7 @@ function buildStatement(name, month){
   var wh = weeklyHolidayOf(c, name, month);
   var ex = empExtraOf(c, name);
   var total = t.net + t.fixed - ex.taxDed - ex.ded + wh.total;
+  var dedAll = t.ded + ex.taxDed + ex.ded;
   var alist = empAllowList(c, name);
   var dst = dedStateOf(c, name);
   var dedTxt = dedLabel(type) + (dst.custom ? ' · 항목 조정' : '');
@@ -5987,14 +6075,14 @@ function buildStatement(name, month){
     humanBlock += '주휴수당: ' + wh.weeks.map(function(w){ return '(' + dateShort(w.week) + ' 주 ' + (Math.round(w.hours*10)/10) + '시간 ' + num(w.pay) + ')'; }).join(' · ') + ' = ' + num(wh.total) + '원\n';
   }
   humanBlock += '합계 ' + t.days + '일 ' + hm(t.worked) + ' · 지급 ' + num(t.gross + t.fixed) +
-    ' · 공제 ' + num(t.ded) + ' · 실수령 ' + num(total) + '원\n';
+    ' · 공제 ' + num(dedAll) + ' · 실수령 ' + num(total) + '원\n';
   if(t.employer) humanBlock += '회사 부담(사업주) ' + num(t.employer) + '원\n';
   humanBlock += '\n';
   var text = head + humanBlock +
     '[근무]\n' + (lines.length ? lines.join('\n') : '(기록 없음)') + '\n\n[합계]\n' +
     '근무 ' + t.days + '일 · ' + hm(t.worked) + '\n' +
     '지급(공제 전) ' + money(t.gross + t.fixed) + '\n' +
-    '뗀 돈(참고) ' + money(t.ded) + '\n' +
+    '뗀 돈(참고) ' + money(dedAll) + '\n' +
     '직원이 받는 돈 ' + money(total) + '\n' +
     (t.allow ? '기타 수당 ' + money(t.allow) + '\n' : '') +
     (t.fixed ? '고정 수당 ' + money(t.fixed) + '\n' : '') +
@@ -6079,6 +6167,8 @@ function startApp(){
   if(!started){ started = true; }
   refresh();
   renderScreen(currentScr, {});
+  maybeShowWhatsNew();
+  setTimeout(checkServerVersion, 900);
 }
 function switchCompany(id){
   if(!id || id === ui.cid) return;
@@ -6131,6 +6221,13 @@ function bindAll(){
   on($('#btnLock'), 'click', lockNow);
   on($('#btnTheme'), 'click', cycleTheme);
   on($('#btnLock2'), 'click', lockNow);
+  on($('#btnShare'), 'click', function(){ openSheet('share'); });
+  on($('#btnShareEmp'), 'click', function(){ doShare('emp'); });
+  on($('#btnShareAdm'), 'click', function(){ doShare('adm'); });
+  on($('#btnWhatsNew'), 'click', function(){ openWhatsNew(); });
+  on($('#btnWhatsNewOk'), 'click', closeWhatsNew);
+  on($('#btnForceReload'), 'click', function(){ setTimeout(reloadToLatest, 150); });
+  on($('#btnReloadNew'), 'click', reloadToLatest);
 
   onAll('.tab', 'click', function(){ goTab(this.getAttribute('data-view')); });
 
@@ -6444,6 +6541,7 @@ function bindAll(){
 }
 function handleClose(kind){
   if(kind === 'confirm'){ closeConfirm(); return; }
+  if(kind === 'whatsnew'){ closeWhatsNew(); return; }
   closeSheet(kind);
 }
 function shiftMonth(n){
@@ -6557,9 +6655,117 @@ var GUIDE_TOC = '';
    의견 보내기 · 접수함
    ============================================================ */
 var FB_KEY = 'dealerLedger.v1.feedback';
-var APP_VERSION = '1.0';
-var APP_UPDATED = '2026-11-26';
+var APP_VERSION = '2026-11-27.1';
+var APP_UPDATED = '2026-11-27';
+/* 버전을 올릴 때마다 맨 위에 새 내역을 하나 더 넣습니다 (아래로 갈수록 옛 내역) */
+var UPDATES = [
+  { ver:'2026-11-27.1', date:'2026-11-27', items:[
+    '💰 식대·교통비·직급·특근 같은 기타 수당에도 3.3%·4대보험을 똑같이 뗍니다 (직원용 앱과 같은 계산)',
+    '📤 맨 위 📤 버튼으로 직원용 앱·관리자용 앱 주소를 카톡으로 바로 보냅니다',
+    '📢 앱을 열면 이번에 바뀐 점을 한 번만 알려 드립니다',
+    '🔄 새 버전이 나오면 위에 뜨는 안내로 바로 새로고침'
+  ]},
+  { ver:'1.0', date:'2026-11-26', items:[
+    '첫 버전 — 입금 대장 · 급여 계산 · 카카오톡 출근부 · 스케줄 · 명세 · 백업'
+  ]}
+];
+var SEEN_VER_KEY = 'dealerLedger.v1.seenVer';
+var SHARE_EMP_URL = 'https://lkj7670.github.io/Dealer-studio/daily-pay.html';
+var SHARE_ADM_URL = 'https://lkj7670.github.io/Dealer-studio/daily-pay-admin.html';
+var verCheckDone = false;
 var fbItems = [];
+
+/* ============================================================
+   📤 공유 · 📢 새 소식 · 🔄 새 버전 확인
+   ============================================================ */
+function seenVersion(){
+  var v = '';
+  try{ v = localStorage.getItem(SEEN_VER_KEY) || ''; }catch(e){}
+  return v;
+}
+function markVersionSeen(){
+  try{ localStorage.setItem(SEEN_VER_KEY, APP_VERSION); }catch(e){}
+}
+function updateBlockHtml(u, isNew){
+  return '<div class="wn-block">' +
+    '<div class="wn-ver">v' + esc(u.ver) + ' · ' + esc(u.date) + (isNew ? ' · 지금 버전' : '') + '</div>' +
+    '<ul class="wn-list">' + u.items.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+  '</div>';
+}
+function openWhatsNew(){
+  var body = $('#wnBody');
+  if(body) body.innerHTML = UPDATES.map(function(u, i){ return updateBlockHtml(u, i === 0 && u.ver === APP_VERSION); }).join('');
+  var sub = $('#wnSub');
+  if(sub) sub.textContent = '딜러리의 입금대장 v' + APP_VERSION + ' · ' + APP_UPDATED;
+  $('#whatsNewModal').hidden = false;
+}
+function closeWhatsNew(){
+  $('#whatsNewModal').hidden = true;
+  markVersionSeen();
+}
+function maybeShowWhatsNew(){
+  if(seenVersion() === APP_VERSION) return;
+  openWhatsNew();
+}
+function showVerBanner(v){
+  var b = $('#verBanner');
+  if(!b) return;
+  b.setAttribute('data-new-ver', v || '');
+  b.hidden = false;
+}
+function reloadToLatest(){
+  try{ location.replace(location.pathname + '?v=' + Date.now()); }
+  catch(e){ location.reload(); }
+}
+/* 서버에 있는 앱 파일의 APP_VERSION을 가볍게 확인합니다.
+   file:// · 오프라인 · 망 오류때는 조용히 넘어갑니다. */
+function checkServerVersion(){
+  if(verCheckDone) return;
+  verCheckDone = true;
+  try{
+    if(location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    if(!window.fetch || !location.pathname) return;
+    fetch(location.pathname + '?_=' + Date.now(), { cache:'no-store' }).then(function(r){
+      if(!r || !r.ok) return '';
+      return r.text();
+    }).then(function(html){
+      if(!html) return;
+      var m = html.match(/var\s+APP_VERSION\s*=\s*'([^']{1,40})'/);
+      if(!m || !m[1] || m[1] === APP_VERSION) return;
+      showVerBanner(m[1]);
+    }).catch(function(){});
+  }catch(e){}
+}
+/* 공유 문구 — 급여 기록·입금 내역·비밀번호·직원 이름은 절대 넣지 않습니다 */
+function sharePayload(kind){
+  if(kind === 'emp'){
+    return {
+      title:'딜러리의 일급계산기 (직원용)',
+      text:'일한 날 출퇴근을 넣으면 급여를 바로 계산해 주는 앱이에요. 폰 인터넷에 주소를 열고 홈 화면에 추가해서 쓰세요.',
+      url:SHARE_EMP_URL
+    };
+  }
+  return {
+    title:'딜러리의 입금대장 (관리자용)',
+    text:'현장 급여·입금을 한 장에 정리하는 관리자용 앱이에요. 기록은 각 폰 안에만 저장됩니다.',
+    url:SHARE_ADM_URL
+  };
+}
+function doShare(kind){
+  var p = sharePayload(kind);
+  var plain = p.title + '\n' + p.text + '\n' + p.url;
+  closeSheet('share');
+  if(navigator.share){
+    try{
+      navigator.share({ title:p.title, text:p.text, url:p.url }).then(function(){}, function(err){
+        if(err && err.name === 'AbortError') return;
+        copyText(plain, '공유창이 안 열려서 복사했어요. 카톡에 붙여넣으세요.');
+      });
+      return;
+    }catch(e){}
+  }
+  copyText(plain, '복사했어요. 카톡에 붙여넣으세요.');
+}
 
 function loadFeedback(){
   var v = null;
@@ -6964,7 +7170,7 @@ var GUIDE_HTML = '' +
 
 '<div class="card">' +
   '<p class="hint">이 설명서는 앱 화면과 같은 이름을 그대로 썼습니다. 화면과 다르게 보이면 <b>📢 소리샘</b>이나 <b>설정 → 의견 보내기</b>로 알려 주세요.</p>' +
-  '<p class="exhint">딜러리의 입금대장 v1.0 (테스트) · 2026-11-26</p>' +
+  '<p class="exhint">딜러리의 입금대장 v2026-11-27.1 (테스트) · 2026-11-27</p>' +
 '</div>';
 
 init();
