@@ -69,6 +69,20 @@ button{cursor:pointer}
 .reload-btn{font-size:17px;font-weight:800;min-width:40px;height:34px;color:#0b3d91;border-color:#c7d4ea;background:#f6f9ff}
 .reload-btn.spin{animation:rlspin .7s linear infinite}
 @keyframes rlspin{to{transform:rotate(360deg)}}
+/* ---- 새 버전 안내 팝업 ---- */
+#verPop{position:fixed;inset:0;z-index:120;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;padding:18px}
+#verPop.open{display:flex}
+.ver-card{background:#fff;border-radius:16px;max-width:360px;width:100%;padding:18px 16px 14px;box-shadow:0 12px 32px rgba(17,24,39,.28)}
+.ver-title{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:2px}
+.ver-ver{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px}
+.ver-notes{margin:0 0 10px;padding-left:0;list-style:none;font-size:13px;line-height:1.55}
+.ver-notes li{padding-left:14px;position:relative}
+.ver-notes li:before{content:'•';position:absolute;left:2px;color:#0b3d91;font-weight:800}
+.ver-base{font-size:12.5px;font-weight:700;border-radius:10px;padding:8px 10px;margin-bottom:12px;background:#eef7ee;color:#1f6b32}
+.ver-base.bad{background:#fdecec;color:#b3261e}
+.ver-btns{display:flex;gap:8px}
+.ver-btns .btn{flex:1}
+.ver-no{background:#f2f4f7;border:1px solid var(--line2);color:var(--ink)}
 .stage-tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:0 10px 8px}
 html.locked .stage-tabs{display:none}
 html.locked .head-row{padding-bottom:8px}
@@ -8755,6 +8769,87 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
+/* ---------- 새 버전 안내 · 자동 새로고침 ---------- */
+const APP_VERSION='2026-11-28b';
+const VER_SEEN_KEY='wl_seen_ver';
+const VER_NOTES={
+  '2026-11-28b':['상단에 새로고침(↻) 버튼을 달았습니다','새 버전이 나오면 앱을 열 때 한 번만 다시 불러옵니다']
+};
+function baseStateText(){
+  /* 폰에 저장된 기준표(내장+추가−삭제)까지 합쳐서 센다 */
+  let n=0;
+  try{ n=(typeof allRows==='function')?allRows().length:((typeof BASE_ROWS!=='undefined'&&BASE_ROWS)?BASE_ROWS.length:0); }catch(e){ n=0; }
+  if(n>0) return {ok:true,txt:'기준표 품목 '+n+'건 연결됨 · 적치 위치가 나옵니다'};
+  return {ok:false,txt:'기준표 0건 · 사진만 읽힙니다. 기준표 관리 → 복원을 눌러 주세요'};
+}
+function showVersionPopup(){
+  try{
+    bindVerBtns();
+    $('#verVer').textContent='버전 '+APP_VERSION;
+    const list=$('#verNotes'); list.innerHTML='';
+    (VER_NOTES[APP_VERSION]||[]).forEach(t=>{const li=document.createElement('li');li.textContent=t;list.appendChild(li);});
+    const bs=baseStateText();
+    const el=$('#verBase'); el.textContent=bs.txt; el.classList.toggle('bad',!bs.ok);
+    $('#verPop').classList.add('open');
+  }catch(e){}
+}
+function closeVersionPopup(setSeen){
+  $('#verPop').classList.remove('open');
+  if(setSeen){ try{ localStorage.setItem(VER_SEEN_KEY,APP_VERSION); }catch(e){} }
+}
+/* 팝업 단추는 화면(#verPop)이 다 만들어진 뒤에 연결한다 */
+function bindVerBtns(){
+  const ok=$('#verOk'), no=$('#verNo');
+  if(ok) ok.onclick=()=>closeVersionPopup(true);
+  if(no) no.onclick=()=>closeVersionPopup(true);
+}
+/* 버전 파일을 확인해 다르면 한 번만 다시 연다(입력 중이거나 화면이 꺼져 있으면 미룸) */
+let verBusy=false, verReloaded=false;
+function isEditingNow(){
+  if(document.hidden) return true;
+  if($('.sheet.open')) return true;
+  const a=document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+  if($('#verPop').classList.contains('open')) return true;
+  return false;
+}
+function checkVersion(){
+  if(verBusy||verReloaded) return;
+  verBusy=true;
+  fetch('version.json?t='+Date.now(),{cache:'no-store'})
+    .then(r=>r.ok?r.json():null)
+    .then(j=>{
+      verBusy=false;
+      if(!j||!j.v||j.v===APP_VERSION){ try{ sessionStorage.removeItem('wl_ver_reload'); }catch(e){} return; }
+      if(isEditingNow()) return;           /* 입력 중이면 다음 기회에 */
+      /* 되돌이 새로고침 방지: 60초 안에 두 번 넘게 다시 열었으면 멈춘다 */
+      try{
+        let n=0; try{ n=Number(sessionStorage.getItem('wl_ver_reload')||0); }catch(e){}
+        if(n>=2) return;
+        try{ sessionStorage.setItem('wl_ver_reload',String(n+1)); }catch(e){}
+      }catch(e){}
+      verReloaded=true;
+      try{ toast('새 버전으로 바뀌었습니다. 잠시 후 새로고침합니다'); }catch(e){}
+      setTimeout(()=>{
+        try{ const u=new URL(location.href); u.searchParams.set('r',String(Date.now())); location.replace(u.toString()); }
+        catch(e){ location.reload(); }
+      },900);
+    })
+    .catch(()=>{ verBusy=false; });
+}
+
+function bootVersion(){
+  bindVerBtns();
+  document.addEventListener('DOMContentLoaded',bindVerBtns);
+  try{
+    let seen=null; try{ seen=localStorage.getItem(VER_SEEN_KEY); }catch(e){}
+    if(seen!==APP_VERSION) setTimeout(showVersionPopup,600);
+  }catch(e){}
+  setTimeout(checkVersion,1500);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) setTimeout(checkVersion,800); });
+  setInterval(()=>{ if(!document.hidden) checkVersion(); },60000);
+}
+
 /* ---------- 시작 ---------- */
 /* 한 화면만 보여주는 파일에서는 그 단계로 가는 메뉴만 남긴다 */
 function applyLockMenu(){
@@ -8775,6 +8870,7 @@ function init(){
   if(LOCK_STAGE){ document.documentElement.classList.add('locked'); applyLockMenu(); }
   renderAll();
   showStage(LOCK_STAGE||'in');
+  bootVersion();
   const p=loadPin();
   if(p.on) showLock();
   let hiddenAt=0;
@@ -8785,5 +8881,17 @@ function init(){
 }
 init();
 </script>
+<div id="verPop" role="dialog" aria-modal="true" aria-label="앱 안내">
+  <div class="ver-card">
+    <div class="ver-title">물류 현장 앱</div>
+    <div class="ver-ver" id="verVer"></div>
+    <ul class="ver-notes" id="verNotes"></ul>
+    <div class="ver-base" id="verBase"></div>
+    <div class="ver-btns">
+      <button class="btn primary" id="verOk">확인</button>
+      <button class="btn ver-no" id="verNo">다시 보지 않기</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
