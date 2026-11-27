@@ -392,14 +392,14 @@
   .rs-sign input{width:118px; min-height:38px; height:38px; font-size:13px; padding:5px 8px; border-radius:8px; border:1px solid #e0d2b2; background:#fffdf7}
   .rs-sign .rs-sig{display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:800; color:#8a7752}
   .rs-stamp{
-    position:absolute; right:14px; bottom:58px; width:86px; height:86px; border-radius:50%;
+    position:absolute; right:10px; bottom:38px; width:80px; height:80px; border-radius:50%;
     border:3px solid #c0261f; color:#c0261f; display:flex; flex-direction:column; align-items:center; justify-content:center;
     transform:rotate(-13deg); opacity:.9; pointer-events:none; z-index:1;
     box-shadow:inset 0 0 0 2px #c0261f, inset 0 0 14px rgba(192,38,31,.22), 0 0 0 7px rgba(255,252,242,.78);
     font-weight:900; line-height:1.05; letter-spacing:1px; background:rgba(255,255,255,.12);
   }
-  .rs-stamp b{font-size:21px}
-  .rs-stamp small{font-size:9.5px; letter-spacing:1px}
+  .rs-stamp b{font-size:20px}
+  .rs-stamp small{font-size:9px; letter-spacing:1px}
 
   .rs-big{display:flex; align-items:baseline; gap:8px; margin-top:10px; flex-wrap:wrap}
   .rs-big b{font-size:33px; font-weight:900; letter-spacing:-1.5px; color:var(--brand-d); font-variant-numeric:tabular-nums; line-height:1}
@@ -409,7 +409,13 @@
   .rs-stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:12px}
   .rs-stats>div{background:#f7fafc; border:1px solid var(--line); border-radius:12px; padding:8px 9px; min-width:0}
   .rs-stats .k{display:block; font-size:11px; font-weight:800; color:var(--muted); line-height:1.3}
-  .rs-stats b{display:block; font-size:13.5px; font-weight:900; letter-spacing:-.4px; margin-top:3px; overflow-wrap:anywhere; line-height:1.35}
+  .rs-stats b{display:block; font-size:13px; font-weight:900; letter-spacing:-.4px; margin-top:3px; white-space:nowrap; line-height:1.35}
+  #rsEta{white-space:normal; overflow-wrap:anywhere}
+  @media (max-width:359px){
+    .rs-stats b{font-size:11.5px}
+    .rs-stats>div{padding:7px 6px}
+    .rs-stats .k{font-size:10.5px}
+  }
   .rs-mile{display:flex; gap:5px; margin-top:12px; flex-wrap:wrap}
   .rs-mile span{font-size:11px; font-weight:900; padding:4px 9px; border-radius:99px; background:#eef2f7; color:#8b97a9; border:1px solid var(--line)}
   .rs-mile span.on{background:var(--brand-w); color:var(--brand-d); border-color:var(--brand-l)}
@@ -4353,7 +4359,7 @@ var L = (function(){
     var rEl = $('#rsReason'); if(rEl) rEl.textContent = reason;
     var aEl = $('#rsAmountLine');
     if(aEl) aEl.textContent = c.target > 0
-      ? T('{a} 중 {b} 모음', { a: money(c.target), b: money(c.saved) })
+      ? money(c.saved) + ' / ' + money(c.target)
       : T('목표 금액을 정해 주세요');
     var pEl = $('#rsPeriod');
     var rsDone = c.target > 0 && c.pct >= 100;
