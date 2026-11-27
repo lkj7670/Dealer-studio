@@ -619,6 +619,24 @@
   .mrowAmt{margin-left:auto; font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--brand-d)}
   .mrowMid{display:block; font-size:12px; font-weight:700; color:var(--muted); margin-top:3px}
   .mrowBot{display:block; font-size:11.5px; font-weight:600; color:#9aa6b8; margin-top:2px}
+  /* 날짜를 누르면 바로 아래에 펼쳐지는 그날 상세 카드 */
+  .calcard{padding:12px}
+  .caldet{padding:11px 12px 10px; cursor:pointer}
+  .caldet .cdgrid{display:grid; gap:3px; margin-top:7px}
+  .cdrow{display:flex; align-items:baseline; gap:8px; font-size:12px; min-width:0}
+  .cdrow .cdk{flex:0 0 58px; font-size:11.5px; font-weight:800; color:var(--muted)}
+  .cdrow .cdv{flex:1 1 auto; min-width:0; font-weight:700; color:var(--ink);
+    font-variant-numeric:tabular-nums; overflow-wrap:anywhere}
+  .cdrow .cdv small{font-weight:600; color:#9aa6b8}
+  .cdline{margin-top:7px; font-size:12px; font-weight:700; color:#4a5a70; overflow-wrap:anywhere}
+  .cdline .cdlbl{font-size:11.5px; font-weight:800; color:var(--muted); margin-right:2px}
+  .cdline b{color:var(--brand-d)}
+  .cdmoney{display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px; margin-top:8px; padding-top:8px;
+    border-top:1px dashed var(--line); font-size:11.5px; font-weight:700; color:#8b97a8;
+    font-variant-numeric:tabular-nums}
+  .cdmoney b{font-size:13px; color:var(--brand-d)}
+  .cdbtns{display:flex; gap:6px; margin-top:9px}
+  .rbadge.wait{background:#fff7e8; color:#b45309}
   .pstats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
   .pstats .cs{border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:#fbfcfe}
   .pstats .cs span{display:block; font-size:11px; font-weight:800; color:var(--muted)}
@@ -754,7 +772,7 @@
   #app.lang-i18n .tabbar .inner{grid-template-columns:repeat(6,minmax(0,1fr))}
 
 
-/* ================= 공유 · 새 소식 · 새로고침 (2026-11-27.2) ================= */
+/* ================= 공유 · 새 소식 · 새로고침 (2026-11-27.3) ================= */
 .updatebar{
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
   background:linear-gradient(180deg,#fff8e8,#ffefd2); border:1px solid #f0d59b;
@@ -940,6 +958,26 @@
         </div>
       </section>
 
+      <!-- 이번 달 달력 — 앱을 켜면 바로 보이는 자리 (시트 탭의 [📅 달력]을 누르면 이 달력이 그쪽으로 잠깐 옮겨 갑니다) -->
+      <section class="card calcard" id="calCard">
+        <div id="calCalcHost">
+          <div id="calWrap">
+            <div class="calnav">
+              <button class="cnav" id="calPrevMonth" type="button" aria-label="이전 달">‹</button>
+              <div class="calnav-mid">
+                <div class="cmlbl"><b id="calMonthTxt">11월</b><span id="calYearTxt">2026</span></div>
+                <input id="calMonthPick" type="month" aria-label="월 선택">
+              </div>
+              <button class="cnav" id="calNextMonth" type="button" aria-label="다음 달">›</button>
+            </div>
+            <div class="calgrid calwide" id="payCal"></div>
+            <div class="calbar" id="payCalBar"></div>
+            <p class="hint" style="margin:8px 2px 0">날짜를 톡 누르면 그날 근무가 아래에 펼쳐져요.</p>
+            <div id="calDayList" class="alrows" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="card entry">
         <h2 id="entryTitle">✏️ 오늘 기록 넣기</h2>
         <label class="field"><span class="flabel">날짜</span>
@@ -1078,20 +1116,7 @@
           </table>
         </div>
         <p class="scroll-hint">← 옆으로 밀면 금액까지 보여요 · 행을 누르면 수정</p>
-        <div id="calWrap" hidden>
-          <div class="calnav">
-            <button class="cnav" id="calPrevMonth" type="button" aria-label="이전 달">‹</button>
-            <div class="calnav-mid">
-              <div class="cmlbl"><b id="calMonthTxt">11월</b><span id="calYearTxt">2026</span></div>
-              <input id="calMonthPick" type="month" aria-label="월 선택">
-            </div>
-            <button class="cnav" id="calNextMonth" type="button" aria-label="다음 달">›</button>
-          </div>
-          <div class="calgrid calwide" id="payCal"></div>
-          <div class="calbar" id="payCalBar"></div>
-          <p class="hint" style="margin:8px 2px 0">날짜를 톡 누르면 그날 근무가 아래에 펼쳐져요.</p>
-          <div id="calDayList" class="alrows" style="margin-top:8px"></div>
-        </div>
+        <div id="calSheetHost"></div>
       </section>
 
       <section class="card" id="periodCard">
@@ -1479,10 +1504,10 @@
           <text x="286" y="124" font-size="9" font-weight="800" fill="#a9b4c4">›</text>
         </svg>
         <div class="steps">
-          <div class="step"><span class="n">1</span><div>맨 아래 <b>[📋 시트]</b> 탭을 누르고, 카드 위쪽 <b>[📅 달력]</b>을 누르면 달력이 떠요. <b>[📋 목록]</b>을 누르면 다시 표로 돌아가요.</div></div>
+          <div class="step"><span class="n">1</span><div>앱을 켜면 <b>[💰 계산]</b> 화면에 이번 달 달력이 바로 보여요. <b>[📋 시트]</b> 탭에서 <b>[📅 달력]</b>을 눌러도 같은 달력이 뜨고, <b>[📋 목록]</b>을 누르면 표로 돌아가요.</div></div>
           <div class="step"><span class="n">2</span><div>달력 위 <b>‹ 11월 2026 ›</b> 화살표로 달을 넘기고, 가운데 <b>달 이름</b>을 누르면 원하는 달로 바로 갈 수 있어요.</div></div>
           <div class="step"><span class="n">3</span><div>근무한 날은 날짜 아래에 파란 금액(<b>+169,938</b>)이 찍혀요. 달력 아래 바에서는 이번 달 <b>공제</b>와 <b>실수령</b> 합계를 한눈에 봐요.</div></div>
-          <div class="step"><span class="n">4</span><div>날짜를 톡 누르면 그날 출퇴근·근무시간이 아래에 펼쳐져요. 펼쳐진 줄을 누르면 바로 고칠 수 있고, 기록이 없는 날은 <b>[➕ 이 날 기록 추가]</b>로 그 자리에서 넣어요.</div></div>
+          <div class="step"><span class="n">4</span><div>날짜를 톡 누르면 그날 출퇴근·근무시간·야간·수당·공제 방식·메모·실수령까지 아래에 펼쳐져요. <b>[✏️ 이 날 수정]</b>으로 바로 고치고, 기록이 없는 날은 <b>[➕ 이 날 기록 추가]</b>로 그 자리에서 넣어요.</div></div>
           <div class="step"><span class="n">5</span><div>달력 아래 <b>📆 기간별 합계</b> 칸에서 <b>[📅 이번 달]</b>·<b>[🙋 이번 주]</b>·<b>[⏪ 지난 주]</b>·<b>[1️⃣ 1~15일]</b>·<b>[2️⃣ 16~말일]</b> 중 하나를 누르면 그 기간 합계가 바로 나와요.</div></div>
         </div>
         <div class="tip">💡 달력에 찍히는 금액은 <b>실수령</b>이에요. 달력 아래 <b>공제·실수령</b> 바를 누르면 <b>기간별 합계</b> 칸으로 넘어가요.</div>
@@ -1664,6 +1689,9 @@ var L = (function(){
   /* 2026-11-27.2 추가 문구(공유·새 소식·새로고침) — 기존 사전 뒤에 합칩니다 */
   var D2 = {"동료에게 앱 공유하기": {"en": "Share this app with a coworker", "zh": "与同事分享此应用", "vi": "Chia sẻ ứng dụng cho đồng nghiệp", "th": "แชร์แอปให้เพื่อนร่วมงาน", "id": "Bagikan aplikasi ke rekan kerja", "mn": "Хамт ажиллагчдад апп хуваалцах", "bn": "সহকর্মীর সাথে অ্যাপ শেয়ার করুন", "ne": "सहकर्मीलाई एप साझा गर्नुहोस्", "kk": "Әріптеспен қосымшаны бөлісу", "ru": "Поделиться приложением с коллегой", "uz": "Hamkasbga ilovani ulashish", "km": "ចែករំលែកកម្មវិធីទៅមិត្តរួមការងារ", "tl": "Ibahagi ang app sa katrabaho", "my": "လုပ်ဖော်ကိုင်ဖက်ထံ အက်ပ် မျှဝေ"}, "📤 앱 공유": {"en": "📤 Share app", "zh": "📤 分享应用", "vi": "📤 Chia sẻ ứng dụng", "th": "📤 แชร์แอป", "id": "📤 Bagikan aplikasi", "mn": "📤 Апп хуваалцах", "bn": "📤 অ্যাপ শেয়ার", "ne": "📤 एप साझा", "kk": "📤 Қосымшаны бөлісу", "ru": "📤 Поделиться приложением", "uz": "📤 Ilovani ulashish", "km": "📤 ចែករំលែកកម្មវិធី", "tl": "📤 Ibahagi ang app", "my": "📤 အက်ပ် မျှဝေ"}, "같이 일하는 동료에게 이 앱을 보내 주세요. 급여 기록은 함께 보내지 않아요.": {"en": "Send this app to a coworker. Your pay records are never sent with it.", "zh": "把这个应用发给一起工作的同事，不会一起发送工资记录。", "vi": "Gửi ứng dụng này cho đồng nghiệp. Không gửi kèm dữ liệu lương.", "th": "ส่งแอปนี้ให้เพื่อนร่วมงาน ข้อมูลค่าจ้างจะไม่ถูกส่งไปด้วย", "id": "Kirim aplikasi ini ke rekan kerja. Data gaji tidak ikut terkirim.", "mn": "Энэ аппыг хамт ажиллагчдад илгээнэ үү. Цалингийн бичлэг хамт явахгүй.", "bn": "এই অ্যাপটি সহকর্মীকে পাঠান। বেতনের রেকর্ড পাঠানো হয় না।", "ne": "यो एप सहकर्मीलाई पठाउनुहोस्। तलबको रेकर्ड सँगै जाँदैन।", "kk": "Бұл қосымшаны әріптесіңізге жіберіңіз. Жалақы жазбалары жіберілмейді.", "ru": "Отправьте приложение коллеге. Записи о зарплате не передаются.", "uz": "Bu ilovani hamkasbga yuboring. Ish haqi yozuvlari birga yuborilmaydi.", "km": "ផ្ញើកម្មវិធីនេះទៅមិត្តរួមការងារ។ កំណត់ត្រាប្រាក់ខែមិនផ្ញើទៅជាមួយទេ។", "tl": "Ipadala ang app na ito sa katrabaho. Hindi kasamang ipinapadala ang record ng sahod.", "my": "ဒီအက်ပ်ကို လုပ်ဖော်ကိုင်ဖက်ထံ ပို့ပါ။ လစာမှတ်တမ်းများ ပါမသွားပါ။"}, "📤 동료에게 앱 공유하기": {"en": "📤 Share with a coworker", "zh": "📤 与同事分享应用", "vi": "📤 Chia sẻ cho đồng nghiệp", "th": "📤 แชร์ให้เพื่อนร่วมงาน", "id": "📤 Bagikan ke rekan kerja", "mn": "📤 Хамт ажиллагчдад хуваалцах", "bn": "📤 সহকর্মীকে অ্যাপ শেয়ার", "ne": "📤 सहकर्मीलाई साझा", "kk": "📤 Әріптеспен бөлісу", "ru": "📤 Поделиться с коллегой", "uz": "📤 Hamkasbga ulashish", "km": "📤 ចែករំលែកទៅមិត្តរួមការងារ", "tl": "📤 Ibahagi sa katrabaho", "my": "📤 လုပ်ဖော်ကိုင်ဖက်ထံ မျှဝေ"}, "📢 새 소식 / 업데이트 내역": {"en": "📢 What's new / Update history", "zh": "📢 新消息 / 更新记录", "vi": "📢 Có gì mới / Lịch sử cập nhật", "th": "📢 มีอะไรใหม่ / ประวัติอัปเดต", "id": "📢 Yang baru / Riwayat pembaruan", "mn": "📢 Шинэ мэдээ / Шинэчлэлийн түүх", "bn": "📢 নতুন কী / আপডেট ইতিহাস", "ne": "📢 नयाँ के छ / अपडेट इतिहास", "kk": "📢 Жаңалық / Жаңарту тарихы", "ru": "📢 Что нового / История обновлений", "uz": "📢 Yangiliklar / Yangilanish tarixi", "km": "📢 អ្វីថ្មី / ប្រវត្តិធ្វើបច្ចុប្បន្នភាព", "tl": "📢 Ano'ng bago / Kasaysayan ng update", "my": "📢 အသစ်များ / အပ်ဒိတ်မှတ်တမ်း"}, "🔄 최신 버전으로 새로고침": {"en": "🔄 Refresh to the latest version", "zh": "🔄 刷新到最新版本", "vi": "🔄 Tải lại bản mới nhất", "th": "🔄 รีเฟรชเป็นเวอร์ชันล่าสุด", "id": "🔄 Muat ulang versi terbaru", "mn": "🔄 Хамгийн сүүлийн хувилбарыг ачаалах", "bn": "🔄 সর্বশেষ ভার্সনে রিফ্রেশ", "ne": "🔄 पछिल्लो संस्करणमा रिफ्रेस", "kk": "🔄 Соңғы нұсқаға жаңарту", "ru": "🔄 Обновить до последней версии", "uz": "🔄 Eng so'nggi versiyaga yangilash", "km": "🔄 ផ្ទុកឡើងវិញជំនាន់ចុងក្រោយ", "tl": "🔄 I-refresh sa pinakabagong bersyon", "my": "🔄 နောက်ဆုံးဗားရှင်းသို့ ပြန်တင်"}, "🆕 새 버전이 나왔어요!": {"en": "🆕 A new version is available!", "zh": "🆕 有新版本了！", "vi": "🆕 Đã có phiên bản mới!", "th": "🆕 มีเวอร์ชันใหม่แล้ว!", "id": "🆕 Versi baru tersedia!", "mn": "🆕 Шинэ хувилбар гарлаа!", "bn": "🆕 নতুন ভার্সন এসেছে!", "ne": "🆕 नयाँ संस्करण आयो!", "kk": "🆕 Жаңа нұсқа шықты!", "ru": "🆕 Вышла новая версия!", "uz": "🆕 Yangi versiya chiqdi!", "km": "🆕 មានជំនាន់ថ្មីហើយ!", "tl": "🆕 May bagong bersyon na!", "my": "🆕 ဗားရှင်းအသစ် ထွက်ပါပြီ!"}, "🔄 지금 새로고침": {"en": "🔄 Refresh now", "zh": "🔄 立即刷新", "vi": "🔄 Tải lại ngay", "th": "🔄 รีเฟรชเลย", "id": "🔄 Muat ulang", "mn": "🔄 Одоо ачаалах", "bn": "🔄 এখনই রিফ্রেশ", "ne": "🔄 अहिले रिफ्रेस", "kk": "🔄 Қазір жаңарту", "ru": "🔄 Обновить сейчас", "uz": "🔄 Hozir yangilash", "km": "🔄 ផ្ទុកឡើងវិញឥឡូវ", "tl": "🔄 I-refresh ngayon", "my": "🔄 ယခု ပြန်တင်"}, "📢 새 버전으로 업데이트됐어요": {"en": "📢 Updated to a new version", "zh": "📢 已更新到新版本", "vi": "📢 Đã cập nhật phiên bản mới", "th": "📢 อัปเดตเวอร์ชันใหม่แล้ว", "id": "📢 Diperbarui ke versi baru", "mn": "📢 Шинэ хувилбарт шинэчлэгдлээ", "bn": "📢 নতুন ভার্সনে আপডেট হয়েছে", "ne": "📢 नयाँ संस्करणमा अपडेट भयो", "kk": "📢 Жаңа нұсқаға жаңартылды", "ru": "📢 Обновлено до новой версии", "uz": "📢 Yangi versiyaga yangilandi", "km": "📢 បានធ្វើបច្ចុប្បន្នភាពជំនាន់ថ្មី", "tl": "📢 Na-update sa bagong bersyon", "my": "📢 ဗားရှင်းအသစ်သို့ အပ်ဒိတ်လုပ်ပြီး"}, "이번 버전에서 달라진 점이에요. 확인을 누르면 다시 뜨지 않아요.": {"en": "Here is what changed. Tap OK and it won't show again for this version.", "zh": "这是本版本的改动，按“确认”后此版本不再显示。", "vi": "Đây là những thay đổi. Nhấn OK để không hiện lại ở phiên bản này.", "th": "นี่คือสิ่งที่เปลี่ยนไป กดตกลงแล้วจะไม่ขึ้นอีกในเวอร์ชันนี้", "id": "Ini yang berubah. Tekan OK agar tidak muncul lagi di versi ini.", "mn": "Энэ хувилбарт юу өөрчлөгдсөнийг харуулав. OK дарвал дахин гарахгүй.", "bn": "এই ভার্সনে যা বদলেছে। ঠিক আছে চাপলে আর দেখাবে না।", "ne": "यो संस्करणमा के फेरियो। ठीक छ थिचेपछि फेरि देखिँदैन।", "kk": "Бұл нұсқадағы өзгерістер. OK бассаңыз қайта шықпайды.", "ru": "Что изменилось в этой версии. Нажмите «ОК», и для этой версии окно больше не появится.", "uz": "Bu versiyada nima o'zgardi. OK bosilsa, boshqa chiqmaydi.", "km": "នេះជាអ្វីដែលបានផ្លាស់ប្ដូរ។ ចុចយល់ព្រម នឹងមិនបង្ហាញម្តងទៀតទេ។", "tl": "Ito ang mga nabago. Pindutin ang OK para hindi na lumitaw sa bersyong ito.", "my": "ဒီဗားရှင်းတွင် ပြောင်းလဲသွားသည်များ။ OK နှိပ်ပါက ထပ်မပြပါ။"}, "확인": {"en": "OK", "zh": "确认", "vi": "OK", "th": "ตกลง", "id": "OK", "mn": "OK", "bn": "ঠিক আছে", "ne": "ठीक छ", "kk": "OK", "ru": "ОК", "uz": "OK", "km": "យល់ព្រម", "tl": "OK", "my": "OK"}, "버전 {v}": {"en": "Version {v}", "zh": "版本 {v}", "vi": "Phiên bản {v}", "th": "เวอร์ชัน {v}", "id": "Versi {v}", "mn": "Хувилбар {v}", "bn": "ভার্সন {v}", "ne": "संस्करण {v}", "kk": "Нұсқа {v}", "ru": "Версия {v}", "uz": "Versiya {v}", "km": "ជំនាន់ {v}", "tl": "Bersyon {v}", "my": "ဗားရှင်း {v}"}, "앱 주소를 복사했어요. 카톡에 붙여넣어 보내 주세요.": {"en": "App link copied. Paste it into KakaoTalk and send.", "zh": "已复制应用地址，请粘贴到KakaoTalk发送。", "vi": "Đã sao chép địa chỉ app. Hãy dán vào KakaoTalk để gửi.", "th": "คัดลอกที่อยู่แอปแล้ว นำไปวางใน KakaoTalk เพื่อส่ง", "id": "Tautan aplikasi disalin. Tempel di KakaoTalk untuk mengirim.", "mn": "Аппын хаягийг хууллаа. KakaoTalk-д хуулж илгээнэ үү.", "bn": "অ্যাপের ঠিকানা কপি হয়েছে। KakaoTalk-এ পেস্ট করে পাঠান।", "ne": "एपको ठेगाना कपी भयो। KakaoTalk मा टाँसेर पठाउनुहोस्।", "kk": "Қосымша мекенжайы көшірілді. KakaoTalk-қа қойып жіберіңіз.", "ru": "Ссылка на приложение скопирована. Вставьте её в KakaoTalk и отправьте.", "uz": "Ilova manzili nusxalandi. KakaoTalk-ga qo'yib yuboring.", "km": "បានចម្លងអាសយដ្ឋានកម្មវិធី។ បិទភ្ជាប់ក្នុង KakaoTalk ដើម្បីផ្ញើ។", "tl": "Nakopya ang link ng app. I-paste sa KakaoTalk para ipadala.", "my": "အက်ပ် လိပ်စာ ကူးယူပြီး။ KakaoTalk တွင် ကပ်ပြီး ပို့ပါ။"}, "직원용 급여 계산 앱이에요. 하루 일당·시급으로 실수령액을 바로 계산해 주고, 근무 기록은 각자 폰에만 저장됩니다.": {"en": "A pay calculator for staff. It works out take-home pay from a daily wage or hourly rate, and each person's records stay only on their own phone.", "zh": "员工版工资计算器。按日薪或时薪立即算出实收金额，工作记录只保存在各自手机里。", "vi": "Máy tính lương cho nhân viên. Tính ngay thực nhận theo lương ngày hoặc giờ; dữ liệu chỉ lưu trên máy mỗi người.", "th": "เครื่องคิดค่าแรงสำหรับพนักงาน คิดยอดรับจริงจากค่าแรงรายวันหรือรายชั่วโมงทันที ข้อมูลเก็บในเครื่องของแต่ละคนเท่านั้น", "id": "Kalkulator upah untuk karyawan. Langsung menghitung gaji bersih dari upah harian atau per jam; data hanya di ponsel masing-masing.", "mn": "Ажилтны цалингийн тооцоолуур. Өдрийн эсвэл цагийн хөлсөөр цэвэр цалинг шууд бодож, бичлэг зөвхөн өөрийн утсанд хадгална.", "bn": "কর্মীদের জন্য বেতন ক্যালকুলেটর। দৈনিক বা ঘণ্টা মজুরি থেকে হাতে পাওয়া টাকা সঙ্গে সঙ্গে হিসাব করে, রেকর্ড শুধু নিজের ফোনে থাকে।", "ne": "कर्मचारीका लागि ज्याला क्याल्कुलेटर। दैनिक वा घण्टाको ज्यालाबाट हातमा आउने रकम तुरुन्तै गणना गर्छ, रेकर्ड आफ्नै फोनमा मात्र रहन्छ।", "kk": "Қызметкерлерге арналған жалақы калькуляторы. Күндік немесе сағаттық ақыдан қолға тиетін соманы бірден есептеп, жазба тек өз телефонда сақталады.", "ru": "Калькулятор зарплаты для сотрудников. Сразу считает сумму на руки от дневной ставки или почасовой, записи хранятся только в своём телефоне.", "uz": "Xodimlar uchun ish haqi kalkulyatori. Kunlik yoki soatbay haqdan qo'lga tegadigan summani darhol hisoblaydi, yozuvlar faqat o'z telefoningizda saqlanadi.", "km": "ម៉ាស៊ីនគិតប្រាក់សម្រាប់បុគ្គលិក។ គិតប្រាក់ទទួលពិតពីប្រាក់ថ្ងៃ ឬម៉ោងភ្លាមៗ កំណត់ត្រារក្សាទុកក្នុងទូរស័ព្ទរៀងៗខ្លួន។", "tl": "Calculator ng sahod para sa empleyado. Agad na kinakalkula ang take-home mula sa arawan o orasang sahod; nasa sariling phone lang ng bawat isa ang records.", "my": "ဝန်ထမ်းများအတွက် လစာတွက်စက်။ နေ့စား သို့မဟုတ် နာရီစားမှ လက်ခံရမည့်ငွေကို ချက်ချင်းတွက်ပေးပြီး မှတ်တမ်းများ ကိုယ့်ဖုန်းတွင်သာ သိမ်းထားသည်။"}, "딜러리의 일급계산기 · 직원용": {"en": "Daily Pay Calculator (Staff)", "zh": "工资计算器（员工版）", "vi": "Máy tính lương (Nhân viên)", "th": "เครื่องคิดค่าแรง (พนักงาน)", "id": "Kalkulator Upah (Karyawan)", "mn": "Цалингийн тооцоолуур (Ажилтан)", "bn": "বেতন ক্যালকুলেটর (কর্মী)", "ne": "ज्याला क्याल्कुलेटर (कर्मचारी)", "kk": "Жалақы калькуляторы (Қызметкер)", "ru": "Калькулятор зарплаты (Сотрудник)", "uz": "Ish haqi kalkulyatori (Xodim)", "km": "ម៉ាស៊ីនគិតប្រាក់ (បុគ្គលិក)", "tl": "Calculator ng Sahod (Empleyado)", "my": "လစာ တွက်စက် (ဝန်ထမ်း)"}, "📤 동료에게 앱 공유하기 기능 추가 (상단 📤 / 설정)": {"en": "📤 Share the app with coworkers (top 📤 / Settings)", "zh": "📤 新增与同事分享应用功能（顶部 📤 / 设置）", "vi": "📤 Thêm chia sẻ ứng dụng cho đồng nghiệp (📤 trên cùng / Cài đặt)", "th": "📤 เพิ่มการแชร์แอปให้เพื่อนร่วมงาน (📤 ด้านบน / ตั้งค่า)", "id": "📤 Fitur bagikan aplikasi ke rekan kerja (📤 atas / Pengaturan)", "mn": "📤 Аппыг хамт ажиллагчдад хуваалцах (дээд 📤 / Тохиргоо)", "bn": "📤 সহকর্মীর সাথে অ্যাপ শেয়ার (উপরে 📤 / সেটিংস)", "ne": "📤 सहकर्मीलाई एप साझा (माथि 📤 / सेटिङ)", "kk": "📤 Әріптеспен қосымша бөлісу (жоғарғы 📤 / Параметрлер)", "ru": "📤 Можно поделиться приложением с коллегой (📤 сверху / Настройки)", "uz": "📤 Hamkasbga ilova ulashish (yuqori 📤 / Sozlamalar)", "km": "📤 ចែករំលែកកម្មវិធីទៅមិត្តរួមការងារ (📤 ខាងលើ / ការកំណត់)", "tl": "📤 Ibahagi ang app sa katrabaho (📤 sa itaas / Settings)", "my": "📤 လုပ်ဖော်ကိုင်ဖက်ထံ အက်ပ် မျှဝေနိုင်ပြီ (အပေါ် 📤 / ဆက်တင်)"}, "📢 앱 실행 시 새 버전 업그레이드 공지 팝업 추가": {"en": "📢 A new-version notice pops up when the app starts", "zh": "📢 启动应用时显示新版本公告弹窗", "vi": "📢 Hiện thông báo phiên bản mới khi mở app", "th": "📢 แจ้งเวอร์ชันใหม่เมื่อเปิดแอป", "id": "📢 Popup info versi baru saat aplikasi dibuka", "mn": "📢 Апп нээгдэхэд шинэ хувилбарын мэдэгдэл гарна", "bn": "📢 অ্যাপ চালু হলে নতুন ভার্সনের নোটিশ", "ne": "📢 एप खुल्दा नयाँ संस्करणको सूचना", "kk": "📢 Қосымша ашылғанда жаңа нұсқа хабарламасы", "ru": "📢 При запуске показывается сообщение о новой версии", "uz": "📢 Ilova ochilganda yangi versiya xabari", "km": "📢 ជូនដំណឹងជំនាន់ថ្មីពេលបើកកម្មវិធី", "tl": "📢 Popup ng bagong bersyon pagbukas ng app", "my": "📢 အက်ပ်ဖွင့်ချိန် ဗားရှင်းအသစ် အသိပေးချက်"}, "🔄 새 버전이 나오면 알려 주고 바로 새로고침 (설정에서도)": {"en": "🔄 Tells you when a new version is up, with one-tap refresh (also in Settings)", "zh": "🔄 有新版本时提示，一键刷新（设置中也有）", "vi": "🔄 Báo khi có bản mới, làm mới một chạm (cả trong Cài đặt)", "th": "🔄 แจ้งเมื่อมีเวอร์ชันใหม่ พร้อมรีเฟรชในแตะเดียว (ในตั้งค่าด้วย)", "id": "🔄 Beri tahu saat ada versi baru, muat ulang sekali ketuk (juga di Pengaturan)", "mn": "🔄 Шинэ хувилбар гарвал мэдэгдэж, нэг товчоор ачаална (Тохиргоонд ч)", "bn": "🔄 নতুন ভার্সন এলে জানায়, এক ট্যাপে রিফ্রেশ (সেটিংসেও)", "ne": "🔄 नयाँ संस्करण आए सूचना, एक ट्यापमा रिफ्रेस (सेटिङमा पनि)", "kk": "🔄 Жаңа нұсқа шықса хабарлап, бір басумен жаңартады (Параметрлерде де)", "ru": "🔄 Сообщает о новой версии и обновляет одним нажатием (и в настройках)", "uz": "🔄 Yangi versiya chiqsa xabar beradi, bir bosishda yangilaydi (Sozlamalarda ham)", "km": "🔄 ជូនដំណឹងពេលមានជំនាន់ថ្មី និងផ្ទុកឡើងវិញម្តងចុច (ក្នុងការកំណត់ផងដែរ)", "tl": "🔄 Magpapaalam kapag may bagong bersyon, isang tap lang para i-refresh (sa Settings din)", "my": "🔄 ဗားရှင်းအသစ်ရှိလျှင် အသိပေး၊ တစ်ချက်နှိပ်ပြီး ပြန်တင် (ဆက်တင်တွင်လည်း)"}, "💰 기타 수당(특근·직급 등)에도 3.3%·4대보험 공제율 자동 반영": {"en": "💰 3.3% and the four insurances now apply to other allowances (holiday work, position, etc.)", "zh": "💰 其他津贴（特勤、职务等）也自动适用3.3%·四大保险扣除率", "vi": "💰 Phụ cấp khác (làm ngày lễ, chức vụ) cũng tự trừ 3,3%·4 bảo hiểm", "th": "💰 เบี้ยเลี้ยงอื่น (ทำงานวันหยุด/ตำแหน่ง) หัก 3.3%·ประกัน 4 อย่างอัตโนมัติ", "id": "💰 Tunjangan lain (lembur hari libur, jabatan) otomatis kena potongan 3,3%·4 jaminan", "mn": "💰 Бусад нэмэгдэл (амралтын өдөр, албан тушаал) -д 3.3%·4 даатгалын суутгал автоматаар", "bn": "💰 অন্যান্য ভাতা (বিশেষ কাজ/পদবি)েও ৩.৩%·৪ বীমা কর্তন স্বয়ংক্রিয়", "ne": "💰 अन्य भत्ता (विशेष काम/पद) मा पनि ३.३%·४ बीमा कटौती स्वतः", "kk": "💰 Басқа үстемеақыға (демалыс күні/лауазым) 3.3%·4 сақтандыру ұсталымы автоматты", "ru": "💰 С прочих надбавок (выходной, должность) тоже автоматически удерживаются 3,3% и четыре страховки", "uz": "💰 Boshqa ustamalarga (bayram ishi, lavozim) ham 3,3%·4 sug'urta ushlanmasi avtomatik", "km": "💰 ប្រាក់បន្ថែមផ្សេង (ថ្ងៃឈប់/មុខតំណែង) ក៏កាត់ ៣.៣%·ធានារ៉ាប់រង ៤ ដោយស្វ័យប្រវត្តិ", "tl": "💰 Awtomatik na ring ibinabawas ang 3.3%·4 insurance sa ibang allowance (espesyal, posisyon)", "my": "💰 အခြားထောက်ပံ့ကြေး (အထူးအလုပ်/ရာထူး) တွင်လည်း 3.3%·အာမခံ ၄ မျိုး အလိုအလျောက် နှုတ်သည်"}, "🌐 15개국 다국어·급여 달력·의견 보내기(소리샘) 적용": {"en": "🌐 15 languages, pay calendar and feedback (SoriSeam)", "zh": "🌐 15种语言、工资日历、意见反馈（SoriSeam）", "vi": "🌐 15 ngôn ngữ, lịch lương, góp ý (SoriSeam)", "th": "🌐 15 ภาษา ปฏิทินค่าจ้าง ส่งความคิดเห็น (SoriSeam)", "id": "🌐 15 bahasa, kalender gaji, kirim masukan (SoriSeam)", "mn": "🌐 15 хэл, цалингийн хуанли, санал илгээх (SoriSeam)", "bn": "🌐 ১৫ ভাষা, বেতন ক্যালেন্ডার, মতামত পাঠান (SoriSeam)", "ne": "🌐 १५ भाषा, तलब क्यालेन्डर, सुझाव पठाउने (SoriSeam)", "kk": "🌐 15 тіл, жалақы күнтізбесі, пікір жіберу (SoriSeam)", "ru": "🌐 15 языков, календарь зарплаты, обратная связь (SoriSeam)", "uz": "🌐 15 til, ish haqi taqvimi, fikr yuborish (SoriSeam)", "km": "🌐 ១៥ ភាសា ប្រតិទិនប្រាក់ខែ ផ្ញើមតិ (SoriSeam)", "tl": "🌐 15 wika, kalendaryo ng sahod, feedback (SoriSeam)", "my": "🌐 ဘာသာ ၁၅ မျိုး၊ လစာပြက္ခဒိန်၊ အကြံပြုချက် ပို့ (SoriSeam)"}};
   (function(){ for(var _k in D2){ if(Object.prototype.hasOwnProperty.call(D2,_k) && !D[_k]) D[_k] = D2[_k]; } })();
+  /* 2026-11-27.3 추가 문구(메인 달력 · 날짜 상세) */
+  var D3 = {"✏️ 이 날 수정":{"en":"✏️ Edit this day","zh":"✏️ 修改这一天","vi":"✏️ Sửa ngày này","th":"✏️ แก้ไขวันนี้","id":"✏️ Edit hari ini","mn":"✏️ Энэ өдрийг засах","bn":"✏️ এই দিন সম্পাদনা","ne":"✏️ यो दिन सम्पादन","kk":"✏️ Осы күнді өңдеу","ru":"✏️ Изменить этот день","uz":"✏️ Bu kunni tahrirlash","km":"✏️ កែថ្ងៃនេះ","tl":"✏️ I-edit ang araw na ito","my":"✏️ ဒီနေ့ကို ပြင်ဆင်"},"공제 방식":{"en":"Deduction","zh":"扣除方式","vi":"Cách trừ","th":"วิธีหัก","id":"Cara potong","mn":"Суутгах арга","bn":"কর্তনের ধরন","ne":"कटौती विधि","kk":"Ұстау әдісі","ru":"Способ удержания","uz":"Ushlash usuli","km":"វិធីកាត់","tl":"Paraan ng bawas","my":"နှုတ်နည်း"},"없음":{"en":"None","zh":"无","vi":"Không có","th":"ไม่มี","id":"Tidak ada","mn":"Байхгүй","bn":"নেই","ne":"छैन","kk":"Жоқ","ru":"Нет","uz":"Yo'q","km":"គ្មាន","tl":"Wala","my":"မရှိ"},"수당":{"en":"Allowance","zh":"津贴","vi":"Phụ cấp","th":"เบี้ยเลี้ยง","id":"Tunjangan","mn":"Нэмэгдэл","bn":"ভাতা","ne":"भत्ता","kk":"Үстемеақы","ru":"Надбавка","uz":"Ustama","km":"ប្រាក់បន្ថែម","tl":"Allowance","my":"ထောက်ပံ့ကြေး"},"야간":{"en":"Night","zh":"夜间","vi":"Ban đêm","th":"กลางคืน","id":"Malam","mn":"Шөнө","bn":"রাত","ne":"राति","kk":"Түн","ru":"Ночь","uz":"Tunda","km":"យប់","tl":"Gabi","my":"ည"},"📅 메인 화면에 이번 달 급여 달력 배치 (앱을 켜면 바로 보임)":{"en":"📅 The monthly pay calendar is now on the main screen (see it as soon as you open the app)","zh":"📅 主画面直接显示本月工资日历（打开应用就能看到）","vi":"📅 Lịch lương tháng này nằm ngay màn hình chính (mở app là thấy)","th":"📅 ปฏิทินค่าจ้างเดือนนี้อยู่หน้าหลักแล้ว (เปิดแอปก็เห็นทันที)","id":"📅 Kalender gaji bulan ini ada di layar utama (langsung terlihat saat aplikasi dibuka)","mn":"📅 Сарын цалингийн хуанли үндсэн дэлгэцэд байрлана (апп нээхэд шууд харагдана)","bn":"📅 মাসিক বেতন ক্যালেন্ডার এখন মূল স্ক্রিনে (অ্যাপ খুললেই দেখা যায়)","ne":"📅 यो महिनाको तलब क्यालेन्डर अब मुख्य स्क्रिनमा (एप खोल्दा नै देखिन्छ)","kk":"📅 Айлық жалақы күнтізбесі енді негізгі экранда (қосымшаны ашсаңыз бірден көрінеді)","ru":"📅 Календарь зарплаты за месяц теперь на главном экране (виден сразу при открытии приложения)","uz":"📅 Oylik ish haqi taqvimi endi asosiy ekranda (ilovani ochsangiz darhol ko'rinadi)","km":"📅 ប្រតិទិនប្រាក់ខែខែនេះនៅអេក្រង់ដើម (បើកកម្មវិធីឃើញភ្លាម)","tl":"📅 Nasa pangunahing screen na ang kalendaryo ng sahod ngayong buwan (nakikita agad pagkabukas ng app)","my":"📅 ဒီလ လစက္ခဒိန် ပင်မမျက်နှာပြင်တွင် (အက်ပ်ဖွင့်သည်နှင့် တွေ့မြင်ရ)"},"👆 달력에서 날짜를 누르면 그날 상세(출퇴근·근무·야간·수당·공제 방식·메모·실수령)가 바로 표시":{"en":"👆 Tap a date and that day's details appear right away (clock-in/out, hours, night, allowances, deduction, memo, take-home)","zh":"👆 点日期即显示当天详情（上下班·工时·夜间·津贴·扣除方式·备注·实收）","vi":"👆 Nhấn ngày là hiện ngay chi tiết ngày đó (vào/ra, giờ làm, ban đêm, phụ cấp, cách trừ, ghi chú, thực nhận)","th":"👆 แตะวันที่เพื่อดูรายละเอียดวันนั้นทันที (เข้า/ออกงาน ชั่วโมง กลางคืน เบี้ยเลี้ยง วิธีหัก บันทึก ยอดรับจริง)","id":"👆 Ketuk tanggal dan detail hari itu langsung tampil (masuk/keluar, jam kerja, malam, tunjangan, cara potong, catatan, gaji bersih)","mn":"👆 Өдрийг дарвал тухайн өдрийн дэлгэрэнгүй (ирэх/гарах, ажилласан цаг, шөнө, нэмэгдэл, суутгах арга, тэмдэглэл, цэвэр цалин) шууд харагдана","bn":"👆 তারিখ চাপলেই সেই দিনের বিস্তারিত (প্রবেশ/প্রস্থান, কর্মঘণ্টা, রাত, ভাতা, কর্তনের ধরন, মেমো, হাতে পাওয়া) সঙ্গে সঙ্গে দেখা যায়","ne":"👆 मिति थिच्नासाथ त्यो दिनको विवरण (हाजिरी, काम घण्टा, राति, भत्ता, कटौती विधि, मेमो, हातमा आउने) तुरुन्तै देखिन्छ","kk":"👆 Күнді бассаңыз сол күннің толық мәліметі (келу/кету, жұмыс уақыты, түн, үстемеақы, ұстау әдісі, ескертпе, қолға тиетін) бірден шығады","ru":"👆 Нажмите дату — сразу видно всё за этот день (приход/уход, часы, ночь, надбавки, удержание, заметка, на руки)","uz":"👆 Sanani bossangiz o'sha kun tafsiloti darhol chiqadi (kirish/chiqish, soat, tun, ustama, ushlash usuli, izoh, qo'lga tegadigan)","km":"👆 ចុចកាលបរិច្ឆេទ បង្ហាញលម្អិតថ្ងៃនោះភ្លាម (ចូល/ចេញ ម៉ោងធ្វើការ យប់ ប្រាក់បន្ថែម វិធីកាត់ កំណត់ចំណាំ ប្រាក់ទទួល)","tl":"👆 Pindutin ang petsa at agad na lalabas ang detalye ng araw na iyon (pasok/labas, oras, gabi, allowance, paraan ng bawas, memo, take-home)","my":"👆 ရက်စွဲကို နှိပ်လိုက်ပါက ထိုနေ့၏ အသေးစိတ် (အလုပ်ဝင်/ဆင်း၊ နာရီ၊ ည၊ ထောက်ပံ့ကြေး၊ နှုတ်နည်း၊ မှတ်ချက်၊ လက်ခံငွေ) ချက်ချင်းပြမည်"},"✏️ 그 자리에서 [이 날 수정]·[이 날 기록 추가]로 바로 고치기":{"en":"✏️ Fix it on the spot with [Edit this day] / [Add record for this day]","zh":"✏️ 用[修改这一天]·[添加这一天记录]就地修改","vi":"✏️ Sửa ngay tại chỗ bằng [Sửa ngày này] / [Thêm ghi chú ngày này]","th":"✏️ แก้ได้ทันทีด้วย [แก้ไขวันนี้] / [เพิ่มบันทึกวันนี้]","id":"✏️ Perbaiki langsung dengan [Edit hari ini] / [Tambah catatan hari ini]","mn":"✏️ [Энэ өдрийг засах]·[Энэ өдрийн бичлэг нэмэх] товчоор шууд засна","bn":"✏️ [এই দিন সম্পাদনা]·[এই দিনের রেকর্ড যোগ] দিয়ে সঙ্গে সঙ্গে ঠিক করুন","ne":"✏️ [यो दिन सम्पादन]·[यो दिनको रेकर्ड थप] ले तुरुन्तै सुधार्नुहोस्","kk":"✏️ [Осы күнді өңдеу]·[Осы күнге жазба қосу] арқылы бірден түзетіңіз","ru":"✏️ Исправьте сразу: [Изменить этот день] / [Добавить запись за этот день]","uz":"✏️ [Bu kunni tahrirlash]·[Bu kunga yozuv qo'shish] bilan darhol tuzating","km":"✏️ កែភ្លាមដោយ [កែថ្ងៃនេះ] / [បញ្ចូលកំណត់ត្រាថ្ងៃនេះ]","tl":"✏️ Ayusin agad gamit ang [I-edit ang araw na ito] / [Magdagdag ng record ngayong araw]","my":"✏️ [ဒီနေ့ကို ပြင်ဆင်]·[ဒီနေ့ မှတ်တမ်း ထည့်] ဖြင့် ချက်ချင်း ပြင်ပါ"}};
+  (function(){ for(var _k3 in D3){ if(Object.prototype.hasOwnProperty.call(D3,_k3) && !D[_k3]) D[_k3] = D3[_k3]; } })();
   var cur = 'ko';
   var saved = [];
   var timer = null, mo = null, applying = false;
@@ -3229,15 +3257,18 @@ var L = (function(){
         '<span class="v">' + money(s.net) + '</span><span class="ar">›</span></button>';
     $$('#payCalBar [data-calbar]').forEach(function(b){
       b.addEventListener('click', function(){
-        var card = $('#periodCard');
+        var card = (currentView === 'calc') ? document.querySelector('#view-calc .dash') : $('#periodCard');
         if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
       });
     });
   }
+  /* 고른 날짜의 기록을 빠짐없이 펼칩니다 — 출퇴근·실제 근무·야간·적용 공제 방식·수당 내역·세전/공제/실수령·입금 확인·메모 */
   function renderCalDay(){
     var host = $('#calDayList');
+    if(!host) return;
     var ds = periodState.sel;
     if(!ds){ host.innerHTML = ''; return; }
+    var s = data.settings;
     var list = data.records.filter(function(r){ return r.date === ds; });
     if(!list.length){
       host.innerHTML = '<div class="mrow"><span class="mrowTop"><b>' + dateFull(ds) + '</b>' +
@@ -3248,17 +3279,50 @@ var L = (function(){
       if(add) add.addEventListener('click', function(){ addRecordOn(ds); });
       return;
     }
+    var dedTxt = dedLabel(s);
+    if(s.dedCustom) dedTxt += ' · ' + (Math.round(dedRate(s) * 1000) / 10) + '%';
     host.innerHTML = list.map(function(r){
-      var c = calc(r, data.settings);
-      return '<button type="button" class="mrow" data-calrec="' + r.id + '">' +
+      var c = calc(r, s);
+      var allows = normalizeRecordAllows(r.allowances).filter(function(a){ return r0(a.amount) > 0; });
+      var allowLine = allows.length
+        ? '<div class="cdline"><span class="cdlbl">' + L.t('수당') + '</span> ' +
+            allows.map(function(a){ return escapeHtml(a.name) + ' ' + money(a.amount); }).join(' · ') +
+            ' <b>+' + money(c.allow) + '</b></div>'
+        : '';
+      var memoLine = r.memo
+        ? '<div class="cdline"><span class="cdlbl">' + L.t('메모') + '</span> ' + escapeHtml(r.memo) + '</div>'
+        : '';
+      return '<div class="mrow caldet" data-calrec="' + r.id + '">' +
         '<span class="mrowTop"><b>' + dateFull(ds) + '</b>' +
-          (r.paid ? '<span class="rbadge ok">' + L.t('입금 확인') + '</span>' : '') +
+          (r.paid ? '<span class="rbadge ok">' + L.t('입금 확인') + '</span>'
+                  : '<span class="rbadge wait">' + L.t('아직 못 받음') + '</span>') +
           '<span class="mrowAmt">+' + num(c.net) + '</span></span>' +
-        '<span class="mrowMid">' + (r.start || '--:--') + '~' + (r.end || '--:--') + ' · ' + fmtHM(c.worked) +
-          (c.nightMin ? ' · ' + L.t('야간 {hm}', { hm:fmtHM(c.nightMin) }) : '') + (c.allow ? ' · ' + L.t('수당 +{n}원', { n:num(c.allow) }) : '') + '</span>' +
-        '<span class="mrowBot">' + L.t('세전') + ' ' + num(c.pretax) + ' · ' + L.t('공제') + ' ' + num(c.ded) + ' · ' + L.t('실수령') + ' ' + money(c.net) + '</span></button>';
+        '<div class="cdgrid">' +
+          '<div class="cdrow"><span class="cdk">' + L.t('출퇴근') + '</span><span class="cdv">' +
+            (r.start || '--:--') + '~' + (r.end || '--:--') +
+            ' <small>(' + L.t('{n}분', { n:r.breakMin }) + ')</small>' +
+            (c.overnight ? ' <span class="badge-night">+1일</span>' : '') + '</span></div>' +
+          '<div class="cdrow"><span class="cdk">' + L.t('실근무') + '</span><span class="cdv">' + fmtHM(c.worked) + '</span></div>' +
+          (c.otMin ? '<div class="cdrow"><span class="cdk">' + L.t('연장') + '</span><span class="cdv">' + fmtHM(c.otMin) + '</span></div>' : '') +
+          '<div class="cdrow"><span class="cdk">' + L.t('야간') + '</span><span class="cdv">' +
+            (c.nightMin ? fmtHM(c.nightMin) + ' <small>+' + money(c.night) + '</small>' : L.t('없음')) + '</span></div>' +
+          '<div class="cdrow"><span class="cdk">' + L.t('공제 방식') + '</span><span class="cdv">' + dedTxt + '</span></div>' +
+        '</div>' + allowLine + memoLine +
+        '<div class="cdmoney"><span>' + L.t('세전') + ' ' + money(c.pretax) + '</span>' +
+          '<span>' + L.t('공제') + ' ' + money(c.ded) + '</span>' +
+          '<b>' + L.t('실수령') + ' ' + money(c.net) + '</b></div>' +
+        '<div class="cdbtns"><button class="btn ghost small" type="button" data-caledit="' + r.id + '">' +
+          L.t('✏️ 이 날 수정') + '</button></div>' +
+      '</div>';
     }).join('') +
       '<button class="btn ghost small" type="button" id="calDayAdd2" style="margin-top:2px">' + L.t('➕ 이 날 기록 추가') + '</button>';
+    $$('#calDayList [data-caledit]').forEach(function(b){
+      b.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var rec = findRecord(b.getAttribute('data-caledit'));
+        if(rec) startEdit(rec);
+      });
+    });
     $$('#calDayList [data-calrec]').forEach(function(b){
       b.addEventListener('click', function(){
         var rec = findRecord(b.getAttribute('data-calrec'));
@@ -3277,14 +3341,24 @@ var L = (function(){
     updatePreview();
     $('#entryTitle').scrollIntoView({ behavior:'smooth', block:'center' });
   }
+  /* 달력은 계산 화면(#calCalcHost)에 살고, 시트 탭의 [📅 달력]을 누를 때만 그 카드로 잠깐 옮겨 갑니다 (ID 중복 없이 한 발만 유지) */
+  function placeCal(){
+    var wrap = $('#calWrap');
+    if(!wrap) return;
+    var onSheet = (currentView === 'sheet' && sheetMode === 'cal');
+    var target = onSheet ? $('#calSheetHost') : $('#calCalcHost');
+    if(target && wrap.parentNode !== target) target.appendChild(wrap);
+    wrap.hidden = false;
+  }
   function renderSheetMode(){
     $('#sheetTableWrap').hidden = sheetMode !== 'list';
-    $('#calWrap').hidden = sheetMode !== 'cal';
     $$('#sheetModeToggle [data-sheetmode]').forEach(function(b){
       b.classList.toggle('on', b.getAttribute('data-sheetmode') === sheetMode);
     });
+    placeCal();
+    renderPayCalendar();
+    renderCalDay();
     syncMonthBar();
-    if(sheetMode === 'cal'){ renderPayCalendar(); renderCalDay(); }
   }
   /* 달력 보기에서는 달력 안의 < 11월 >로 달을 넘기므로 위의 월 바를 접습니다 */
   function syncMonthBar(){
@@ -3959,7 +4033,7 @@ var L = (function(){
     $$('.tab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-view') === name); });
     $('#monthBar').hidden = !(name === 'calc' || name === 'sheet');
     syncMonthBar();
-    if(name === 'sheet' || name === 'calc'){ renderDash(); renderSheet(); }
+    if(name === 'sheet' || name === 'calc'){ renderDash(); renderSheet(); renderSheetMode(); }
     if(name === 'settings') fillSettingsForm();
     if(name === 'received') renderReceived();
     window.scrollTo(0,0);
@@ -4675,11 +4749,16 @@ var L = (function(){
     });
   }
 
-  /* ================= 공유 · 새 소식 · 새로고침 (2026-11-27.2) ================= */
-  var APP_VERSION = '2026-11-27.2';
+  /* ================= 공유 · 새 소식 · 새로고침 (2026-11-27.3) ================= */
+  var APP_VERSION = '2026-11-27.3';
   var SEEN_KEY = 'dailypay_seen_ver';
   var SHARE_URL = 'https://lkj7670.github.io/Dealer-studio/daily-pay.html';
   var UPDATES = [
+    { ver:'2026-11-27.3', date:'2026-11-27', items:[
+      '📅 메인 화면에 이번 달 급여 달력 배치 (앱을 켜면 바로 보임)',
+      '👆 달력에서 날짜를 누르면 그날 상세(출퇴근·근무·야간·수당·공제 방식·메모·실수령)가 바로 표시',
+      '✏️ 그 자리에서 [이 날 수정]·[이 날 기록 추가]로 바로 고치기'
+    ]},
     { ver:'2026-11-27.2', date:'2026-11-27', items:[
       '📤 동료에게 앱 공유하기 기능 추가 (상단 📤 / 설정)',
       '📢 앱 실행 시 새 버전 업그레이드 공지 팝업 추가',
