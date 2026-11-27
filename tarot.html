@@ -760,7 +760,9 @@ function numberLine(picks, P){
     chips.push('숫자 ' + nums[0].card.num);
     t = '숫자 카드는 ' + nums[0].card.title + ' 하나뿐입니다.';
   } else if (picks.length > 1){
-    t = '숫자 카드가 없습니다.';
+    t = '숫자 카드가 없습니다.' + (majors
+      ? ' 세 장 모두 메이저라 단계로 따질 숫자가 없어요 — 대신 0(바보)에서 21(세계)로 가는 큰 흐름 위에 서 있다고 보세요. 숫자보다 순서가 중요한 국면입니다.'
+      : ' 숫자 없이 인물과 큰 국면만 있는 조합입니다.');
   }
 
   if (courts.length){
