@@ -1575,7 +1575,7 @@ function entryDone(){
     }
     setPin(u.id,entry.buf);
     entry.newPin=null; entry.buf='';
-    doLogin(u.id,'사장 PIN을 정하고 들어왔습니다');
+    doLogin(u.id,'사장 PIN을 정했습니다');
     return;
   }
   if(lockOf(u.id)){entry.buf='';renderEntry();return;}
@@ -1614,7 +1614,7 @@ function doLogin(id,msg){
   entryHide(); closeSheet();
   view='home';
   render();
-  toast(msg||(rname(rankKeyOf(me()))+'으로 들어왔습니다'));
+  toast(msg||(rname(rankKeyOf(me()))+'님으로 들어왔습니다'));
 }
 function logout(){
   saveSession(null);
