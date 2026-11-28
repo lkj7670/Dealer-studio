@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>verify 390x844</title>
+<style>
+  html,body{margin:0;background:#334155;font-family:system-ui,sans-serif}
+  #wrap{position:relative;width:390px;height:844px;margin:0 auto;background:#fff;overflow:hidden}
+  iframe{width:390px;height:844px;border:0;display:block}
+  #log{color:#fff;font:12px/1.5 monospace;padding:8px;white-space:pre-wrap;max-width:900px;margin:0 auto}
+</style>
+</head>
+<body>
+<div id="wrap"><iframe id="f" title="app"></iframe></div>
+<pre id="log">loading…</pre>
+<script>
+(function(){
+  var errs = [];
+  window.__errs = errs;
+  var f = document.getElementById('f');
+  var w = f.contentWindow, d = f.contentDocument;
+  function rec(kind){ return function(e){
+    var m = (e && (e.message || (e.reason && (e.reason.message || e.reason))) || e) + '';
+    errs.push(kind + ': ' + m);
+    document.getElementById('log').textContent = errs.join('\n');
+  }; }
+  w.addEventListener('error', rec('error'), true);
+  w.addEventListener('unhandledrejection', rec('rejection'));
+  var origErr = w.console && w.console.error;
+  if(w.console){ w.console.error = function(){ errs.push('console.error: ' + Array.prototype.join.call(arguments, ' ')); document.getElementById('log').textContent = errs.join('\n'); if(origErr) try{ origErr.apply(w.console, arguments); }catch(e){} }; }
+  fetch('daily-pay.html').then(function(r){ return r.text(); }).then(function(t){
+    d.open(); d.write(t); d.close();
+    document.getElementById('log').textContent = errs.length ? errs.join('\n') : 'no errors yet';
+  }).catch(function(e){ document.getElementById('log').textContent = 'fetch failed: ' + e; });
+})();
+</script>
+</body>
+</html>
