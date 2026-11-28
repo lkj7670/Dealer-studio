@@ -6,6 +6,8 @@
 <meta name="color-scheme" content="light">
 <title>딜러리의 입금대장</title>
 <meta name="description" content="여러 회사의 일당 직원 급여 입금을 한 곳에서 관리하는 관리자용 입금대장">
+<meta name="copyright" content="© 2026 YL 솔루션 (주식회사 와이엘솔루션). 무단 복제·배포·재판매 금지.">
+<meta name="yls-canary" content="YLS-CANARY-AD-7b3e08">
 <meta name="theme-color" content="#0f766e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -532,7 +534,7 @@
   }
 </style>
 </head>
-<body>
+<body data-yls-canary="YLS-CANARY-AD-7b3e08">
 <style>
   /* ======= 큰 글씨 · 큰 버튼 (사용성 우선) ======= */
   body{font-size:17px}
@@ -988,7 +990,19 @@
     .cobar{top:56px}
     #verBanner{margin:8px 8px 0}
   }
+  /* ---------- 유출 추적 표식 (워터마크 · 저작권) ---------- */
+  #wm{position:fixed; inset:0; z-index:5; pointer-events:none; opacity:.075;
+    background-repeat:repeat; background-position:0 0; -webkit-user-select:none; user-select:none}
+  .yls-cr{font-size:11px; color:var(--muted); text-align:center; line-height:1.55; padding:10px 8px 12px}
+  .yls-code{font-variant-numeric:tabular-nums; letter-spacing:.6px; font-weight:800; color:var(--brand)}
+  @media print{
+    #wm{-webkit-print-color-adjust:exact; print-color-adjust:exact; opacity:.10}
+    .yls-cr{color:#3f4a5a}
+  }
 </style>
+
+<!-- 유출 추적 워터마크(pointer-events:none · 화면/인쇄 공통) -->
+<div id="wm" aria-hidden="true"></div>
 
 <!-- ================= 잠금 ================= -->
 <div id="lockScreen">
@@ -1652,7 +1666,23 @@
         <button class="bigbtn" id="btnWhatsNew" type="button"><span class="bi">📢</span><span class="bt">새 소식 · 업데이트 내역<i id="wnNow">이번에 바뀐 점 다시 보기</i></span><span class="bc">›</span></button>
         <button class="bigbtn" id="btnForceReload" type="button"><span class="bi">🔄</span><span class="bt">최신 버전으로 새로고침<i>바뀐 내용이 안 보일 때</i></span><span class="bc">›</span></button>
       </div>
+      <div class="card">
+        <div class="steplabel">🔐 표식 · 발급 코드</div>
+        <p class="exhint">화면에 사업장 이름과 발급 코드를 옅게 표시합니다. 캡처가 새어 나가면 어느 배포본인지 알 수 있어요.</p>
+        <label class="f big"><span>사업장 이름 (워터마크에 표시)</span><input id="sSiteName" maxlength="20" autocomplete="off" placeholder="예: YL 솔루션"></label>
+        <div class="f" style="margin-top:10px"><span>발급 코드</span>
+          <div class="row" style="flex-wrap:nowrap">
+            <input id="sIssueCode" class="yls-code" readonly aria-label="발급 코드" style="flex:1; min-width:0">
+            <button class="btn small" id="btnCopyIssue" type="button">코드 복사</button>
+          </div>
+        </div>
+        <p class="exhint">이 코드로 어느 배포본인지 확인할 수 있습니다.</p>
+        <label class="chkall" style="margin-top:12px; display:flex"><input type="checkbox" id="sWmOn" checked>
+          <span>워터마크 표시 (사업장 이름 · 발급 코드 · 날짜)<br><span class="ex">기본은 켜짐이에요. 끄면 화면에 표시되지 않아요.</span></span>
+        </label>
+      </div>
       <p class="exhint" id="setVerFoot" style="text-align:center">딜러리의 입금대장 v1.0 · 기록은 이 기기 안에만 저장됩니다.</p>
+      <p class="yls-cr">© 2026 YL 솔루션 (주식회사 와이엘솔루션). 무단 복제·배포·재판매 금지.</p>
     </section>
 
     <section class="screen" id="scr-set-co">
@@ -7184,6 +7214,105 @@ var GUIDE_HTML = '' +
 '</div>';
 
 init();
+</script>
+<script>
+/* ================= YL 솔루션 — 유출 추적 표식 (워터마크 · 발급 코드 · 저작권) =================
+   서버 없이 localStorage만 씁니다. 발급 코드는 처음 한 번 만들어 이 기기에 고정 저장합니다. */
+(function(){
+  'use strict';
+  var K_CODE='ylsIssue.v1', K_SITE='ylsSite.v1', K_WM='ylsWm.v1';
+  var CANARY='YLS-CANARY-AD-7b3e08', SITE_DEFAULT='YL 솔루션';
+  function rls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function wls(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+  function p2(n){ return (n<10?'0':'')+n; }
+  function mmdd(){ var d=new Date(); return p2(d.getMonth()+1)+p2(d.getDate()); }
+  function yymmdd(){ var d=new Date(); return String(d.getFullYear()).slice(2)+'.'+p2(d.getMonth()+1)+'.'+p2(d.getDate()); }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'})[c]; }); }
+  function issueCode(){
+    var c=rls(K_CODE);
+    if(c && /^YLS-[A-Z0-9]{4}-\d{4}$/.test(c)) return c;
+    var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r='';
+    for(var i=0;i<4;i++){ r+=A.charAt(Math.floor(Math.random()*A.length)); }
+    c='YLS-'+r+'-'+mmdd(); wls(K_CODE,c); return c;
+  }
+  function companyName(){
+    try{
+      var d=JSON.parse(rls('dealerLedger.v1.data')||'null');
+      if(!d || !d.companies || !d.companies.length) return '';
+      var u=JSON.parse(rls('dealerLedger.v1.ui')||'null')||{}, c=null;
+      for(var i=0;i<d.companies.length;i++){ if(d.companies[i].id===u.cid) c=d.companies[i]; }
+      if(!c) c=d.companies[0];
+      return String((c && c.name) || '').replace(/\s+/g,' ').trim();
+    }catch(e){ return ''; }
+  }
+  function siteName(){
+    var v=(rls(K_SITE)||'').replace(/\s+/g,' ').trim();
+    return v || companyName() || SITE_DEFAULT;
+  }
+  function wmOn(){ return rls(K_WM) !== '0'; }
+  function render(){
+    var el=document.getElementById('wm'); if(!el) return;
+    if(!wmOn()){ el.style.display='none'; return; }
+    el.style.display='block';
+    var t=esc(siteName())+' · '+issueCode()+' · '+yymmdd();
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="360" height="180">'+
+      '<text x="10" y="100" font-family="-apple-system,Malgun Gothic,Apple SD Gothic Neo,sans-serif" font-size="12.5" fill="#1d4ed8" transform="rotate(-21 180 90)">'+t+'</text></svg>';
+    el.style.backgroundImage='url("data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'")';
+    el.style.backgroundSize='360px 180px';
+  }
+  function warn(){
+    try{
+      if(window.__ylsWarn) return; window.__ylsWarn=1;
+      console.log('%c\u24d2 2026 YL 솔루션 (주식회사 와이엘솔루션)','font-size:16px;font-weight:bold;color:#b91c1c');
+      console.log('이 앱의 코드는 YL 솔루션의 저작물입니다. 무단 복제·배포·재판매는 저작권법에 따라 처벌받을 수 있습니다.');
+    }catch(e){}
+  }
+  function copy(text, btn, field){
+    function done(ok){ if(!btn) return; var old=btn.textContent;
+      btn.textContent = ok ? '복사했어요' : '직접 복사';
+      if(!ok && field){ try{ field.focus(); field.select(); }catch(e){} }
+      setTimeout(function(){ btn.textContent=old; }, 1600); }
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); });
+        return;
+      }
+    }catch(e){}
+    try{
+      var ta=document.createElement('textarea'); ta.value=text;
+      ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      var ok=document.execCommand('copy'); document.body.removeChild(ta); done(ok);
+    }catch(e){ done(false); }
+  }
+  function bind(){
+    var inp=document.getElementById('sSiteName');
+    var codeEl=document.getElementById('sIssueCode');
+    var btn=document.getElementById('btnCopyIssue');
+    var sw=document.getElementById('sWmOn');
+    if(codeEl) codeEl.value=issueCode();
+    if(inp){
+      inp.value=rls(K_SITE)||'';
+      inp.addEventListener('input', function(){ wls(K_SITE, inp.value.trim()); render(); });
+      inp.addEventListener('change', function(){ wls(K_SITE, inp.value.trim()); render(); });
+    }
+    if(sw){
+      sw.checked=wmOn();
+      sw.addEventListener('change', function(){ wls(K_WM, sw.checked?'1':'0'); render(); });
+    }
+    if(btn) btn.addEventListener('click', function(){ copy(issueCode(), btn, codeEl); });
+  }
+  function start(){
+    try{ document.documentElement.setAttribute('data-yls-canary', CANARY); }catch(e){}
+    render(); warn(); bind();
+    setTimeout(render, 700);
+    /* 회사 이름·화면 이동이 바뀌면 워터마크 글자를 다시 맞춥니다 */
+    document.addEventListener('change', function(){ setTimeout(render, 120); });
+    document.addEventListener('click', function(){ setTimeout(render, 260); });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
 </script>
 </body>
 </html>
