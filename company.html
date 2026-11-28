@@ -869,7 +869,9 @@ function buildTax(){
 const TAX_POPULAR=[17,25,30,47,21,7,69,52];
 function filterTax(){
   if(!TAX)return;
-  const q=(taxQuery||'').trim().toLowerCase().replace(/\s+/g,'');
+  const raw=(taxQuery||'').trim();
+  const toks=raw.toLowerCase().split(/\s+/).filter(Boolean).map(t=>t.replace(/\s+/g,''));
+  const q=toks.join('');
   const nodes=$$('#taxList details.qa');
   const byNo={}; nodes.forEach(d=>byNo[d.dataset.no]=d);
   const scored=[];
@@ -879,12 +881,16 @@ function filterTax(){
     const qq=(it.q||'').toLowerCase().replace(/\s+/g,'');
     const ss=(it.short||'').toLowerCase().replace(/\s+/g,'');
     const mm=(it.more||'').toLowerCase().replace(/\s+/g,'');
+    const cc=(it.cat||'').toLowerCase().replace(/\s+/g,'');
     let sc=0;
-    if(q){
-      if(qq.includes(q))sc+=100;
-      if(ss.includes(q))sc+=30;
-      if(mm.includes(q))sc+=8;
-      if(!sc)return;
+    if(toks.length){
+      for(const t of toks){
+        if(qq.includes(t))sc+=100;
+        else if(ss.includes(t))sc+=30;
+        else if(cc.includes(t))sc+=20;
+        else if(mm.includes(t))sc+=8;
+        else return;
+      }
     } else if(taxCat==='전체'){
       sc=TAX_POPULAR.indexOf(it.no)>=0?(100-TAX_POPULAR.indexOf(it.no)):(taxShowAll?1:0);
       if(!sc)return;
@@ -903,7 +909,7 @@ function filterTax(){
   const cnt=$('#taxCount');
   if(cnt)cnt.textContent=q?(total+'개 결과'+(total>limit?' · '+limit+'개 표시':'')):(taxCat==='전체'?'전체 '+TAX.items.length+'문항 중 '+Math.min(limit,total)+'개':taxCat+' '+total+'문항'+(total>limit?' 중 '+limit+'개':''));
   const head=$('#taxHead');
-  if(head)head.textContent=q?'"'+(taxQuery||'').trim()+'" 검색 결과':(taxCat==='전체'?'자주 찾는 질문':taxCat);
+  if(head)head.textContent=q?'"'+raw+'" 검색 결과':(taxCat==='전체'?'자주 찾는 질문':taxCat);
   const btn=$('#taxAllBtn');
   if(btn)btn.textContent=taxShowAll?'접기':(q?'검색 결과 '+total+'개 모두 보기':(taxCat==='전체'?'전체 문항 보기':taxCat+' '+total+'문항 모두 보기'));
 }
