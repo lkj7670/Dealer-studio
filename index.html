@@ -30,6 +30,9 @@
     <button id="manualBtn" class="btn ghost small" type="button">
       <span aria-hidden="true">📘</span> 업무 매뉴얼
     </button>
+    <button id="refreshBtn" class="btn ghost small" type="button" aria-label="새로고침" title="새로고침">
+      <span aria-hidden="true">↻</span>
+    </button>
   </header>
 
   <div class="syncbar">
@@ -368,5 +371,17 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="app.js"></script>
+<script>
+(function () {
+  var b = document.getElementById('refreshBtn');
+  if (!b) return;
+  b.addEventListener('click', function () {
+    b.disabled = true;
+    var u = new URL(location.href);
+    u.searchParams.set('r', String(Date.now()));
+    location.replace(u.toString());
+  });
+})();
+</script>
 </body>
 </html>
