@@ -1328,6 +1328,7 @@ function renderTeam(){
         '</div>':'')+
        '</div>';
   });
+  if(!owner)h+='<div class="note" style="margin-top:9px">직급·개인 권한·PIN은 사장만 바꿉니다. 여기서는 아래 직급 명단과 권한을 보기만 합니다.</div>';
   h+='</div>';
   if(owner&&boss){
     h+='<div class="card"><div class="card-h"><div class="card-t"><span class="em">➕</span> 직원 추가</div><div class="card-sub">새로 들어온 사람</div></div>'+
