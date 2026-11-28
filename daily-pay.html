@@ -2511,6 +2511,12 @@ var L = (function(){
     s = s || data.settings;
     return dedModeOf(s) === 'daily';
   }
+  /* 같은 날짜에 같은 출·퇴근 시간의 기록인지 */
+  function sameShiftOf(a, b){
+    if(!a || !b) return false;
+    if((a.start||'') !== (b.start||'') || (a.end||'') !== (b.end||'')) return false;
+    return Math.max(0, Number(a.breakMin)||0) === Math.max(0, Number(b.breakMin)||0);
+  }
   /* 한 기록의 일용소득세 — 같은 날 기록이 여러 건이면 그날 일당을 합쳐 계산하고,
      기록마다 일당 비율만큼 나누어 가집니다(하루 단위 과세) */
   function dailyTaxShareOf(r, pretax, s){
@@ -2524,8 +2530,9 @@ var L = (function(){
     for(var i=0;i<data.records.length;i++){
       var o = data.records[i];
       if(!o || o.id === r.id || o.date !== day) continue;
-      /* 수정 중인 기록을 미리 볼 때는 저장된 그 기록을 빼고 셉니다 */
+      /* 수정 중인 기록, 또는 방금 저장한 것과 똑같은 근무를 미리 볼 때는 그 기록을 빼고 셉니다 */
       if(!r.id && editingId && o.id === editingId) continue;
+      if(!r.id && sameShiftOf(o, r)) continue;
       var op = Math.max(0, r0(calcParts(o, s).pretax));
       if(!op) continue;
       list.push({ id:o.id, pre:op });
