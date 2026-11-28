@@ -531,8 +531,8 @@ function renderShop(){
       '</div></div>';
 
   h+='<div class="grid2">'+
-      statCard('오늘 '+P.att+' · 직원 '+all.length+'명', st.length+'<small>/'+all.length+'명</small>',
-        st.length===all.length?'전원 '+P.att+'했습니다':(all.length-st.length)+'명 쉬는 중')+
+      statCard('오늘 '+P.att, st.length+'<small>/'+all.length+'명</small>',
+        st.length===all.length?'직원 '+all.length+'명 전원 '+P.att:'직원 '+all.length+'명 중 '+st.length+'명 '+P.att)+
       statCard('오늘 할 일', S.todos.filter(x=>x.done).length+'<small>/'+S.todos.length+'개</small>',
         S.todos.filter(x=>!x.done).length?'남은 일 '+S.todos.filter(x=>!x.done).length+'개':'오늘 일은 다 끝났어요')+
      '</div>';
@@ -642,7 +642,7 @@ function renderHome(){
     statCard('업무일지 제출', sub+'<small>/'+pr.length+'명</small>',
       rate+'% 제출'+(miss.length?' · <span style="color:var(--bad)">미보고 '+miss.map(u=>esc(u.name)).join(', ')+'</span>':''),
       '<div class="bar '+(rate>=100?'ok':rate>=60?'':'warn')+'"><i style="width:'+rate+'%"></i></div>')+
-    statCard('이번 달 예상 '+P.pay, '<span style="font-size:18px">'+manwon(payrollTotal())+'원</span>', '직원 '+payroll().length+'명 · '+esc(S.company.payday)+'일 지급', '').replace('class="stat"','class="stat wide"')+
+    statCard('이번 달 예상 '+P.pay, '<span style="font-size:18px">'+manwon(payrollTotal())+'원</span>', '직원 '+payroll().length+'명 · 매월 '+esc(S.company.payday)+'일 지급', '').replace('class="stat"','class="stat wide"')+
   '</div>';
   h+=presetFocus();
   /* 오늘 일지 요약 */
@@ -911,7 +911,10 @@ function filterTax(){
   const head=$('#taxHead');
   if(head)head.textContent=q?'"'+raw+'" 검색 결과':(taxCat==='전체'?'자주 찾는 질문':taxCat);
   const btn=$('#taxAllBtn');
-  if(btn)btn.textContent=taxShowAll?'접기':(q?'검색 결과 '+total+'개 모두 보기':(taxCat==='전체'?'전체 문항 보기':taxCat+' '+total+'문항 모두 보기'));
+  if(btn){
+    btn.textContent=taxShowAll?'접기':(q?'검색 결과 '+total+'개 모두 보기':(taxCat==='전체'?'전체 문항 보기':taxCat+' '+total+'문항 모두 보기'));
+    btn.classList.toggle('hidden',!taxShowAll&&total<=limit);
+  }
 }
 
 /* ---------- 근태 ---------- */
@@ -942,7 +945,7 @@ function renderAtt(){
 function renderPay(){
   const rows=payroll(), total=payrollTotal();
   let h='<div class="pane-h"><h1>급여</h1><span>이번 달 예상 · '+P.pay+' 기준</span></div>';
-  h+='<div class="card"><div class="card-h"><div class="card-t"><span class="em">💰</span> 이번 달 예상 합계</div><div class="card-sub">12월 10일 지급</div></div>'+
+  h+='<div class="card"><div class="card-h"><div class="card-t"><span class="em">💰</span> 이번 달 예상 합계</div><div class="card-sub">매월 '+esc(S.company.payday)+'일 지급</div></div>'+
      '<div class="num" style="font-size:26px;font-weight:800;letter-spacing:-1px">'+won(total)+'</div>'+
      '<div class="small muted" style="margin-top:2px">직원 '+rows.length+'명 · 4대보험·공제 전 금액(예상)</div></div>';
   h+='<div class="card"><div class="card-h"><div class="card-t"><span class="em">📄</span> 사람별 예상</div><div class="card-sub">사장은 전체 열람</div></div>';
